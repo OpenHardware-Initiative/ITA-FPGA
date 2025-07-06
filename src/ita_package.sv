@@ -37,6 +37,16 @@ package ita_package;
   // Feedforward
   typedef enum bit [1:0] {Attention=0, Feedforward=1, Linear=2, SingleAttention=3} layer_e;
   typedef enum bit [1:0] {Identity=0, Gelu=1, Relu=2} activation_e;
+
+  function string activation_e_to_string(input activation_e act);
+    case (act)
+      Identity: return "Identity";
+      Gelu:     return "Gelu";
+      Relu:     return "Relu";
+      default:  return "unknown";
+    endcase
+  endfunction
+
   typedef logic signed [GELU_CONSTANTS_WIDTH-1:0] gelu_const_t;
   typedef logic signed [GELU_OUT_WIDTH-1:0] gelu_out_t;
 

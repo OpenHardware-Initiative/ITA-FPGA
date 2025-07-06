@@ -5,7 +5,7 @@
 .PHONY: lib build
 all: lib build
 
-QUESTA_SEPP ?= questa-2023.4
+
 buildpath   ?= build
 VOPT        ?= $(QUESTA_SEPP) vopt
 VSIM        ?= $(QUESTA_SEPP) vsim

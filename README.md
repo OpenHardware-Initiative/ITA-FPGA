@@ -14,6 +14,18 @@ The repository is structured as follows:
 - `src` contains the RTL code.
     * `tb` contains the testbenches for the ITA modules.
 
+## Vivado setup
+
+1. Source your Vivado License (in our case we used 2023.1)
+2. Clone ITA
+3. Get all the files and checkouts using Bender.
+4. Get the python test files using the PyITA as intended by the original authors.
+5. Run the following command to setup the project:
+```bash
+vivado -mode batch -source new_sourcing_script.tcl
+```
+6. Run simulation.
+
 ## RTL Simulation
 We use [Bender](https://github.com/pulp-platform/bender) to generate our simulation scripts. Make sure you have Bender installed, or install it in the ITA repository with:
 ```bash

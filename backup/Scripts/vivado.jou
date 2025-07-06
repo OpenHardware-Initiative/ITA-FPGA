@@ -1,0 +1,28 @@
+#-----------------------------------------------------------
+# Vivado v2023.1_AR000036820 (64-bit)
+# SW Build 3865809 on Sun May  7 15:04:56 MDT 2023
+# IP Build 3864474 on Sun May  7 20:36:21 MDT 2023
+# SharedData Build 3865790 on Sun May 07 13:33:03 MDT 2023
+# Start of session at: Sun Jul  6 17:01:34 2025
+# Process ID: 1913741
+# Current directory: /Projects/Agus/ITA
+# Command line: vivado
+# Log file: /Projects/Agus/ITA/vivado.log
+# Journal file: /Projects/Agus/ITA/vivado.jou
+# Running On: gpu1, OS: Linux, CPU Frequency: 3519.696 MHz, CPU Physical cores: 4, Host memory: 16373 MB
+#-----------------------------------------------------------
+start_gui
+open_project /Projects/Agus/ITA/ITA-kria-vivado/ITA-kria-vivado.xpr
+update_compile_order -fileset sources_1
+update_compile_order -fileset sim_1
+launch_simulation
+source ita_hwpe_tb.tcl
+close_sim
+launch_simulation
+launch_simulation
+source ita_hwpe_tb.tcl
+close_sim
+launch_simulation
+source ita_hwpe_tb.tcl
+relaunch_sim
+run all

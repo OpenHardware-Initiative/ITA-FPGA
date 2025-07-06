@@ -9,8 +9,8 @@
  * Dummy memory transaction.
  */
 
-timeunit 1ps;
-timeprecision 1ps;
+
+`timescale 1ns / 1ps
 
 module tb_dummy_memory
 #(

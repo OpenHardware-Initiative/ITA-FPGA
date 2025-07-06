@@ -2,17 +2,20 @@
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
+`timescale 1ns / 1ps
 `include "hci_helpers.svh"
 
 module ita_hwpe_tb;
-
-  import ita_hwpe_package::*;
+  
   import ita_package::*;
+  import ita_hwpe_package::*;
+  
   import hci_package::*;
   import hwpe_stream_package::*;
 
-  timeunit 10ps;
-  timeprecision 1ps;
+  //timeunit 10ps;
+  //timeprecision 1ps;
+  
 
   localparam time CLK_PERIOD          = 2000ps;
   localparam time APPL_DELAY          = 400ps;
@@ -60,11 +63,11 @@ module ita_hwpe_tb;
 
   integer BASE_PTR[23];
 
-  logic [N_STATES][31:0] BASE_PTR_INPUT;
-  logic [N_STATES][31:0] BASE_PTR_WEIGHT0;
-  logic [N_STATES][31:0] BASE_PTR_WEIGHT1;
-  logic [N_STATES][31:0] BASE_PTR_BIAS;
-  logic [N_STATES][31:0] BASE_PTR_OUTPUT;
+  logic [N_STATES-1:0][31:0] BASE_PTR_INPUT;
+  logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT0;
+  logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT1;
+  logic [N_STATES-1:0][31:0] BASE_PTR_BIAS;
+  logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
 
   // HWPE Parameters
   localparam unsigned ITA_REG_OFFSET  = 32'h20;
@@ -122,7 +125,7 @@ module ita_hwpe_tb;
     $timeformat(-9, 1, " ns", 11);
 
     simdir = {
-      "../../simvectors/data_S",
+      "../../../../../simvectors/data_S",
       $sformatf("%0d", SEQUENCE_LEN),
       "_E",
       $sformatf("%0d", EMBEDDING_SIZE),
@@ -133,7 +136,7 @@ module ita_hwpe_tb;
       "_H1_B",
       $sformatf("%0d", `ifdef BIAS `BIAS `else 0 `endif),
       "_",
-      $sformatf( "%s", ACTIVATION)
+      activation_e_to_string(ACTIVATION)
     };
     // Number of tiles in the sequence dimension
     N_TILES_SEQUENCE_DIM = SEQUENCE_LEN / M_TILE_LEN;
@@ -759,9 +762,9 @@ endfunction
   task automatic ita_reg_eps_mult_val_compute(
     output logic [5:0][31:0] reg_val
   );
-    logic [N_REQUANT_CONSTS][EMS-1:0] eps_mult;
-    logic [N_REQUANT_CONSTS][EMS-1:0] right_shift;
-    logic [N_REQUANT_CONSTS][ WI-1:0] add;
+    logic [N_REQUANT_CONSTS-1:0][EMS-1:0] eps_mult;
+    logic [N_REQUANT_CONSTS-1:0][EMS-1:0] right_shift;
+    logic [N_REQUANT_CONSTS-1:0][ WI-1:0] add;
     read_ITA_rqs(eps_mult, right_shift, add);
     reg_val[0] = eps_mult[0] | eps_mult[1] << 8 | eps_mult[2] << 16 | eps_mult[3] << 24;
     reg_val[1] = eps_mult[4] | eps_mult[5] << 8 | eps_mult[6] << 16 | eps_mult[7] << 24;
@@ -794,9 +797,9 @@ endfunction
   endtask
 
   task read_ITA_rqs(
-    output logic [N_REQUANT_CONSTS][EMS-1:0]  eps_mult,
-    output logic [N_REQUANT_CONSTS][EMS-1:0]  right_shift,
-    output logic [N_REQUANT_CONSTS][ WI-1:0]  add
+    output logic [N_REQUANT_CONSTS-1:0][EMS-1:0]  eps_mult,
+    output logic [N_REQUANT_CONSTS-1:0][EMS-1:0]  right_shift,
+    output logic [N_REQUANT_CONSTS-1:0][ WI-1:0]  add
   );
     integer stim_fd_mul, stim_fd_shift, stim_fd_add;
     integer ret_code;
