@@ -22,9 +22,14 @@ The repository is structured as follows:
 4. Get the python test files using the PyITA as intended by the original authors.
 5. Run the following command to setup the project:
 ```bash
-vivado -mode batch -source new_sourcing_script.tcl
+vivado -mode batch -source setup_vivado.tcl
 ```
 6. Run simulation.
+7. DEBUGGING:
+```bash
+set_param synth.elaboration.rodinMoreOptions {rt::set_parameter dissolveMemorySizeLimit 106496}
+```
+8. Run Synthesis
 
 ## RTL Simulation
 We use [Bender](https://github.com/pulp-platform/bender) to generate our simulation scripts. Make sure you have Bender installed, or install it in the ITA repository with:

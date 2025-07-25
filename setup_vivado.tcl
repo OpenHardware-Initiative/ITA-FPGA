@@ -10,7 +10,7 @@
 set proj_name "ITA-kria-vivado"
 #set part_name "xck26-sfvc784-2LV-c"
 set board_part "xilinx.com:kr260_som:part0:1.1"
-set top_rtl   "ita_hwpe_top"
+set top_rtl   "ita_hwpe_wrap"
 set top_tb    "ita_hwpe_tb"
 set ROOT [file dirname [info script]]
 
@@ -331,5 +331,6 @@ update_compile_order -fileset sim_1
 set_property top $top_tb [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 set_property source_mgmt_mode All [current_project]
+set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE_OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
 
 puts "INFO: Project setup complete."
