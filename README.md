@@ -22,7 +22,7 @@ The repository is structured as follows:
 4. Get the python test files using the PyITA as intended by the original authors.
 5. Run the following command to setup the project:
 ```bash
-vivado -mode batch -source new_sourcing_script.tcl
+vivado -mode batch -source setup_vivado.tcl
 ```
 6. Run simulation.
 
@@ -92,7 +92,7 @@ $> python testGenerator.py -h
 
 To generate a ONNX graph and test vectors for RTL simulations for a MHA operation run:
 ```sh
-$> python testGenerator.py -H 1 -S 64 -E 128 -P 192
+$> python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity
 ```
 
 To visualize the ONNX graph after generation, run:
