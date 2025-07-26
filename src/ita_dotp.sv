@@ -1,12 +1,3 @@
-// Copyright 2020 ETH Zurich and University of Bologna.
-// Solderpad Hardware License, Version 0.51, see LICENSE for details.
-// SPDX-License-Identifier: SHL-0.51
-
-
-/**
-  DotP submodule.
-  Calculates the dot product of two 8-bit vector of size M.
-  */
 
 module ita_dotp #(
     parameter integer M  = 64,

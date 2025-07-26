@@ -107,7 +107,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_demux_static.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/tcdm/hwpe_stream_tcdm_reorder_static.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_buffer.sv" \
-    "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/fifo/hwpe_stream_fifo_scm.sv" \
+    "$ROOT/no_latches/hwpe_stream_fifo_scm.sv" \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/core/hci_core_mux_ooo.sv" \
     "$ROOT/no_latches/hwpe_stream_fifo.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_assign.sv" \
@@ -172,7 +172,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/addr_decode_dync.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/passthrough_stream_fifo.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_filter.sv" \
-    "$ROOT/.bender/git/checkouts/hwpe-ctrl-b4d268c729c1adb1/rtl/hwpe_ctrl_regfile_latch_test_wrap.sv" \
+    "$ROOT/no_latches/hwpe_ctrl_regfile_latch_test_wrap.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/cdc_2phase_clearable.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_mux.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/deprecated/pulp_buffer.sv" \
@@ -180,7 +180,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/rstgen_bypass.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/edge_propagator_tx.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/rr_arb_tree.sv" \
-    "$ROOT/.bender/git/checkouts/hwpe-ctrl-b4d268c729c1adb1/rtl/hwpe_ctrl_regfile_ff.sv" \
+    "$ROOT/no_latches/hwpe_ctrl_regfile_ff.sv \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/ecc_encode.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/fall_through_register.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/popcount.sv" \
@@ -191,7 +191,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_throttle.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/binary_to_gray.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/isochronous_4phase_handshake.sv" \
-    "$ROOT/.bender/git/checkouts/hwpe-ctrl-b4d268c729c1adb1/rtl/hwpe_ctrl_slave.sv" \
+    "$ROOT/no_latches/hwpe_ctrl_slave.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_delay.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/mem_to_banks.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_fifo.sv" \
@@ -227,7 +227,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_join.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_arbiter.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/sub_per_hash.sv" \
-    "$ROOT/.bender/git/checkouts/hwpe-ctrl-b4d268c729c1adb1/rtl/hwpe_ctrl_regfile.sv" \
+    "$ROOT/no_latches/hwpe_ctrl_regfile.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/rtl/tc_clk.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/multiaddr_decode.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/deprecated/pulp_clock_gating_async.sv" \
