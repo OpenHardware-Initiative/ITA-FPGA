@@ -109,7 +109,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_buffer.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/fifo/hwpe_stream_fifo_scm.sv" \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/core/hci_core_mux_ooo.sv" \
-    "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/fifo/hwpe_stream_fifo.sv" \
+    "$ROOT/no_latches/hwpe_stream_fifo.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_assign.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_fence.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/fifo/hwpe_stream_fifo_ctrl.sv" \
@@ -257,7 +257,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_all.sv" \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_64b_1r_32b.sv" \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_multi_way_1w_multi_port_read.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w.sv" \
+    "$ROOT/no_latches/register_file_1r_1w.sv" \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_1row.sv" \
 ]
 update_compile_order -fileset sources_1
@@ -296,6 +296,8 @@ set verilog_macros [list \
     "TARGET_VSIM" \
     "NO_STALLS=0" \
     "SINGLE_ATTENTION=0" \
+    "ITA_N=8" \
+    "ITA_M=64" \
     "SEQ_LENGTH=64" \
     "EMBED_SIZE=128" \
     "PROJ_SPACE=192" \
@@ -331,6 +333,6 @@ update_compile_order -fileset sim_1
 set_property top $top_tb [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 set_property source_mgmt_mode All [current_project]
-set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE_OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
+#set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE_OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
 
 puts "INFO: Project setup complete."

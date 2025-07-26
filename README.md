@@ -97,7 +97,7 @@ $> python testGenerator.py -h
 
 To generate a ONNX graph and test vectors for RTL simulations for a MHA operation run:
 ```sh
-$> python testGenerator.py -H 1 -S 64 -E 128 -P 192
+$> python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity
 ```
 
 To visualize the ONNX graph after generation, run:
