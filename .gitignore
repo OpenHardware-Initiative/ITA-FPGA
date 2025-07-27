@@ -40,3 +40,6 @@ logs
 # Ignore Bender dependencies
 deps
 
+# Ignore vivado jou and log files
+*.jou
+*.log
