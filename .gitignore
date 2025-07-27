@@ -43,3 +43,4 @@ deps
 # Ignore vivado jou and log files
 *.jou
 *.log
+*.str
