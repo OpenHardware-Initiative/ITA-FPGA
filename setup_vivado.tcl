@@ -296,7 +296,7 @@ set verilog_macros [list \
     "TARGET_VSIM" \
     "NO_STALLS=0" \
     "SINGLE_ATTENTION=0" \
-    "ITA_N=8" \
+    "ITA_N=16" \
     "ITA_M=64" \
     "SEQ_LENGTH=64" \
     "EMBED_SIZE=128" \

@@ -18,6 +18,29 @@
                 "-E${input:emb_len}",
                 "-P${input:prj_len}",
             ],
+        },
+        {
+            "name": "Generate Test (Custom)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/testGenerator.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "args": [
+                "-H",
+                "1",
+                "-S",
+                "64",
+                "-E",
+                "128",
+                "-P",
+                "192",
+                "-F",
+                "256",
+                "--no-bias",
+                "--activation=identity"
+            ]
         }
     ],
     "inputs": [
@@ -36,7 +59,7 @@
         {
             "id": "emb_len",
             "type": "promptString",
-            "description": "Embenbing length",
+            "description": "Embedding length",
             "default": "64"
         },
         {
