@@ -180,7 +180,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/rstgen_bypass.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/edge_propagator_tx.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/rr_arb_tree.sv" \
-    "$ROOT/no_latches/hwpe_ctrl_regfile_ff.sv \
+    "$ROOT/no_latches/hwpe_ctrl_regfile_ff.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/ecc_encode.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/fall_through_register.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/popcount.sv" \
