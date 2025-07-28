@@ -2,10 +2,12 @@
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
+`timescale 10ps / 1ps
+
 module activation_tb;
 
-  timeunit 10ps;
-  timeprecision 1ps;
+  //timeunit 10ps;
+  //timeprecision 1ps;
 
   import ita_package::*;
 
@@ -48,7 +50,7 @@ module activation_tb;
     EMBEDDING_SIZE = `ifdef EMBED_SIZE `EMBED_SIZE `else M_TILE_LEN `endif;
     FEEDFORWARD_SIZE = `ifdef FF_SIZE `FF_SIZE `else M_TILE_LEN `endif;
     simdir = {
-      "../../simvectors/data_S",
+      "/home/coppholl/Projects/ITA-FPGA/simvectors/data_S",
       $sformatf("%0d", SEQUENCE_LEN),
       "_E",
       $sformatf("%0d", EMBEDDING_SIZE),
@@ -69,7 +71,7 @@ module activation_tb;
     .rst_no(rst_n)
   );
 
-  activation dut (
+  ita_activation dut (
     .clk_i        (clk  ),
     .rst_ni       (rst_n),
     .b_i          (gelu_b    ),

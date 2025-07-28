@@ -11,7 +11,7 @@ set proj_name "ITA-kria-vivado"
 #set part_name "xck26-sfvc784-2LV-c"
 set board_part "xilinx.com:kr260_som:part0:1.1"
 set top_rtl   "ita_hwpe_top"
-set top_tb    "ita_hwpe_tb"
+set top_tb    "ita_tb"
 set ROOT [file dirname [info script]]
 
 # --- 2. Create the Project ---
