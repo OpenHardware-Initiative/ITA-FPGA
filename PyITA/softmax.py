@@ -72,7 +72,7 @@ def streamingPartialSoftmax(x, integerize = True):
 
     seq_length = x.shape[-1]
     n_heads = x.shape[-3]
-    width = 16  # 16 PE (processing units)
+    width = 8 # 16 PE (processing units)
     groups = seq_length // width
 
     assert seq_length % width == 0, f"Sequence length must be a multiple of width ({width})"

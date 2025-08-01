@@ -12,8 +12,8 @@ export FEEDFORWARD_SIZE=$5
 export TEST_BENCH=$6
 
 # Number of dot product units
-export ITA_N=16
-export ITA_M=64
+export ITA_N=8
+export ITA_M=32
 
 # Round to the clostest of multiple of $ITA_M
 ita_s=$(( ITA_M * ( (( ${SEQUENCE_LEN} - 1) / ITA_M) + 1) ))

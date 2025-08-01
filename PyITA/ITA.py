@@ -62,7 +62,7 @@ class Transformer:
                  debug_pattern: str = 'random',):
 
         self.ITA_N = 8
-        self.ITA_M = 64
+        self.ITA_M = 32
 
         # WIESEP: Set numpy print options
         np.set_printoptions(threshold = sys.maxsize)
