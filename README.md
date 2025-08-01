@@ -94,6 +94,10 @@ To generate a ONNX graph and test vectors for RTL simulations for a MHA operatio
 ```sh
 $> python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity
 ```
+To generate debugging data we use
+```sh
+python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity --debug-pattern asymmetric -v  --skip-vector-validation
+```
 
 To generate debugging data:
 ```sh 
