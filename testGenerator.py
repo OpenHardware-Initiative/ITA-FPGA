@@ -102,6 +102,11 @@ class TestParser(argparse.ArgumentParser):
                                  type = str,
                                  help = 'Activation function',
                                  choices = ['gelu', 'relu', 'identity'])
+        self.group1.add_argument('--debug-pattern',
+                                 default='random',
+                                 type=str,
+                                 help='Select a specific data pattern for debugging.',
+                                 choices=['random', 'ones', 'simple', 'asymmetric'])
         self.group1.add_argument('--no-partial-softmax',
                                  action = 'store_true',
                                  help = 'Disable partial softmax calculation')

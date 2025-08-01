@@ -24,6 +24,50 @@ from numpy.typing import DTypeLike
 from numpy import int8 as i8, int16 as i16, int32 as i32, float32 as f32, uint8 as u8, uint16 as u16
 
 
+# This will be our "ones" pattern generator
+def generate_ones_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, **kwargs) -> np.ndarray:
+    """Generates a tensor filled with ones for debugging."""
+    return np.ones(shape, dtype=type)
+
+# This will be our "simple" repeating pattern generator
+def generate_simple_pattern_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, **kwargs) -> np.ndarray:
+    """Generates a tensor with the fixed, repeating pattern [1, -2, 0, 1]."""
+    pattern = np.array([1, -2, 0, 1], dtype=type)
+    size = np.prod(shape)
+    repeats = (size + len(pattern) - 1) // len(pattern)
+    full_pattern = np.tile(pattern, repeats)[:size]
+    return full_pattern.reshape(shape)
+
+# This is the new "asymmetric" pattern generator that guarantees a non-zero output
+def generate_asymmetric_pattern_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, **kwargs) -> np.ndarray:
+    """
+    Generates a tensor with a fixed, repeating pattern designed to produce
+    non-zero results after default requantization.
+    Uses [1, 1, 2, 2] for inputs and [2, 2, 3, 3] for weights.
+    The 'role' kwarg determines which pattern is used.
+    """
+    if kwargs.get('role') == 'weight':
+        pattern = np.array([-2, -1, 0, 4], dtype=type)
+    else:  # Default to input pattern
+        pattern = np.array([0, 1, 2, 3], dtype=type)
+
+    size = np.prod(shape)
+    repeats = (size + len(pattern) - 1) // len(pattern)
+    full_pattern = np.tile(pattern, repeats)[:size]
+    return full_pattern.reshape(shape)
+
+# Helper function to select the generator
+def get_tensor_generator(pattern_name: str):
+    """Returns the appropriate tensor generation function based on the pattern name."""
+    if pattern_name == 'ones':
+        return generate_ones_tensor
+    elif pattern_name == 'simple':
+        return generate_simple_pattern_tensor
+    elif pattern_name == 'asymmetric':
+        return generate_asymmetric_pattern_tensor
+    else: # Default to random
+        return random_shuffled_tensor
+
 def random_shuffled_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, scaling = 1 / 4) -> np.ndarray:
     """
     Generates a random shuffled tensor with a specified shape, bit width, and type.

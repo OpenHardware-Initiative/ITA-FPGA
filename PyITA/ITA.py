@@ -25,7 +25,7 @@ from numpy.typing import ArrayLike, DTypeLike
 from .softmax import fastSoftmax, realSoftmax, streamingPartialSoftmax
 from .gelu import gelu_requantize, i_gelu_requantized, get_i_gelu_constants, get_i_gelu_requantized_constants
 from .util import (generate_matrix_mem, pack_8b_to_word, pack_array_8b_to_word, pack_hex_24b, pack_multihead_8b_to_word,
-                   pack_multihead_24b_to_word, random_shuffled_tensor, requantize, split_matrix, to_hex, write_matrix,
+                   pack_multihead_24b_to_word, generate_asymmetric_pattern_tensor, get_tensor_generator, generate_simple_pattern_tensor, generate_ones_tensor, random_shuffled_tensor, get_tensor_generator, requantize, split_matrix, to_hex, write_matrix,
                    write_matrix_mem, write_matrix_mem_hex, write_vector_mem_hex, get_almost_symmetric_scaling_factor,
                    error_MAEP)
 
@@ -58,9 +58,10 @@ class Transformer:
                  Wff: ArrayLike = None,
                  Wff2: ArrayLike = None,
                  Bff: ArrayLike = None,
-                 Bff2: ArrayLike = None):
+                 Bff2: ArrayLike = None,
+                 debug_pattern: str = 'random',):
 
-        self.ITA_N = 16
+        self.ITA_N = 8
         self.ITA_M = 64
 
         # WIESEP: Set numpy print options
@@ -83,6 +84,8 @@ class Transformer:
         self.H = H
         self.bias = bias
         self.activation = activation
+        
+        self.debug_pattern = debug_pattern
 
         # Setup transformation functions
         self.split_m_m = partial(split_matrix, block_shape = (self.ITA_M, self.ITA_M))
@@ -131,43 +134,47 @@ class Transformer:
         # assert (self.H % self.H_ITA == 0 or self.H == 1), "Number of heads must be one or divisible by H_ITA"
 
     def _initialize_tensors(self, Q, V, Wq, Wk, Wv, Wo, Bq, Bk, Bv, Bo, FF_in, Wff, Wff2, Bff, Bff2):
-
+        
+        tensor_generator = get_tensor_generator(self.debug_pattern)
+        
         self.exp_sum = np.zeros(self.S, dtype = np.int32)
 
-        self.Q_in = random_shuffled_tensor((self.S, self.E), self.WI) if Q is None else Q
+        self.Q_in = tensor_generator((self.S, self.E), self.WI, role='input') if Q is None else Q
+        self.V_in = tensor_generator((self.S, self.E), self.WI, role='input') if V is None else V
+        self.FF_in = tensor_generator((self.S, self.E), self.WI, role='input') if FF_in is None else FF_in
+
+        self.Wq_in = tensor_generator((self.H, self.E, self.P), self.WI, role='weight') if Wq is None else Wq
+        self.Wk_in = tensor_generator((self.H, self.E, self.P), self.WI, role='weight') if Wk is None else Wk
+        self.Wv_in = tensor_generator((self.H, self.E, self.P), self.WI, role='weight') if Wv is None else Wv
+        self.Wo_in = tensor_generator((self.H, self.P, self.E), self.WI, role='weight') if Wo is None else Wo
+        self.Wff_in = tensor_generator((1, self.E, self.F), self.WI, role='weight') if Wff is None else Wff
+        self.Wff2_in = tensor_generator((1, self.F, self.E), self.WI, role='weight') if Wff2 is None else Wff2
+        
         self.Q = np.pad(self.Q_in, ((0, self.S_ITA - self.S), (0, self.E_ITA - self.E)))
 
-        self.V_in = random_shuffled_tensor((self.S, self.E), self.WI) if V is None else V
         self.V = np.pad(self.V_in, ((0, self.S_ITA - self.S), (0, self.E_ITA - self.E)))
 
         # WIESEP: K is the same as V because we do cross-attention
         self.K_in = self.V_in
         self.K = self.V
 
-        self.FF_in = random_shuffled_tensor((self.S, self.E), self.WI) if FF_in is None else FF_in
         self.FF = np.pad(self.FF_in, ((0, self.S_ITA - self.S), (0, self.E_ITA - self.E)))
 
         #### Weight matrices ####
-        self.Wq_in = random_shuffled_tensor((self.H, self.E, self.P), self.WI) if Wq is None else Wq
         self.Wq = np.pad(self.Wq_in, ((0, 0), (0, self.E_ITA - self.E), (0, self.P_ITA - self.P)))
 
-        self.Wk_in = random_shuffled_tensor((self.H, self.E, self.P), self.WI) if Wk is None else Wk
         self.Wk = np.pad(self.Wk_in, ((0, 0), (0, self.E_ITA - self.E), (0, self.P_ITA - self.P)))
 
-        self.Wv_in = random_shuffled_tensor((self.H, self.E, self.P), self.WI) if Wv is None else Wv
         self.Wv = np.pad(self.Wv_in, ((0, 0), (0, self.E_ITA - self.E), (0, self.P_ITA - self.P)))
 
-        self.Wo_in = random_shuffled_tensor((self.H, self.P, self.E), self.WI) if Wo is None else Wo
         self.Wo = np.pad(self.Wo_in, ((0, 0), (0, self.P_ITA - self.P), (0, self.E_ITA - self.E)))
 
-        self.Wff_in = random_shuffled_tensor((1, self.E, self.F), self.WI) if Wff is None else Wff
         self.Wff = np.pad(self.Wff_in, ((0, 0), (0, self.E_ITA - self.E), (0, self.F_ITA - self.F)))
-        self.Wff2_in = random_shuffled_tensor((1, self.F, self.E), self.WI) if Wff2 is None else Wff2
         self.Wff2 = np.pad(self.Wff2_in, ((0, 0), (0, self.F_ITA - self.F), (0, self.E_ITA - self.E)))
 
         #### Bias matrices ####
         if self.bias:
-            self.Bq_in = random_shuffled_tensor(
+            self.Bq_in = tensor_generator(
                 (self.H, self.P), int(np.log2(self.P)) + 8, type = np.int32) if Bq is None else Bq
         else:
             self.Bq_in = np.zeros((self.H, self.P), dtype = np.int8)
@@ -175,7 +182,7 @@ class Transformer:
         self.Bq_broadcast = np.reshape(np.repeat(self.Bq, self.S, axis = 0), (self.H, self.S, self.P))
 
         if self.bias:
-            self.Bk_in = random_shuffled_tensor(
+            self.Bk_in = tensor_generator(
                 (self.H, self.P), int(np.log2(self.P)) + 8, type = np.int32) if Bk is None else Bk
         else:
             self.Bk_in = np.zeros((self.H, self.P), dtype = np.int8)
@@ -183,7 +190,7 @@ class Transformer:
         self.Bk_broadcast = np.reshape(np.repeat(self.Bk, self.S, axis = 0), (self.H, self.S, self.P))
 
         if self.bias:
-            self.Bv_in = random_shuffled_tensor(
+            self.Bv_in = tensor_generator(
                 (self.H, self.P), int(np.log2(self.P)) + 8, type = np.int32) if Bv is None else Bv
         else:
             self.Bv_in = np.zeros((self.H, self.P), dtype = np.int8)
@@ -191,7 +198,7 @@ class Transformer:
         self.Bv_broadcast = np.reshape(np.repeat(self.Bv, self.S, axis = 0), (self.H, self.S, self.P))
 
         if self.bias:
-            self.Bo_in = random_shuffled_tensor(
+            self.Bo_in = tensor_generator(
                 (self.H, self.E), int(np.log2(self.E)) + 8, type = np.int32) if Bo is None else Bo
         else:
             self.Bo_in = np.zeros((self.H, self.E), dtype = np.int8)
@@ -199,14 +206,14 @@ class Transformer:
         self.Bo_broadcast = np.reshape(np.repeat(self.Bo, self.S, axis = 0), (self.H, self.S, self.E))
 
         if self.bias:
-            self.Bff_in = random_shuffled_tensor(
+            self.Bff_in = tensor_generator(
                 (1, self.F), int(np.log2(self.F)) + 8, type = np.int32) if Bff is None else Bff
         else:
             self.Bff_in = np.zeros((1, self.F), dtype = np.int8)
         self.Bff = np.pad(self.Bff_in, ((0, 0), (0, self.F_ITA - self.F)))
         self.Bff_broadcast = np.reshape(np.repeat(self.Bff, self.S, axis = 0), (1, self.S, self.F))
         if self.bias:
-            self.Bff2_in = random_shuffled_tensor(
+            self.Bff2_in = tensor_generator(
                 (1, self.E), int(np.log2(self.E)) + 8, type = np.int32) if Bff2 is None else Bff2
         else:
             self.Bff2_in = np.zeros((1, self.E), dtype = np.int8)
@@ -239,7 +246,7 @@ class Transformer:
 
         self.Out_soft_sum = None
         self.Out_soft_sum_requant = None
-
+        
         self.preactivation = np.random.randint(-128, 127, size = (self.S, self.F), dtype = np.int8)
         self.postactivation = None
 
@@ -974,19 +981,28 @@ def generateTestVectors(path, **kwargs):
     bias = int(not kwargs['no_bias'])
     export_snitch_cluster = kwargs['export_snitch_cluster']
     export_mempool = kwargs['export_mempool']
+    
+    debug_pattern = kwargs['debug_pattern']
 
-    acc1 = Transformer(s, p, e, f, h, bias = bias, path = path, activation = activation)
+    acc1 = Transformer(s, p, e, f, h, bias = bias, path = path, activation = activation, debug_pattern = debug_pattern)
 
     if kwargs['verbose']:
         print("=> Generating test vectors...")
     acc1.print_properties(kwargs['verbose'])
     acc1.step1_Qp()
+    print(f"Shape of Qp_requant: {acc1.Qp_requant.shape}")
     acc1.step2_Kp()
+    print(f"Shape of Kp_requant: {acc1.Kp_requant.shape}")
     acc1.step3_Vp()
+    print(f"Shape of Vp_requant: {acc1.Vp_requant.shape}")
     acc1.step4_QK(kwargs['no_partial_softmax'])
+    print(f"Shape of A_requant: {acc1.A_requant.shape}")
     acc1.step5_AV()
+    print(f"Shape of O_soft_requant: {acc1.O_soft_requant.shape}")
     acc1.step6_O()
+    print(f"Shape of Out_soft_requant: {acc1.Out_soft_requant.shape}")
     acc1.step7_Osum()
+    print(f"Shape of Out_soft_sum_requant: {acc1.Out_soft_sum_requant.shape}")
     acc1.feedforward_layer()
     acc1.test_activations()
 
