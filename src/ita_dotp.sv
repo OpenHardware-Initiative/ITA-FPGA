@@ -11,7 +11,7 @@ module ita_dotp #(
 
     // --- STAGE 1: Element-wise Multiplication ---
     localparam int PROD_WIDTH = WS + WI; // 9 + 8 = 17 bits
-    logic signed [PROD_WIDTH-1:0] products[0:M-1];
+    (* use_dsp = "yes" *) logic signed [PROD_WIDTH-1:0] products[0:M-1];
 
     generate
         for (genvar i = 0; i < M; i = i + 1) begin: multiplication_loop
