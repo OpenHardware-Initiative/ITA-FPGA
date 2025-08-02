@@ -71,16 +71,16 @@ module ita_tb;
   initial begin
     $timeformat(-9, 1, " ns", 11);
 
-    N_PE = `ifdef ITA_N `ITA_N `else 16 `endif;
-    M_TILE_LEN = `ifdef ITA_M `ITA_M `else 64 `endif;
-    SEQUENCE_LEN = `ifdef SEQ_LENGTH `SEQ_LENGTH `else M_TILE_LEN `endif;
-    PROJECTION_SPACE = `ifdef PROJ_SPACE `PROJ_SPACE `else M_TILE_LEN `endif;
-    EMBEDDING_SIZE = `ifdef EMBED_SIZE `EMBED_SIZE `else M_TILE_LEN `endif;
-    FEEDFORWARD_SIZE = `ifdef FF_SIZE `FF_SIZE `else M_TILE_LEN `endif;
+    N_PE = 8;
+    M_TILE_LEN = 32;
+    SEQUENCE_LEN = 64;
+    PROJECTION_SPACE = 192;
+    EMBEDDING_SIZE = 128;
+    FEEDFORWARD_SIZE = 256;
     ACTIVATION = activation_e'(`ifdef ACTIVATION `ACTIVATION `else Identity `endif);
 
     simdir = {
-      "/home/coppholl/Projects/ITA-FPGA/simvectors/data_S",
+      "/Projects/Agus/ITA-FPGA/simvectors/data_S",
       $sformatf("%0d", SEQUENCE_LEN),
       "_E",
       $sformatf("%0d", EMBEDDING_SIZE),

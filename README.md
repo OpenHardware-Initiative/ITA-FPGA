@@ -99,6 +99,16 @@ To generate debugging data we use
 python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity --debug-pattern asymmetric -v  --skip-vector-validation
 ```
 
+To generate debugging data:
+```sh 
+python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity --debug-pattern asymmetric -v  --skip-vector-validation
+```
+
+To copy data to our server 
+```sh 
+scp -v -r /path/to/folder username@ipORname:/destination/path
+```
+
 To visualize the ONNX graph after generation, run:
 ```sh
 $> netron simvectors/data_S64_E128_P192_H1_B1/network.onnx

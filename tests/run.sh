@@ -17,10 +17,10 @@ export vsim_flags=-c
 export target=ita_tb
 export no_stalls=0
 export s=64
-export e=64
-export p=64
-export f=64
-export bias=1
+export e=128
+export p=192
+export f=256
+export bias=0
 export activation=identity
 
 # Create test vectors if don't exist
@@ -30,7 +30,7 @@ then
     then
         python testGenerator.py -H 1 -S $s -P $p -E $e -F $f --activation $activation
     else
-        python testGenerator.py -H 1 -S $s -P $p -E $e -F $f --activation $activation --no-bias
+        python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity --debug-pattern asymmetric -v  --skip-vector-validation
     fi
 fi
 
