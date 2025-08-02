@@ -56,6 +56,182 @@ def generate_asymmetric_pattern_tensor(shape, bitwidth: int, type: DTypeLike = n
     full_pattern = np.tile(pattern, repeats)[:size]
     return full_pattern.reshape(shape)
 
+def generate_debug_checkers_pattern_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, **kwargs) -> np.ndarray:
+    """
+    Generates a tensor with a block-wise ramping pattern for effective hardware debugging.
+
+    This pattern solves the issue of intermediate tensors becoming constant (or zero)
+    by creating structured, non-uniform data that is still easy to predict and trace.
+
+    Logic:
+    - The value of each element is determined by its index: `(index // 8) - 4`.
+    - For 'input' tensors (Q, K, V), the `row` index is used. This creates
+      horizontal stripes of constant values that change every 8 rows.
+    - For 'weight' tensors (Wq, Wk, etc.), the `column` index is used. This creates
+      vertical stripes of constant values that change every 8 columns.
+    - The product of a horizontally-striped and a vertically-striped matrix results
+      in a matrix of block-wise constant values, preventing uniformity.
+
+    Example:
+    - An input `Q` of shape (16, 8) would look like:
+      [[-4, -4, -4, -4, -4, -4, -4, -4],  // Rows 0-7 are all -4
+       ...
+       [-3, -3, -3, -3, -3, -3, -3, -3],  // Rows 8-15 are all -3
+       ...]
+
+    - A weight `Wq` of shape (8, 16) would look like:
+      [[-4, -4, ..., -3, -3, ...],      // Cols 0-7 are -4, Cols 8-15 are -3
+       [-4, -4, ..., -3, -3, ...],
+       ...]
+
+    - The resulting product `Qp = Q @ Wq` of shape (16, 16) would be block-wise constant:
+      [[1024, ..., 768],   // Block [0:8, 0:8] = 8*(-4)*(-4) = 1024
+       ...                  // Block [0:8, 8:16] = 8*(-4)*(-3) = 768
+       [768, ..., 576],    // Block [8:16, 0:8] = 8*(-3)*(-4) = 768
+       ...]                 // Block [8:16, 8:16] = 8*(-3)*(-3) = 576
+    """
+    tensor = np.zeros(shape, dtype=type)
+
+    def clip_to_int8(val):
+        # We keep values small to prevent large intermediate products
+        # and make debugging easier. The range is [-128, 127].
+        return np.clip(val, -128, 127)
+
+    if len(shape) == 2: # For 2D matrices like Q, K, V and Wq, Wk, Wv slices
+        rows, cols = shape
+        for i in range(rows):
+            for j in range(cols):
+                if kwargs.get('role') == 'weight':
+                    # Value ramps based on column index, creating vertical stripes.
+                    # The values are small, e.g., in [-4, 20] for typical dimensions.
+                    val = (j // 8) - 4
+                else:
+                    # Value ramps based on row index, creating horizontal stripes.
+                    val = (i // 8) - 4
+                tensor[i, j] = clip_to_int8(val)
+                
+    elif len(shape) == 3: # For 3D tensors like Wq, Wk, Wv, Wo
+        heads, rows, cols = shape
+        for h in range(heads):
+            for i in range(rows):
+                for j in range(cols):
+                    if kwargs.get('role') == 'weight':
+                        # Add head dependency for variation across heads
+                        val = (j // 8) - 4 + h
+                    else:
+                        # Inputs are typically the same across heads
+                        val = (i // 8) - 4
+                    tensor[h, i, j] = clip_to_int8(val)
+
+    elif len(shape) == 1: # For 1D bias vectors
+        size = shape[0]
+        for i in range(size):
+            val = (i // 8) - 4
+            tensor[i] = clip_to_int8(val)
+
+    return tensor.astype(type)
+
+def generate_gradient_pattern_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, **kwargs) -> np.ndarray:
+    """
+    Generates a tensor with a smooth gradient pattern for robust hardware debugging.
+
+    This pattern is guaranteed to pass the constant-value validation check by ensuring
+    the difference between adjacent elements is always significant.
+
+    Logic:
+    - The value of each element is determined by its index, creating a gradient.
+    - 'input' tensors (Q, K, V) get values based on their row index: `value = i + 1`.
+    - 'weight' tensors (Wq, etc.) get values based on their col index: `value = j + 1`.
+    - This ensures that the dot products result in a smooth, non-uniform matrix
+      where `Product[i,j]` is proportional to `(i+1)*(j+1)`, which is easy to verify.
+    - The `+1` offset prevents the first row and column from being all zeros, which
+      would lead to zero rows/columns in subsequent matrix products.
+    """
+    tensor = np.zeros(shape, dtype=type)
+
+    def clip_to_int8(val):
+        # Clip to the valid 8-bit signed integer range using modulo arithmetic.
+        # This keeps the pattern consistent for dimensions larger than the int8 range.
+        val = val % 256
+        if val > 127:
+            val -= 256
+        return val
+
+    if len(shape) == 2:
+        rows, cols = shape
+        for i in range(rows):
+            for j in range(cols):
+                if kwargs.get('role') == 'weight':
+                    val = j + 1
+                else:
+                    val = i + 1
+                tensor[i, j] = clip_to_int8(val)
+                
+    elif len(shape) == 3:
+        heads, rows, cols = shape
+        for h in range(heads):
+            for i in range(rows):
+                for j in range(cols):
+                    if kwargs.get('role') == 'weight':
+                        val = j + 1 + h # Add head dependency
+                    else:
+                        val = i + 1
+                    tensor[h, i, j] = clip_to_int8(val)
+
+    elif len(shape) == 1:
+        size = shape[0]
+        for i in range(size):
+            val = i + 1
+            tensor[i] = clip_to_int8(val)
+
+    return tensor.astype(type)
+
+def generate_diagonal_pattern_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, **kwargs) -> np.ndarray:
+    """
+    Generates a tensor with a diagonal wave pattern.
+
+    This pattern is guaranteed to produce non-constant intermediate values that
+    are large enough to survive requantization without causing saturation.
+    Its smooth distribution is also handled accurately by the low-precision
+    hardware softmax approximation.
+
+    Logic:
+    - The value of an element is based on the sum of its indices `(i + j)`.
+    - To keep the values within a predictable int8 range, the final value
+      is `(i + j) % 32 - 16`, creating diagonal waves from -16 to 15.
+    """
+    tensor = np.zeros(shape, dtype=type)
+
+    def clip_to_int8(val):
+        val = val % 256
+        if val > 127:
+            val -= 256
+        return val
+
+    if len(shape) == 2:
+        rows, cols = shape
+        for i in range(rows):
+            for j in range(cols):
+                val = (i + j) % 32 - 16
+                tensor[i, j] = clip_to_int8(val)
+                
+    elif len(shape) == 3:
+        heads, rows, cols = shape
+        for h in range(heads):
+            for i in range(rows):
+                for j in range(cols):
+                    val = (h + i + j) % 32 - 16
+                    tensor[h, i, j] = clip_to_int8(val)
+
+    elif len(shape) == 1:
+        size = shape[0]
+        for i in range(size):
+            val = i % 32 - 16
+            tensor[i] = clip_to_int8(val)
+
+    return tensor.astype(type)
+
+
 # Helper function to select the generator
 def get_tensor_generator(pattern_name: str):
     """Returns the appropriate tensor generation function based on the pattern name."""
@@ -65,10 +241,16 @@ def get_tensor_generator(pattern_name: str):
         return generate_simple_pattern_tensor
     elif pattern_name == 'asymmetric':
         return generate_asymmetric_pattern_tensor
+    elif pattern_name == 'checkers':
+        return generate_debug_checkers_pattern_tensor
+    elif pattern_name == 'gradient':
+        return generate_gradient_pattern_tensor
+    elif pattern_name == 'diagonal':
+        return generate_diagonal_pattern_tensor
     else: # Default to random
         return random_shuffled_tensor
 
-def random_shuffled_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, scaling = 1 / 4) -> np.ndarray:
+def random_shuffled_tensor(shape, bitwidth: int, type: DTypeLike = np.int8, scaling = 1 / 4, **kwargs) -> np.ndarray:
     """
     Generates a random shuffled tensor with a specified shape, bit width, and type.
 
