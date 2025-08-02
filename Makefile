@@ -34,7 +34,8 @@ else ifeq ($(activation), relu)
 else
 	activation_int = 0
 endif
-vlog_defs += -DNO_STALLS=$(no_stalls) -DSINGLE_ATTENTION=$(single_attention) -DSEQ_LENGTH=$(s) -DEMBED_SIZE=$(e) -DPROJ_SPACE=$(p) -DFF_SIZE=$(f) -DBIAS=$(bias) -DACTIVATION=$(activation_int)
+ITA_N ?= 16
+vlog_defs += -DNO_STALLS=$(no_stalls) -DSINGLE_ATTENTION=$(single_attention) -DSEQ_LENGTH=$(s) -DEMBED_SIZE=$(e) -DPROJ_SPACE=$(p) -DFF_SIZE=$(f) -DBIAS=$(bias) -DACTIVATION=$(activation_int) -DITA_N=$(ITA_N)
 
 ifeq ($(target), sim_ita_hwpe_tb)
 	BENDER_TARGETS += -t ita_hwpe -t ita_hwpe_test

@@ -113,6 +113,9 @@ class TestParser(argparse.ArgumentParser):
         self.group1.add_argument('--export-mempool', action = 'store_true', help = 'Export for mempool')
         self.group1.add_argument('--export-rom', action = 'store_true', help = 'Export ROM configuration')
 
+        self.group2 = self.add_argument_group('Engine Settings')
+        self.group2.add_argument('-ITA_N', default = 16, type = int, help = 'Number of ITA processing elements')
+
 
 if __name__ == "__main__":
     parser = TestParser()

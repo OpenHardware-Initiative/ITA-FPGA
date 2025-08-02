@@ -39,7 +39,7 @@ sources:
   - src/ita_inp2_mux.sv
   - src/ita_input_sampler.sv
   - src/ita_output_controller.sv
-  - src/ita_register_file_1w_1r_double_width_write.sv
+  - src/ita_register_file_1w_1r_multiwidth.sv
   - src/ita_register_file_1w_multi_port_read.sv
   - src/ita_register_file_1w_multi_port_read_we.sv
   - src/ita_requantizer.sv

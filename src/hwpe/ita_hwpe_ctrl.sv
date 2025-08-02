@@ -34,6 +34,7 @@ module ita_hwpe_ctrl
 );
 
   localparam int unsigned TOT_LEN = M*M/N;
+  localparam int unsigned WEIGHT_DIV = (ITA_TCDM_DW / 8) / N;
 
   logic          slave_clear, stream_clear;
   ctrl_slave_t   slave_ctrl;
@@ -146,7 +147,7 @@ module ita_hwpe_ctrl
           restart_weight_d = 1'b1;
           ctrl_streamer_o.bias_source_ctrl.req_start   = !ctrl_stream_o.bias_disable;
           ctrl_streamer_o.output_sink_ctrl.req_start   = 1'b1 & !ctrl_stream_o.output_disable;
-          weight_len_d = (TOT_LEN / 8) - (!ctrl_stream_o.weight_preload * M / 8);
+          weight_len_d = (TOT_LEN / WEIGHT_DIV) - (!ctrl_stream_o.weight_preload * M / WEIGHT_DIV);
           weight_base_addr_d = weight_addr[0] + !ctrl_stream_o.weight_preload * N * M;
         end
       end
@@ -154,7 +155,7 @@ module ita_hwpe_ctrl
         if (flags_streamer_i.weight_source_flags.done) begin
           state_d = Done;
           restart_weight_d = 1'b1;
-          weight_len_d = M / 8;
+          weight_len_d = M / WEIGHT_DIV;
           weight_base_addr_d = weight_addr[1];
         end
       end

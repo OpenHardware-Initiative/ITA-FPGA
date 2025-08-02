@@ -10,7 +10,7 @@
 set proj_name "ITA-kria-vivado"
 #set part_name "xck26-sfvc784-2LV-c"
 set board_part "xilinx.com:kr260_som:part0:1.1"
-set top_rtl   "ita_hwpe_top"
+set top_rtl   "ita_hwpe_wrap"
 set top_tb    "ita_hwpe_tb"
 set ROOT [file dirname [info script]]
 
@@ -31,7 +31,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/src/hwpe/ita_hwpe_input_bias_fence.sv" \
     "$ROOT/src/hwpe/ita_hwpe_streamer.sv" \
     "$ROOT/src/ita_serdiv.sv" \
-    "$ROOT/src/ita_register_file_1w_1r_double_width_write.sv" \
+    "$ROOT/src/ita_register_file_1w_1r_multiwidth.sv" \
     "$ROOT/src/ita_register_file_1w_multi_port_read_we.sv" \
     "$ROOT/src/ita_requantization_controller.sv" \
     "$ROOT/src/ita_controller.sv" \
@@ -296,10 +296,8 @@ set verilog_macros [list \
     "TARGET_VSIM" \
     "NO_STALLS=0" \
     "SINGLE_ATTENTION=0" \
-    "ITA_N=16" \
-    "N_PE=16" \
+    "ITA_N=4" \
     "ITA_M=64" \
-    "M_TILE_LEN=64" \
     "SEQ_LENGTH=64" \
     "EMBED_SIZE=128" \
     "PROJ_SPACE=192" \
