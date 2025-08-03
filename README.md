@@ -19,8 +19,9 @@ The repository is structured as follows:
 1. Source your Vivado License (in our case we used 2023.1)
 2. Clone ITA
 3. Get all the files and checkouts using Bender.
-4. Get the python test files using the PyITA as intended by the original authors.
-5. Run the following command to setup the project:
+4. Get the python test files using the PyITA as intended by the original authors. Make sure to specify ITA_N parameter while generating the data.
+5. Adjust the value of the ITA_N parameter accordingly inside setup_vivado.tcl
+6. Run the following command to setup the project:
 ```bash
 vivado -mode batch -source setup_vivado.tcl
 ```
@@ -37,6 +38,12 @@ To run the RTL simulation, execute the following command:
 $> make sim
 $> s=64 e=128 p=192 make sim # To use different dimensions
 $> target=sim_ita_hwpe_tb make sim # To run ITA with HWPE wrapper
+```
+
+## Vivado Synthesis
+While running synthesis, add the following flag to synthesis settings:
+```sh
+$> -mode out_of_context
 ```
 
 ## Test Vector Generation

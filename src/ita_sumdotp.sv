@@ -1,13 +1,6 @@
-// Copyright 2020 ETH Zurich and University of Bologna.
-// Solderpad Hardware License, Version 0.51, see LICENSE for details.
-// SPDX-License-Identifier: SHL-0.51
+// In ita_sumdotp.sv
 
-/**
-  SumDotP module.
-  Calculates N number of dot products of two 8-bit vector of size M.
-  */
-
- module ita_sumdotp
+module ita_sumdotp
     import ita_package::*;
  (
      input  logic                                  sign_mode_i,

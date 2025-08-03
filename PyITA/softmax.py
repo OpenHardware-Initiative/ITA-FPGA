@@ -66,13 +66,12 @@ def fastSoftmax(x, integerize = True):
         return np.repeat(exp_sum_inverse, seq_length).reshape(n_heads, seq_length, seq_length) / 2**shift
 
 
-def streamingPartialSoftmax(x, integerize = True):
+def streamingPartialSoftmax(width, x, integerize = True):
     if not integerize:
         x = x.astype(np.float32)
 
     seq_length = x.shape[-1]
     n_heads = x.shape[-3]
-    width = 16  # 16 PE (processing units)
     groups = seq_length // width
 
     assert seq_length % width == 0, f"Sequence length must be a multiple of width ({width})"

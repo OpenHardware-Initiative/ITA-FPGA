@@ -35,6 +35,7 @@ class Transformer:
     WI = 8
 
     def __init__(self,
+                 ITA_N: int,
                  S: int,
                  P: int,
                  E: int,
@@ -60,7 +61,7 @@ class Transformer:
                  Bff: ArrayLike = None,
                  Bff2: ArrayLike = None):
 
-        self.ITA_N = 16
+        self.ITA_N = ITA_N
         self.ITA_M = 64
 
         # WIESEP: Set numpy print options
@@ -546,7 +547,7 @@ class Transformer:
         if no_partial_softmax:
             self.A_partial_softmax = fastSoftmax(self.A_requant)
         else:
-            self.A_partial_softmax = streamingPartialSoftmax(self.A_requant)
+            self.A_partial_softmax = streamingPartialSoftmax(self.ITA_N, self.A_requant)
 
         if self.H == 1:
             A_save = [np.tile(self.A_partial_softmax[i], [self.split, 1]) for i in range(self.H)]
@@ -974,8 +975,9 @@ def generateTestVectors(path, **kwargs):
     bias = int(not kwargs['no_bias'])
     export_snitch_cluster = kwargs['export_snitch_cluster']
     export_mempool = kwargs['export_mempool']
+    ita_n = kwargs['ITA_N']
 
-    acc1 = Transformer(s, p, e, f, h, bias = bias, path = path, activation = activation)
+    acc1 = Transformer(ita_n, s, p, e, f, h, bias = bias, path = path, activation = activation)
 
     if kwargs['verbose']:
         print("=> Generating test vectors...")

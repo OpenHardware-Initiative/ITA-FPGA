@@ -17,14 +17,19 @@ module ita_hwpe_input_bias_buffer #(
   hwpe_stream_intf_stream.source data_o
 );
 
+  localparam int unsigned STRB_WIDTH = OUTPUT_DATA_WIDTH / 8;
+  localparam int unsigned WDATA_WIDTH = (N == 8) ? 4 * OUTPUT_DATA_WIDTH : 
+                                         (N == 16) ? 2 * OUTPUT_DATA_WIDTH :
+                                         OUTPUT_DATA_WIDTH;
+
   typedef enum logic { Read, Write } bias_state_t;
 
   bias_state_t state_d, state_q;
 
-  logic [8-1:0] read_cnt_d, read_cnt_q;
-  logic [4-1:0] write_cnt_d, write_cnt_q;
+  logic [$clog2(M*M/N)-1:0] read_cnt_d, read_cnt_q;
+  logic write_cnt_d, write_cnt_q;
 
-  logic [1:0] read_addr;
+  logic [1 + $clog2(WDATA_WIDTH/OUTPUT_DATA_WIDTH)-1:0] read_addr;
   logic write_addr;
   logic read_enable, read_enable_q;
   logic write_enable;
@@ -43,7 +48,7 @@ module ita_hwpe_input_bias_buffer #(
     write_enable = 0;
     data_i.ready = 0;
     data_o.valid = 0;
-    data_o.strb  = 48'hFFFFFFFFFFFF;
+    data_o.strb  = {STRB_WIDTH{1'b1}};
     data_o.data  = '0;
     bias_reshape = '0;
 
@@ -64,22 +69,22 @@ module ita_hwpe_input_bias_buffer #(
         if (read_enable_q) begin
           data_o.data = read_data;
           if (bias_dir_i) begin
-            bias_reshape = read_data >> read_cnt_q[3:0] * 24;
+            bias_reshape = read_data >> read_cnt_q[$clog2(N)-1:0] * 24;
             data_o.data = {N {bias_reshape[0]}};
           end
         end
         read_enable = 1;
         if(data_o.valid && data_o.ready) begin
           read_cnt_d = read_cnt_q + 1;
-          if(read_cnt_q == 255) begin
+          if(read_cnt_q == M*M/N-1) begin
             state_d = Write;
             read_cnt_d = 0;
           end
         end
         if (bias_dir_i) begin
-          read_addr = read_cnt_d[5:4];
+          read_addr = read_cnt_d[$clog2(M)-1:$clog2(N)];
         end else begin
-          read_addr = read_cnt_d[7:6];
+          read_addr = read_cnt_d[$clog2(M*M/N)-1:$clog2(M)];
         end
       end
     endcase
@@ -99,9 +104,9 @@ module ita_hwpe_input_bias_buffer #(
     end
   end
 
-  ita_register_file_1w_1r_double_width_write #(
+  ita_register_file_1w_1r_multiwidth #(
     .WADDR_WIDTH(1),
-    .WDATA_WIDTH(2*OUTPUT_DATA_WIDTH),
+    .WDATA_WIDTH(WDATA_WIDTH),
     .RDATA_WIDTH(OUTPUT_DATA_WIDTH  )
   ) i_register_file (
     .clk         (clk_i),
@@ -111,7 +116,7 @@ module ita_hwpe_input_bias_buffer #(
     .ReadData    (read_data),
     .WriteEnable (write_enable),
     .WriteAddr   (write_addr),
-    .WriteData   (data_i.data[2*OUTPUT_DATA_WIDTH-1:0])
+    .WriteData   (data_i.data[WDATA_WIDTH-1:0])
   );
 
 endmodule
