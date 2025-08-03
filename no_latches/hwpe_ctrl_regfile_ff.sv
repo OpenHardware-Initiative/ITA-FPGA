@@ -48,21 +48,16 @@ logic enable, clkg_en;
 
 assign enable = WriteEnable_i & (WriteAddr_i <= NumWords);
 
-
 assign clkg_en = enable | clear_i;
 
 assign ReadData_o = (ReadEnable_i && (ReadAddr_i <= NumWords)) ? data_q[ReadAddr_i] : '0;
 
-/*
 tc_clk_gating i_we_clkg    (
    .clk_i        ( clk_i   ),
    .en_i         ( clkg_en ),
    .test_en_i    ( 1'b0    ),
    .clk_o        ( clk_int )
 );
-*/
-
-assign clk_int = clk_i;
 
 for (genvar i = 0; i < NumWords; i++) begin
   for (genvar j = 0; j < NumByte; j++) begin

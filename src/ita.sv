@@ -2,15 +2,9 @@
 // Solderpad Hardware License, Version 0.51, see LICENSE for details.
 // SPDX-License-Identifier: SHL-0.51
 
-/**
-  ITA top module.
-*/
-
 module ita
   import ita_package::*;
-#(
-  parameter integer HALF_N  = N / 2
-)(
+(
   input  logic         clk_i             ,
   input  logic         rst_ni            ,
   // Network sizes
@@ -41,10 +35,7 @@ module ita
 
   logic         weight_valid, weight_ready;
   inp_t         inp, inp_stream_soft;
-  logic signed [HALF_N-1:0][M-1:0][WI-1:0] inp1_part0, inp1_part1;
-  logic signed [HALF_N-1:0][M-1:0][WI-1:0] inp2_part0, inp2_part1;
-  logic signed [HALF_N-1:0][M-1:0][WI-1:0] inp1_q_part0, inp1_q_part1;
-  logic signed [HALF_N-1:0][M-1:0][WI-1:0] inp2_q_part0, inp2_q_part1;
+  weight_t      inp1, inp1_q, inp2, inp2_q;
   bias_t        inp_bias, inp_bias_q1, inp_bias_q2;
   oup_t         oup, oup_q, accumulator_oup;
   requant_const_t    requant_mult, requant_shift, activation_requant_mult, activation_requant_shift;
@@ -156,10 +147,8 @@ module ita
 
   always_ff @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
-      inp1_q_part0 <= '0;
-      inp1_q_part1 <= '0;
-      inp2_q_part0 <= '0;
-      inp2_q_part1 <= '0;
+      inp1_q      <= '0;
+      inp2_q      <= '0;
       inp_bias_q2 <= '0;
       inp_bias_q1 <= '0;
       oup_q       <= '0;
@@ -170,10 +159,8 @@ module ita
       end
       if (calc_en_q1) begin
         inp_bias_q1 <= inp_bias;
-        inp1_q_part0 <= inp2_part0;
-        inp1_q_part1 <= inp1_part1;
-        inp2_q_part0 <= inp2_part0;
-        inp2_q_part1 <= inp2_part1;
+        inp1_q      <= inp1;
+        inp2_q      <= inp2;
       end
     end
   end
@@ -213,34 +200,26 @@ module ita
     .inp_bias_o  (inp_bias    )
   );
 
-  // Connect the modified ita_inp1_mux
   ita_inp1_mux i_inp1_mux (
-    .clk_i      (clk_i),
-    .rst_ni     (rst_ni),
-    .calc_en_i  (calc_en_q1),
-    .inp_i      ((step_q1 == AV) ? inp_stream_soft : inp),
-    // Connect to the new split output ports
-    .inp1_p0_o  (inp1_part0),
-    .inp1_p1_o  (inp1_part1)
+    .clk_i    (clk_i                                  ),
+    .rst_ni   (rst_ni                                 ),
+    .calc_en_i(calc_en_q1                             ),
+    .inp_i    ((step_q1 == AV) ? inp_stream_soft : inp),
+    .inp1_o   (inp1                                   )
   );
 
-  // Connect the modified ita_inp2_mux
   ita_inp2_mux i_inp2_mux (
-    .clk_i      (clk_i),
-    .rst_ni     (rst_ni),
-    .calc_en_i  (calc_en_q1),
-    .weight_i   (read_data),
-    // Connect to the new split output ports
-    .inp2_p0_o  (inp2_part0),
-    .inp2_p1_o  (inp2_part1)
+    .clk_i    (clk_i     ),
+    .rst_ni   (rst_ni    ),
+    .calc_en_i(calc_en_q1),
+    .weight_i (read_data ),
+    .inp2_o   (inp2      )
   );
 
   ita_sumdotp i_sumdotp (
     .sign_mode_i((step_q2 == AV) ? 1'b0 : 1'b1),
-    .inp1_p0_i     (inp1_q_part0                       ),
-    .inp1_p1_i     (inp1_q_part1                       ),
-    .inp2_p0_i     (inp2_q_part0                       ),
-    .inp2_p1_i     (inp2_q_part1                       ),
+    .inp1_i     (inp1_q                       ),
+    .inp2_i     (inp2_q                       ),
     .oup_o      (oup                          )
   );
 

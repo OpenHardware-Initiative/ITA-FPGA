@@ -8,7 +8,7 @@ module ita_hwpe_output_buffer #(
   parameter int unsigned INPUT_DATA_WIDTH  = 32,
   parameter int unsigned OUTPUT_DATA_WIDTH = 32,
   parameter int unsigned FIFO_DEPTH = 8,
-  parameter int unsigned LATCH_FIFO = 1,
+  parameter int unsigned LATCH_FIFO = 0,
   parameter int unsigned LATCH_FIFO_TEST_WRAP = 0
 )
 (
@@ -72,8 +72,8 @@ module ita_hwpe_output_buffer #(
   hwpe_stream_fifo #(
     .DATA_WIDTH (OUTPUT_DATA_WIDTH),
     .FIFO_DEPTH (8),
-    .LATCH_FIFO (1),
-    .LATCH_FIFO_TEST_WRAP (0)
+    .LATCH_FIFO (LATCH_FIFO),
+    .LATCH_FIFO_TEST_WRAP (LATCH_FIFO_TEST_WRAP)
   ) i_data_fifo (
     .clk_i (clk_i),
     .rst_ni(rst_ni),

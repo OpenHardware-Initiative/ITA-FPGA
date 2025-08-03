@@ -232,7 +232,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_arbiter.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/sub_per_hash.sv" \
     "$ROOT/no_latches/hwpe_ctrl_regfile.sv" \
-    "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/rtl/tc_clk.sv" \
+    "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/fpga/tc_clk_xilinx.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/multiaddr_decode.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/deprecated/pulp_clock_gating_async.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/ecc_pkg.sv" \
