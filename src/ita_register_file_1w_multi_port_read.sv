@@ -10,10 +10,6 @@
 
 // From latch_scm { git: "https://github.com/pulp-platform/scm.git", version: "1.1.0" }, sync rst -> async rst!
 
-
-`define ICAHE_USE_FF
-
-
 module ita_register_file_1w_multi_port_read
 #(
     parameter ADDR_WIDTH    = 5,
