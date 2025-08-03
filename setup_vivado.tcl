@@ -241,28 +241,28 @@ update_compile_order -fileset sources_1
 
 # Add scm files
 add_files -norecurse -scan_for_includes [list \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_2r_1w_asymm.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_multi_port_read_be.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_64b_multi_port_read_32b_1row.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_64b_multi_port_read_32b.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_multi_port_read.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_multi_way_1w_64b_multi_port_read_32b.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_2r_2w.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_test_wrap_bypass.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_128b_multi_port_read_32b.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_2r_1w_asymm_test_wrap.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_3r_2w.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_3r_2w_be.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_64b_multi_port_read_128b.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_all_test_wrap.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_multi_port_read_1row.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_be.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_test_wrap.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_all.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1w_64b_1r_32b.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_multi_way_1w_multi_port_read.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_2r_1w_asymm.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_multi_port_read_be.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_64b_multi_port_read_32b_1row.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_64b_multi_port_read_32b.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_multi_port_read.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_multi_way_1w_64b_multi_port_read_32b.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_2r_2w.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_test_wrap_bypass.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_128b_multi_port_read_32b.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_2r_1w_asymm_test_wrap.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_3r_2w.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_3r_2w_be.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_64b_multi_port_read_128b.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_all_test_wrap.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_multi_port_read_1row.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_be.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_test_wrap.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_all.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_64b_1r_32b.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_multi_way_1w_multi_port_read.sv" \
     "$ROOT/no_latches/register_file_1r_1w.sv" \
-    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_1r_1w_1row.sv" \
+    "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_1row.sv" \
 ]
 update_compile_order -fileset sources_1
 
