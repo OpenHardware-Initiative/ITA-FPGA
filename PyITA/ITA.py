@@ -11,6 +11,7 @@
 # Copyright (C) 2024, ETH Zurich and University of Bologna.
 #
 # Author: Philip Wiese (wiesep@iis.ee.ethz.ch), ETH Zurich
+# Modified by: Agustin N. Coppari Hollmann (agustin.coppari-hollmann@tum.de), TUM -> To enable ONNX model extraction
 #
 # ----------------------------------------------------------------------
 
@@ -59,7 +60,8 @@ class Transformer:
                  Wff: ArrayLike = None,
                  Wff2: ArrayLike = None,
                  Bff: ArrayLike = None,
-                 Bff2: ArrayLike = None):
+                 Bff2: ArrayLike = None,
+                 quant_params: dict = None):
 
         self.ITA_N = ITA_N
         self.ITA_M = 64
@@ -90,8 +92,8 @@ class Transformer:
         self.split_m_n = partial(split_matrix, block_shape = (self.ITA_M, self.ITA_N))
 
         self._validate_matrix_constraints(K, V)
-        self._initialize_quantization_parameters()
-        self._init_gelu_constants()
+        self._initialize_quantization_parameters(quant_params)
+        self._init_gelu_constants(quant_params)
         self._initialize_tensors(Q, V, Wq, Wk, Wv, Wo, Bq, Bk, Bv, Bo, FF_in, Wff, Wff2, Bff, Bff2)
 
     def split_multihead_m_m(self, multihead_array: np.ndarray):
@@ -244,33 +246,53 @@ class Transformer:
         self.preactivation = np.random.randint(-128, 127, size = (self.S, self.F), dtype = np.int8)
         self.postactivation = None
 
-    def _initialize_quantization_parameters(self):
-        # WIESEP: 6 steps for attention layer and one to requantize the accumulated output, 2 for feedforward
-        self.requant_eps_mult = np.zeros((7, self.H), dtype = np.uint8)
-        self.requant_right_shift = np.zeros((7, self.H), dtype = np.uint8)
+    def _initialize_quantization_parameters(self, quant_params: dict = None):
+        
+        if quant_params:
+            print("  ✅ Loading requantization parameters from ONNX data...")
+            
+            # --- Attention Parameters ---
+            attn_keys = ['q_proj', 'k_proj', 'v_proj', 'qk_matmul', 'av_matmul', 'out_proj']
+            # FIX: Removed .T to create a (7, H) array, matching the shape of the random-data path.
+            self.requant_eps_mult = np.array([quant_params[k]['mult'] for k in attn_keys] + [[0]*self.H])
+            self.requant_right_shift = np.array([quant_params[k]['shift'] for k in attn_keys] + [[0]*self.H])
+            self.requant_add = np.array([quant_params[k]['add'] for k in attn_keys] + [[0]*self.H])
+            
+            # --- FFN Parameters ---
+            ffn_keys = ['fc1', 'fc2']
+            # FIX: Removed extra list wrapping `[]` to correctly form a (2, 1) array.
+            self.requant_eps_mult_ffn = np.array([quant_params[k]['mult'] for k in ffn_keys])
+            self.requant_right_shift_ffn = np.array([quant_params[k]['shift'] for k in ffn_keys])
+            self.requant_add_ffn = np.array([quant_params[k]['add'] for k in ffn_keys])
+        
+        else:
+            print("  ⚠️  No hw_params provided. Generating RANDOM requantization parameters.")
+            # WIESEP: 6 steps for attention layer and one to requantize the accumulated output, 2 for feedforward
+            self.requant_eps_mult = np.zeros((7, self.H), dtype = np.uint8)
+            self.requant_right_shift = np.zeros((7, self.H), dtype = np.uint8)
 
-        # WIESEP: Add parameter in transformers will always be zero as there are no batch normalization layers
-        self.requant_add = np.zeros((7, self.H), dtype = np.int8)
+            # WIESEP: Add parameter in transformers will always be zero as there are no batch normalization layers
+            self.requant_add = np.zeros((7, self.H), dtype = np.int8)
 
-        for i in range(7):
-            self.requant_eps_mult[i, :] = np.random.randint(64, 127, size = (1, self.H), dtype = np.uint8)
+            for i in range(7):
+                self.requant_eps_mult[i, :] = np.random.randint(64, 127, size = (1, self.H), dtype = np.uint8)
 
-            if i < 3:  # Q, K, V
-                max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.E * 2**9).astype(np.uint32)
-            elif i == 3:  # QK
-                max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.P * 2**8).astype(np.uint32)
-            elif i == 4:  # AV
-                max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.S * 2**5).astype(np.uint32)
-            elif i == 5:  # OW
-                max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.E * 2**9).astype(np.uint32)
-            elif i == 6:  # Sum OW
-                max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.H * 2**7).astype(np.uint32)
+                if i < 3:  # Q, K, V
+                    max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.E * 2**9).astype(np.uint32)
+                elif i == 3:  # QK
+                    max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.P * 2**8).astype(np.uint32)
+                elif i == 4:  # AV
+                    max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.S * 2**5).astype(np.uint32)
+                elif i == 5:  # OW
+                    max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.E * 2**9).astype(np.uint32)
+                elif i == 6:  # Sum OW
+                    max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.H * 2**7).astype(np.uint32)
 
-            # WIESEP: Last requatization after head summation shares the same parameters
-            if i == 6:
-                self.requant_right_shift[i, :] = np.tile(max_bit_width[0] - 8 + 2, self.H)
-            else:
-                self.requant_right_shift[i, :] = max_bit_width - 8 + 2
+                # WIESEP: Last requatization after head summation shares the same parameters
+                if i == 6:
+                    self.requant_right_shift[i, :] = np.tile(max_bit_width[0] - 8 + 2, self.H)
+                else:
+                    self.requant_right_shift[i, :] = max_bit_width - 8 + 2
 
         write_matrix([self.requant_eps_mult.T], "RQS_ATTN_MUL", self.paths["base"])
         write_matrix([self.requant_right_shift.T], "RQS_ATTN_SHIFT", self.paths["base"])
@@ -296,13 +318,25 @@ class Transformer:
         write_matrix([self.requant_right_shift_ffn.T], "RQS_FFN_SHIFT", self.paths["base"])
         write_matrix([self.requant_add_ffn.T], "RQS_FFN_ADD", self.paths["base"])
 
-    def _init_gelu_constants(self):
-        CLIP_LO = -4
-        D = 2**20
+    def _init_gelu_constants(self, quant_params: dict = None):
+        
+        if quant_params and 'relu' in quant_params:
+            print("  ✅ Loading ReLU requantization parameters from ONNX data...")
+            p = quant_params['relu']
+            self.q_1, self.q_b, self.q_c = p['q_1'], p['q_b'], p['q_c']
+            self.gelu_rqs_mul = p['mult']
+            self.gelu_rqs_shift = p['shift']
+            self.gelu_rqs_add = p['add']
+            # GELU curve approximation params are not needed for ReLU
+            self.q_1, self.q_b, self.q_c = 0, 0, 0
+        else:
+            print("  ⚠️  No hw_params for GELU/ReLU. Generating DEFAULT constants.")
+            CLIP_LO = -4
+            D = 2**20
 
-        gelu_eps_mult, _ = get_almost_symmetric_scaling_factor(CLIP_LO, n_bits = 8)
-        self.q_1, self.q_b, self.q_c, _, _, _, self.gelu_rqs_mul, self.gelu_rqs_shift, self.gelu_rqs_add, S_out = get_i_gelu_requantized_constants(
-            gelu_eps_mult, D)
+            gelu_eps_mult, _ = get_almost_symmetric_scaling_factor(CLIP_LO, n_bits = 8)
+            self.q_1, self.q_b, self.q_c, _, _, _, self.gelu_rqs_mul, self.gelu_rqs_shift, self.gelu_rqs_add, S_out = get_i_gelu_requantized_constants(
+                gelu_eps_mult, D)
 
         write_matrix([[self.q_1]], "GELU_ONE", self.paths["base"])
         write_matrix([[self.q_b]], "GELU_B", self.paths["base"])
