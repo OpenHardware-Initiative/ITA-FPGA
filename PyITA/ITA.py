@@ -253,25 +253,21 @@ class Transformer:
             
             # --- Attention Parameters ---
             attn_keys = ['q_proj', 'k_proj', 'v_proj', 'qk_matmul', 'av_matmul', 'out_proj']
-            # FIX: Removed .T to create a (7, H) array, matching the shape of the random-data path.
             self.requant_eps_mult = np.array([quant_params[k]['mult'] for k in attn_keys] + [[0]*self.H])
             self.requant_right_shift = np.array([quant_params[k]['shift'] for k in attn_keys] + [[0]*self.H])
             self.requant_add = np.array([quant_params[k]['add'] for k in attn_keys] + [[0]*self.H])
             
             # --- FFN Parameters ---
             ffn_keys = ['fc1', 'fc2']
-            # FIX: Removed extra list wrapping `[]` to correctly form a (2, 1) array.
             self.requant_eps_mult_ffn = np.array([quant_params[k]['mult'] for k in ffn_keys])
             self.requant_right_shift_ffn = np.array([quant_params[k]['shift'] for k in ffn_keys])
             self.requant_add_ffn = np.array([quant_params[k]['add'] for k in ffn_keys])
         
         else:
             print("  ⚠️  No hw_params provided. Generating RANDOM requantization parameters.")
-            # WIESEP: 6 steps for attention layer and one to requantize the accumulated output, 2 for feedforward
+            # --- Generate Random Attention Parameters ---
             self.requant_eps_mult = np.zeros((7, self.H), dtype = np.uint8)
             self.requant_right_shift = np.zeros((7, self.H), dtype = np.uint8)
-
-            # WIESEP: Add parameter in transformers will always be zero as there are no batch normalization layers
             self.requant_add = np.zeros((7, self.H), dtype = np.int8)
 
             for i in range(7):
@@ -287,33 +283,31 @@ class Transformer:
                     max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.E * 2**9).astype(np.uint32)
                 elif i == 6:  # Sum OW
                     max_bit_width = np.log2(self.requant_eps_mult[i, :].astype(np.uint32) * self.H * 2**7).astype(np.uint32)
-
-                # WIESEP: Last requatization after head summation shares the same parameters
                 if i == 6:
                     self.requant_right_shift[i, :] = np.tile(max_bit_width[0] - 8 + 2, self.H)
                 else:
                     self.requant_right_shift[i, :] = max_bit_width - 8 + 2
+                    
+            # --- Generate Random FFN Parameters (MOVED INSIDE THE ELSE BLOCK) ---
+            self.requant_eps_mult_ffn = np.zeros((2, 1), dtype = np.uint8)
+            self.requant_right_shift_ffn = np.zeros((2, 1), dtype = np.uint8)
+            self.requant_add_ffn = np.zeros((2, 1), dtype = np.int8)
 
+            for i in range(2):
+                self.requant_eps_mult_ffn[i, :] = np.random.randint(64, 127, size = (1, 1), dtype = np.uint8)
+
+                if i == 0:
+                    max_bit_width = np.log2(self.requant_eps_mult_ffn[i, :].astype(np.uint32) * self.E * 2**9).astype(np.uint32)
+                elif i == 1:
+                    max_bit_width = np.log2(self.requant_eps_mult_ffn[i, :].astype(np.uint32) * self.F * 2**9).astype(np.uint32)
+
+                self.requant_right_shift_ffn[i, :] = max_bit_width - 8 + 2
+
+        # --- Write parameters to files (this part can stay outside) ---
         write_matrix([self.requant_eps_mult.T], "RQS_ATTN_MUL", self.paths["base"])
         write_matrix([self.requant_right_shift.T], "RQS_ATTN_SHIFT", self.paths["base"])
         write_matrix([self.requant_add.T], "RQS_ATTN_ADD", self.paths["base"])
-
-        self.requant_eps_mult_ffn = np.zeros((2, 1), dtype = np.uint8)
-        self.requant_right_shift_ffn = np.zeros((2, 1), dtype = np.uint8)
-        self.requant_add_ffn = np.zeros((2, 1), dtype = np.int8)
-
-        for i in range(2):
-            self.requant_eps_mult_ffn[i, :] = np.random.randint(64, 127, size = (1, 1), dtype = np.uint8)
-
-            if i == 0:
-                max_bit_width = np.log2(self.requant_eps_mult_ffn[i, :].astype(np.uint32) * self.E * 2**9).astype(
-                    np.uint32)
-            elif i == 1:
-                max_bit_width = np.log2(self.requant_eps_mult_ffn[i, :].astype(np.uint32) * self.F * 2**9).astype(
-                    np.uint32)
-
-            self.requant_right_shift_ffn[i, :] = max_bit_width - 8 + 2
-
+        
         write_matrix([self.requant_eps_mult_ffn.T], "RQS_FFN_MUL", self.paths["base"])
         write_matrix([self.requant_right_shift_ffn.T], "RQS_FFN_SHIFT", self.paths["base"])
         write_matrix([self.requant_add_ffn.T], "RQS_FFN_ADD", self.paths["base"])
@@ -333,7 +327,8 @@ class Transformer:
             print("  ⚠️  No hw_params for GELU/ReLU. Generating DEFAULT constants.")
             CLIP_LO = -4
             D = 2**20
-
+            # NOTE: For now the model addheres to the default approximation
+            # For improving accuracy we could think of using a different value for D and CLIP.
             gelu_eps_mult, _ = get_almost_symmetric_scaling_factor(CLIP_LO, n_bits = 8)
             self.q_1, self.q_b, self.q_c, _, _, _, self.gelu_rqs_mul, self.gelu_rqs_shift, self.gelu_rqs_add, S_out = get_i_gelu_requantized_constants(
                 gelu_eps_mult, D)
@@ -346,6 +341,10 @@ class Transformer:
         write_matrix([[self.gelu_rqs_add]], "activation_requant_add", self.paths["base"])
 
     def _init_paths(self, base_path: Union[str, os.PathLike]):
+        
+        if not str(base_path).endswith(os.sep):
+            base_path = str(base_path) + os.sep
+        
         self.paths = {
             "base": base_path,
             "mempool": os.path.join(base_path, "mempool/"),
@@ -582,6 +581,7 @@ class Transformer:
             self.A_partial_softmax = fastSoftmax(self.A_requant)
         else:
             self.A_partial_softmax = streamingPartialSoftmax(self.ITA_N, self.A_requant)
+            print(f"data type of A_partial_softmax: {self.A_partial_softmax.dtype}")
 
         if self.H == 1:
             A_save = [np.tile(self.A_partial_softmax[i], [self.split, 1]) for i in range(self.H)]
@@ -591,13 +591,16 @@ class Transformer:
             write_matrix(A_save, f"A_soft_{h}", self.paths["standalone"])
 
     def step5_AV(self):
+        print(f" Data type of Vp_requant: {self.Vp_requant.dtype}")
         self.O_soft = np.array([
             np.matmul(self.A_partial_softmax[i].astype(np.uint8), self.Vp_requant[i], dtype = np.int32)
             for i in range(self.H)
         ])
+        print(f" Data type of O_soft: {self.O_soft.dtype}")
         self.O_soft = np.clip(self.O_soft, -2**(self.WO - 1), 2**(self.WO - 1) - 1)
         self.O_soft_requant = requantize(self.O_soft, self.requant_eps_mult[4], self.requant_right_shift[4],
                                          self.requant_add[4])
+        print(f" Data type of O_soft_requant: {self.O_soft_requant.dtype}")
 
         self.tiler_AV(self.A_requant, np.transpose(self.Vp_requant, (0, 2, 1)), self.O_soft_requant, "A_stream_soft_in",
                       "Vp_in", "O_soft")
