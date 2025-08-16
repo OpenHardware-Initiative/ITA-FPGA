@@ -1,9 +1,3 @@
-// Copyright 2020 ETH Zurich and University of Bologna.
-// Solderpad Hardware License, Version 0.51, see LICENSE for details.
-// SPDX-License-Identifier: SHL-0.51
-//
-// Modified for URAM-based parallel memory and non-intrusive verification.
-
 `timescale 1ns / 1ps
 `include "hci_helpers.svh"
 
@@ -44,38 +38,38 @@ module ita_hwpe_tb;
   logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
   
   localparam string BANK_FILES [MP-1:0] = '{
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank0.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank1.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank2.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank3.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank4.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank5.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank6.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank7.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank8.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank9.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank10.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank11.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank12.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank13.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank14.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank15.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank16.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank17.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank18.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank19.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank20.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank21.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank22.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank23.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank24.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank25.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank26.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank27.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank28.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank29.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank31.mem",
     "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank30.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank31.mem"
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank29.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank28.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank27.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank26.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank25.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank24.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank23.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank22.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank21.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank20.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank19.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank18.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank17.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank16.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank15.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank14.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank13.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank12.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank11.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank10.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank9.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank8.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank7.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank6.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank5.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank4.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank3.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank2.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank1.mem",
+    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank0.mem"
 };
 
   // HWPE Parameters
@@ -694,42 +688,44 @@ uram_memory_controller #(
   endtask
   
   task automatic tcdm_read(input logic [31:0] addr, output logic [31:0] data);
-    // Decode the target port/bank from the byte address
-    // For MP=32, the bank index is bits [6:2] of the byte address.
-    int target_port = (addr >> 2) % MP;
+    // 1. Calculate which port is responsible for REQUESTING this address.
+    // This is the direct-mapped port.
+    int request_port = (addr >> 2) % MP;
+    
+    // 2. Calculate which port will RECEIVE the data due to the reversal.
+    int response_port = MP - 1 - request_port;
 
     // take the bus
     sel_init = 1'b1;
     init_req = '0;
-    init_wen = '1; // Set default to read
+    init_wen = '{default:1'b1}; // Set default to read
 
     @(posedge clk);
     
-    // Issue the read request on the CORRECT, decoded port
-    init_req[target_port] = 1'b1;
-    init_wen[target_port] = 1'b1; // READ
-    init_add[target_port] = addr;
+    // 3. Issue the read request on the DIRECT port.
+    init_req[request_port] = 1'b1;
+    init_wen[request_port] = 1'b1; // READ
+    init_add[request_port] = addr;
 
-    // Wait for the grant on that specific port
-    wait (tcdm_gnt[target_port]);
+    // 4. Wait for the grant on the port that made the request.
+    wait (tcdm_gnt[request_port]);
     @(posedge clk);
     
-    // Wait for the valid signal on that specific port
-    wait (tcdm_r_valid[target_port]);
+    // Once granted, de-assert the request.
+    init_req[request_port] = 1'b0;
     
-    // Capture the data from that specific port
-    data = tcdm_r_data[target_port];
+    // 5. Wait for the valid signal on the REVERSED port where the data will appear.
+    wait (tcdm_r_valid[response_port]);
+    
+    // 6. Capture the data from the REVERSED port.
+    data = tcdm_r_data[response_port];
 
-    // De-assert the request on that port
-    @(posedge clk);
-    init_req[target_port] = 1'b0;
-    
     // Wait one more cycle for the bus to be fully idle
     @(posedge clk);
 
     // release the bus
     sel_init = 1'b0;
-endtask
+  endtask
   
 
   task automatic compare_output(string STIM_DATA, integer address);
