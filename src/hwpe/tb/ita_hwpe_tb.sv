@@ -37,6 +37,7 @@ module ita_hwpe_tb;
   logic [N_STATES-1:0][31:0] BASE_PTR_BIAS;
   logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
   
+  
   localparam string BANK_FILES [MP-1:0] = '{
     "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank31.mem",
     "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank30.mem",
@@ -426,30 +427,31 @@ uram_memory_controller #(
     logic        weight_ptr_en;
     logic        bias_ptr_en;
     logic        ita_reg_en;
+
     logic [31:0] input_base_ptr   = BASE_PTR_INPUT[step];
     logic [31:0] weight_base_ptr0 = BASE_PTR_WEIGHT0[step];
     logic [31:0] weight_base_ptr1 = BASE_PTR_WEIGHT1[step];
     logic [31:0] bias_base_ptr    = BASE_PTR_BIAS[step];
     logic [31:0] output_base_ptr  = BASE_PTR_OUTPUT[step];
+
     logic [31:0] input_ptr;
     logic [31:0] weight_ptr0;
     logic [31:0] weight_ptr1;
     logic [31:0] bias_ptr;
     logic [31:0] output_ptr;
 
+
+    // Reprogram ITA once for every tile
     for (int tile_y = 0; tile_y < N_TILES_OUTER_Y[step]; tile_y++) begin
+
       for (int tile_x = 0; tile_x < N_TILES_OUTER_X[step]; tile_x++) begin
         integer output_tile = tile_y * N_TILES_OUTER_X[step] + tile_x;
+
         for (int tile_inner = 0; tile_inner < N_TILES_INNER_DIM[step]; tile_inner++) begin
           integer tile = output_tile * N_TILES_INNER_DIM[step] + tile_inner;
-          
-          if (!(step == Q && tile_y == 0 && tile_x == 0 && tile_inner == 0)) begin
-            wait(busy == 1'b0);
-          end
-          repeat(5) @(posedge clk_i);
-          
           $display("[ITA] Step %0d, Tile %0d (X %0d, Y %0d, I %0d) @ %0t", step, tile, tile_x, tile_y, tile_inner, $time);
 
+          // Calculate input_ptr, weight_ptr0, weight_ptr1, bias_ptr, and output_ptr
           ita_ptrs_compute(input_base_ptr, weight_base_ptr0, weight_base_ptr1, bias_base_ptr, output_base_ptr, step, tile, tile_x, tile_y, tile_inner, input_ptr, weight_ptr0, weight_ptr1, bias_ptr, output_ptr);
 
           if (SINGLE_ATTENTION == 1) begin
@@ -463,16 +465,39 @@ uram_memory_controller #(
             end
           end
 
+          // Calculate ctrl_stream_val, weight_ptr_en, and bias_ptr_en
           ctrl_val_compute(step, tile, ctrl_engine_val, ctrl_stream_val, weight_ptr_en, bias_ptr_en);
+
           $display(" - ITA Reg En 0x%0h, Ctrl Stream Val 0x%0h, Weight Ptr En %0d, Bias Ptr En %0d", ita_reg_en, ctrl_stream_val, weight_ptr_en, bias_ptr_en);
 
+          // Program ITA with the pointers for the current tile.
           PROGRAM_ITA(input_ptr, weight_ptr0, weight_ptr1, weight_ptr_en, bias_ptr, bias_ptr_en, output_ptr, ita_reg_tiles_val, ita_reg_rqs_val, ita_reg_gelu_b_c_val, ita_reg_activation_rqs_val, ita_reg_en, ctrl_engine_val, ctrl_stream_val, clk_i);
 
-          PERIPH_WRITE( 32'h0, 32'h0, 32'h0, clk_i);
+          // Wait for ITA to finish the previous operation, then trigger the new one.
+          @(posedge clk_i);
+          if (step == Q && tile == 0) begin
+            // For the very first tile, just trigger. No need to wait.
+            PERIPH_WRITE( 32'h0, 32'h0, 32'h0, clk_i);
+          end else begin
+            // For all subsequent tiles, wait for the HWPE to finish.
+            wait(busy == 1'b0);
+
+            // ******* THE FIX IS HERE *******
+            // Add a small delay to ensure the HWPE's internal state is stable.
+            repeat(5) @(posedge clk_i);
+            
+            // Now, trigger the next operation.
+            PERIPH_WRITE( 32'h0, 32'h0, 32'h0, clk_i);
+          end
+          #(10ns);
+
         end
       end
     end
-      wait(busy == 1'b0);
+    
+    // This task does not have a `wait(busy == 1'b0)` at the end.
+    // The final wait is in the main `initial` block, which is fine.
+
   endtask
 
   task automatic ita_ptrs_compute(
