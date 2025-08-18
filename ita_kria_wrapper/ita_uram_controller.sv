@@ -22,21 +22,13 @@ module uram_memory_controller
   logic [MP-1:0][3:0]             bank_web;
   logic [MP-1:0]                  bank_ena, bank_enb;
 
-  // --- Synthesizable Stalling Logic ---
-  logic [2:0] stall_counter;
-  logic grant_enable;
-  always_ff @(posedge clk_i or negedge rst_ni) begin
-    if (!rst_ni) stall_counter <= '0;
-    else         stall_counter <= stall_counter + 1;
-  end
-  assign grant_enable = (stall_counter < 5);
 
   // ====================================================================
   // --- Stage 1: Grant Generation ---
   // ====================================================================
   generate
     for (genvar i = 0; i < MP; i++) begin : g_grant
-        assign tcdm[i].gnt = tcdm[i].req & grant_enable;
+        assign tcdm[i].gnt = tcdm[i].req;
     end
   endgenerate
     
@@ -222,3 +214,4 @@ endcase
     end
   endgenerate
   endmodule
+
