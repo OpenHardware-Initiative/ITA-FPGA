@@ -56,6 +56,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/src/ita_accumulator.sv" \
     "$ROOT/src/ita_dotp.sv" \
     "$ROOT/src/hwpe/ita_hwpe_ctrl.sv" \
+    "$ROOT/ita_kria_wrapper/ita_uram_controller.sv" \
 ]
 update_compile_order -fileset sources_1
 
