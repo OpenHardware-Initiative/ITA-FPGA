@@ -764,25 +764,64 @@ uram_memory_controller #(
     sel_init = 1'b0;
   endtask
   
-
-  task automatic compare_output(string STIM_DATA, integer address);
-    integer stim_fd, ret_code, counter, exp_res;
-    logic [31:0] actual_res;
-    $display("Comparing output for %s @ 0x%0h @ %0t", STIM_DATA, address, $time);
-    stim_fd = open_stim_file(STIM_DATA);
-    counter = 0;
-    while (!$feof(stim_fd)) begin
-      $display("DEBUG <<<< Entered while loop");
-      ret_code = $fscanf(stim_fd, "%x\n", exp_res);
-      tcdm_read(address + (counter * 4), actual_res);
-      $display("DEBUG <<<<<<<<<< Output mismatch at address %h: Expected %h, Got %h", address + (counter * 4), exp_res, actual_res);
-      if (exp_res !== actual_res) begin
-        $display("Output mismatch at address %h: Expected %h, Got %h", address + (counter * 4), exp_res, actual_res);
+    task automatic tcdm_verify_read(input logic [31:0] addr, output logic [31:0] data);
+      // 1. Calculate which port is responsible for REQUESTING this address.
+      int request_port = (addr >> 2) % MP;
+      
+      // 2. The response port is the SAME as the request port.
+      int response_port = request_port; // The only change is here.
+    
+      // take the bus
+      sel_init = 1'b1;
+      init_req = '0;
+      init_wen = '{default:1'b1}; 
+    
+      @(posedge clk);
+      
+      // Issue the read request
+      init_req[request_port] = 1'b1;
+      init_wen[request_port] = 1'b1; 
+      init_add[request_port] = addr;
+    
+      // Wait for grant
+      wait (tcdm_gnt[request_port]);
+      @(posedge clk);
+      
+      // De-assert request
+      init_req[request_port] = 1'b0;
+      
+      // Wait for valid signal
+      wait (tcdm_r_valid[response_port]);
+      
+      // Capture data
+      data = tcdm_r_data[response_port];
+    
+      @(posedge clk);
+    
+      // release the bus
+      sel_init = 1'b0;
+    endtask 
+      
+    task automatic compare_output(input string STIM_DATA, input integer address);
+      integer stim_fd, counter, exp_res;
+      logic [31:0] actual_res;
+    
+      $display("Comparing output for %s @ 0x%0h @ %0t", STIM_DATA, address, $time);
+      stim_fd = open_stim_file(STIM_DATA);
+      counter = 0;
+    
+      while ($fscanf(stim_fd, "%x", exp_res) == 1) begin
+        // Use the new task to read from the simplified simulation model
+        tcdm_verify_read(address + (counter * 4), actual_res);
+    
+        if (exp_res !== actual_res) begin
+          $display("Output mismatch at address %h: Expected %h, Got %h", address + (counter * 4), exp_res, actual_res);
+        end
+        counter++;
       end
-      counter++;
-    end
-    $fclose(stim_fd);
-  endtask
+    
+      $fclose(stim_fd);
+    endtask
 
   task read_ITA_rqs(
     output logic [N_REQUANT_CONSTS-1:0][EMS-1:0]  eps_mult,
