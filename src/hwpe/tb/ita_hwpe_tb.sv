@@ -39,38 +39,38 @@ module ita_hwpe_tb;
   
   
   localparam string BANK_FILES [MP-1:0] = '{
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank31.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank30.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank29.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank28.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank27.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank26.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank25.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank24.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank23.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank22.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank21.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank20.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank19.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank18.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank17.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank16.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank15.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank14.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank13.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank12.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank11.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank10.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank9.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank8.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank7.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank6.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank5.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank4.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank3.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank2.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank1.mem",
-    "/nas/ei/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity/hwpe/memory_banks/bank0.mem"
+    "../../../../../ita_kria_wrapper/memory_banks/bank31.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank30.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank29.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank28.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank27.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank26.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank25.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank24.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank23.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank22.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank21.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank20.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank19.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank18.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank17.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank16.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank15.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank14.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank13.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank12.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank11.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank10.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank9.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank8.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank7.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank6.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank5.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank4.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank3.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank2.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank1.mem",
+    "../../../../../ita_kria_wrapper/memory_banks/bank0.mem"
 };
 
   // HWPE Parameters
@@ -246,7 +246,19 @@ uram_memory_controller #(
     init_be   = '{default:4'hF};
 
     simdir = {
-      "/home/ge26dob/Desktop/ITA-FPGA-URAM/simvectors/data_S64_E128_P192_F256_H1_B0_Identity"};
+      "../../../../../simvectors/data_S",
+      $sformatf("%0d", SEQUENCE_LEN),
+      "_E",
+      $sformatf("%0d", EMBEDDING_SIZE),
+      "_P",
+      $sformatf("%0d", PROJECTION_SPACE),
+      "_F",
+      $sformatf("%0d", FEEDFORWARD_SIZE),
+      "_H1_B",
+      $sformatf("%0d", `ifdef BIAS `BIAS `else 0 `endif),
+      "_",
+      activation_e_to_string(ACTIVATION)
+    };
     
     // Calculate parameters
     N_TILES_SEQUENCE_DIM = SEQUENCE_LEN / M_TILE_LEN;
@@ -760,8 +772,10 @@ uram_memory_controller #(
     stim_fd = open_stim_file(STIM_DATA);
     counter = 0;
     while (!$feof(stim_fd)) begin
+      $display("DEBUG <<<< Entered while loop");
       ret_code = $fscanf(stim_fd, "%x\n", exp_res);
       tcdm_read(address + (counter * 4), actual_res);
+      $display("DEBUG <<<<<<<<<< Output mismatch at address %h: Expected %h, Got %h", address + (counter * 4), exp_res, actual_res);
       if (exp_res !== actual_res) begin
         $display("Output mismatch at address %h: Expected %h, Got %h", address + (counter * 4), exp_res, actual_res);
       end
