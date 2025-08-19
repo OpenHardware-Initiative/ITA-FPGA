@@ -3,6 +3,7 @@ modelsim/work/
 modelsim/wlft*
 simvectors/
 .bender/
+ita_kria_wrapper/memory_banks
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
