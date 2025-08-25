@@ -57,6 +57,11 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/src/ita_dotp.sv" \
     "$ROOT/src/hwpe/ita_hwpe_ctrl.sv" \
     "$ROOT/ita_kria_wrapper/ita_uram_controller.sv" \
+    "$ROOT/ita_kria_wrapper/ita_hwpe_sequencer.sv" \
+    "$ROOT/ita_kria_wrapper/dma_address_generator.sv" \
+    "$ROOT/ita_kria_wrapper/uram_memory_controller_ita_dma.sv" \
+    "$ROOT/ita_kria_wrapper/ITA_FPGA_WRAPPER.sv" \
+    "$ROOT/ita_kria_wrapper/ITA_AXI_WRAPPER.sv" \
 ]
 update_compile_order -fileset sources_1
 
