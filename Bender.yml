@@ -27,6 +27,10 @@ dependencies:
 # dependency updates would require disastrous amounts of re-verification.
 frozen: false
 
+# Include directories
+include_dirs:
+  - .bender/git/checkouts/common_cells-*/include
+
 # List of source files in this package. Optional.
 sources:
   # Individual source files are simple string entries:

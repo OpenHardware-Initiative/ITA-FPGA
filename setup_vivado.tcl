@@ -61,7 +61,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/ita_kria_wrapper/dma_address_generator.sv" \
     "$ROOT/ita_kria_wrapper/uram_memory_controller_ita_dma.sv" \
     "$ROOT/ita_kria_wrapper/ITA_FPGA_WRAPPER.sv" \
-    "$ROOT/ita_kria_wrapper/ITA_AXI_WRAPPER.sv" \
+    "$ROOT/ita_kria_wrapper/ITA_AXI_WRAPPER.v" \
 ]
 update_compile_order -fileset sources_1
 
@@ -135,6 +135,10 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/core/hci_core_fifo.sv" \
 ]
 update_compile_order -fileset sources_1
+
+# Add assertions header file
+add_files -fileset sources_1 "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/include/common_cells/assertions.svh"
+set_property file_type "Verilog Header" [get_files */assertions.svh]
 
 # Add common_cells, tech_cells, and hwpe-ctrl files
 add_files -norecurse -scan_for_includes [list \
@@ -281,7 +285,7 @@ set_property include_dirs [list \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/common" \
     "$ROOT/.bender/git/checkouts/hwpe-ctrl-b4d268c729c1adb1/rtl" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl" \
-] [current_fileset]
+    ] [current_fileset]
 
 set_property include_dirs [list \
     "$ROOT/.bender/git/checkouts/cluster_interconnect-d5833d25198a0133/rtl/low_latency_interco" \

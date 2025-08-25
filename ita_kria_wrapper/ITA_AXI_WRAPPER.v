@@ -276,8 +276,6 @@ module ITA_AXI_WRAPPER#(
         .start_wb_i(start_wb_i),
         .start_attn_i(start_attn_i),
         .start_ffn_i(start_ffn_i),
-        .dma_write_done_i(dma_write_done_i),
-        .dma_read_done_i(dma_read_done_i),
 
         // Status Outputs to AXI Register slv_reg2
         .wb_done_o(wb_done_o),

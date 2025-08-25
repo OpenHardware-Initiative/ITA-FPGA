@@ -148,8 +148,8 @@ module ITA_FPGA_WRAPPER #(
     // --- Pre-calculated Transfer Lengths (in 32-bit words) ---
     // These are calculated at compile time based on the accelerator's geometry.
     localparam int WORDS_PER_BYTE = 4;
-    localparam int WB_TOTAL_BYTES = BASE_PTR[15]; // All weights/biases are stored before the first output buffer.
-    localparam int WB_LOAD_WORDS  = WB_TOTAL_BYTES / WORDS_PER_BYTE;
+    logic WB_TOTAL_BYTES = BASE_PTR[15]; // All weights/biases are stored before the first output buffer.
+    logic WB_LOAD_WORDS  = WB_TOTAL_BYTES / WORDS_PER_BYTE;
 
     localparam int Q_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
     localparam int K_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
