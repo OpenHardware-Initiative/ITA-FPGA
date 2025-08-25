@@ -43,56 +43,69 @@ module ITA_FPGA_WRAPPER #(
     input  logic clk_i,
     input  logic rst_ni,
     input  logic test_mode_i,
+    
+    // Base address for the current DMA operation, provided by the host.
+    input logic [C_M_AXIS_TDATA_WIDTH-1:0] base_addr_i,
 
     // Events from HWPE
     output logic [N_CORES-1:0][1:0] evt_o,
-    output logic                   busy_o,
+    output logic                    busy_o,
     
     // --- FSM Control Interface from CPU/System ---
     input  logic start_wb_i,         // Pulse to start writing weights/biases
     input  logic start_attn_i,       // Pulse to start the Attention block computation
     input  logic start_ffn_i,        // Pulse to start the FFN block computation
-    input  logic dma_write_done_i,   // Pulse from DMA after it finishes writing to URAM
-    input  logic dma_read_done_i,    // Pulse from DMA after it finishes reading from URAM
     
-    // --- FSM Status Outputs to CPU/System
+    // --- FSM Status Outputs to CPU/System ---
     output logic wb_done_o,          // Asserted when WB setup is complete
     output logic attn_done_o,        // Asserted when Attention block is done, results ready
     output logic ffn_done_o,         // Asserted when FFN block is done, final results ready
     output logic accelerator_idle_o, // Asserted when FSM is in the top-level IDLE state
+
+    // DMA/Mux Control (Now driven by this module)
+    output logic dma_mode_o, // To uram_memory_controller: 1=DMA mode, 0=ITA (HWPE) mode
+    output logic dma_we_o,   // To uram_memory_controller: 1=Write to URAM, 0=Read from URAM
     
-    // SLAVE AXI STREAM Signals -> Wrapper
+    // SLAVE AXI STREAM Signals -> Wrapper (for loading data into URAM)
     input  logic [C_S_AXIS_TDATA_WIDTH-1:0] s_axis_tdata,
     input  logic s_axis_tvalid,
     output logic s_axis_tready,
     
-    // MASTER AXI STREAM Signals <- Wrapper
+    // MASTER AXI STREAM Signals <- Wrapper (for reading results from URAM)
     output logic [C_M_AXIS_TDATA_WIDTH-1:0] m_axis_tdata,
     output logic m_axis_tvalid,
     input  logic m_axis_tready
     
 );
     
-    // --- FSM State Definition (based on diagram) ---
-    typedef enum logic [3:0] {
-        S_IDLE,
-        S_SETUP_WB,
-        S_SETUP_ATTN,
-        S_RUN_ATTN,
-        S_DONE_ATTN,
-        S_SETUP_FFN,
-        S_RUN_FFN,
-        S_DONE_FFN
+    // --- FSM State Definition (Expanded for Autonomous DMA Control) ---
+    typedef enum logic [4:0] {
+        S_IDLE,                 // Waiting for a start command from the host.
+        // Weight/Bias Loading States
+        S_WAIT_WB_DATA,         // Waiting for the first valid data word on s_axis to begin the WB load.
+        S_SETUP_WB,             // Actively loading weights/biases from s_axis into URAM.
+        // Attention Path States
+        S_WAIT_ATTN_DATA,       // Waiting for the first valid data word (Q, K, V) to begin the ATTN load.
+        S_SETUP_ATTN,           // Actively loading ATTN inputs from s_axis into URAM.
+        S_RUN_ATTN,             // Computation phase: Sequencer is programming and triggering the HWPE.
+        S_WAIT_ATTN_READ_READY, // Computation is done, waiting for the host to be ready (m_axis_tready) to receive results.
+        S_DONE_ATTN,            // Actively streaming ATTN results from URAM to m_axis.
+        // FFN Path States
+        S_WAIT_FFN_DATA,        // Waiting for the first valid data word (FFN input) to begin the FFN load.
+        S_SETUP_FFN,            // Actively loading FFN input from s_axis into URAM.
+        S_RUN_FFN,              // Computation phase: Sequencer is programming and triggering the HWPE for FFN.
+        S_WAIT_FFN_READ_READY,  // Computation is done, waiting for the host to be ready to receive final results.
+        S_DONE_FFN              // Actively streaming final FFN results from URAM to m_axis.
     } state_t;
     
-    state_t current_state, next_state;
-    step_e  current_step_r, next_step;
+    state_t current_state, next_state; // FSM state registers
+    step_e  current_step_r, next_step; // Sub-state for RUN states (Q, K, V, etc.)
     
     // --- Sequencer Control & Status Wires ---
-    logic sequencer_start;
-    logic sequencer_done;
+    logic sequencer_start; // To start the ita_sequencer for a specific step
+    logic sequencer_done;  // From ita_sequencer, indicates one step is complete
 
-    // --- Internal Peripheral Bus ---
+    // --- Internal Peripheral Bus to program the HWPE ---
     logic periph_req_seq;
     logic periph_gnt_seq;
     logic [31:0] periph_add_seq;
@@ -103,16 +116,23 @@ module ITA_FPGA_WRAPPER #(
     logic periph_r_valid_seq;
     logic [IdWidth-1:0] periph_r_id_seq;
     
+    // --- DMA Address Generator Control & Status ---
+    logic        dma_ag_start;         // Pulse to start the address generator.
+    logic [31:0] dma_ag_len;           // Number of addresses to generate for the current transfer.
+    logic        dma_ag_done;          // Pulse from the address generator when the transfer is complete.
+    logic [31:0] uram_addr;            // Address bus to the memory controller.
+    logic        uram_addr_valid;      // Valid signal for the address bus.
+    logic        uram_addr_ready;      // Ready signal for the address bus.
+    logic        transfer_in_progress; // A latch to prevent re-triggering a DMA transfer mid-operation.
+
+    
+    
     // --- Parameter and Pointer Calculation (from Testbench) ---
-    // FIX: Changed these to `localparam` for better synthesis practice.
-    // This ensures they are treated as compile-time constants.
+    // This logic remains unchanged as it defines the accelerator's geometry.
     localparam int N_TILES_SEQUENCE_DIM    = SEQUENCE_LEN / M_TILE_LEN;
     localparam int N_TILES_EMBEDDING_DIM   = EMBEDDING_SIZE / M_TILE_LEN;
     localparam int N_TILES_PROJECTION_DIM  = PROJECTION_SPACE / M_TILE_LEN;
     localparam int N_TILES_FEEDFORWARD_DIM = FEEDFORWARD_SIZE / M_TILE_LEN;
-
-    // FIX: Defined the peripheral transaction ID, which was missing.
-    // The `ita_hwpe_wrap` instance requires an ID, and this was undefined.
     localparam int ID = 0;
 
     logic [N_STATES-1:0] N_TILES_OUTER_X;
@@ -124,10 +144,26 @@ module ITA_FPGA_WRAPPER #(
     logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT1;
     logic [N_STATES-1:0][31:0] BASE_PTR_BIAS;
     logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
+    
+    // --- Pre-calculated Transfer Lengths (in 32-bit words) ---
+    // These are calculated at compile time based on the accelerator's geometry.
+    localparam int WORDS_PER_BYTE = 4;
+    localparam int WB_TOTAL_BYTES = BASE_PTR[15]; // All weights/biases are stored before the first output buffer.
+    localparam int WB_LOAD_WORDS  = WB_TOTAL_BYTES / WORDS_PER_BYTE;
 
-    // This initial block calculates constants and pointers. Synthesis tools are
-    // capable of unrolling these loops and calculations to create the final
-    // constant values for the logic variables.
+    localparam int Q_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
+    localparam int K_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
+    localparam int V_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
+    localparam int ATTN_LOAD_WORDS = Q_WORDS + K_WORDS + V_WORDS;
+    localparam int ATTN_OUTPUT_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE; // Output of OW step
+
+    localparam int FFN_LOAD_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;   // Input to F1 step
+    localparam int FFN_OUTPUT_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE; // Output of F2 step
+    
+
+    // This block is synthesizable and calculates all memory pointers and tile
+    // dimensions at compile time. It's a direct hardware mapping of the
+    // testbench's setup phase.
     initial begin
         N_TILES_OUTER_X[Q] = N_TILES_PROJECTION_DIM;
         N_TILES_OUTER_X[K] = N_TILES_PROJECTION_DIM;
@@ -222,59 +258,140 @@ module ITA_FPGA_WRAPPER #(
         if (!rst_ni) begin
             current_state <= S_IDLE;
             current_step_r <= Idle;
+            transfer_in_progress <= 1'b0;
         end else begin
             current_state <= next_state;
             current_step_r <= next_step;
+            // Manage the transfer flag: set it when a transfer starts,
+            // and clear it when the transfer is done or we return to IDLE.
+            // This prevents re-triggering on subsequent valid/ready signals.
+            if (dma_ag_start) begin
+                transfer_in_progress <= 1'b1;
+            end else if (dma_ag_done || next_state == S_IDLE) begin
+                transfer_in_progress <= 1'b0;
+            end
         end
     end
 
     // --- FSM Combinational Logic ---
     always_comb begin
-        // Default assignments
+        // Default assignments to prevent latches
         next_state = current_state;
         next_step = current_step_r;
         sequencer_start = 1'b0;
+        dma_ag_start = 1'b0;
+        dma_ag_len = 32'b0;
 
         case (current_state)
             S_IDLE: begin
-                if (start_wb_i)   next_state = S_SETUP_WB;
-                if (start_attn_i) next_state = S_SETUP_ATTN;
-                if (start_ffn_i)  next_state = S_SETUP_FFN;
+                // Wait for a command from the host processor.
+                if (start_wb_i)   next_state = S_WAIT_WB_DATA;
+                if (start_attn_i) next_state = S_WAIT_ATTN_DATA;
+                if (start_ffn_i)  next_state = S_WAIT_FFN_DATA;
             end
 
-            S_SETUP_WB:   if (dma_write_done_i) next_state = S_IDLE;
-            S_SETUP_ATTN: if (dma_write_done_i) begin next_state = S_RUN_ATTN; next_step = Q; end
-            S_SETUP_FFN:  if (dma_write_done_i) begin next_state = S_RUN_FFN;  next_step = F1; end
+            // --- Weight & Bias Loading Path ---
+            S_WAIT_WB_DATA: begin
+                // Wait for the host to start sending data.
+                if (s_axis_tvalid && !transfer_in_progress) begin
+                    dma_ag_start = 1'b1; // Trigger the address generator.
+                    dma_ag_len   = WB_LOAD_WORDS; // Tell it how many addresses to generate.
+                    next_state   = S_SETUP_WB;    // Move to the active loading state.
+                end
+            end
+            S_SETUP_WB: begin
+                // Stay in this state until the address generator signals completion.
+                if (dma_ag_done) next_state = S_IDLE;
+            end
 
+            // --- Attention Computation Path ---
+            S_WAIT_ATTN_DATA: begin
+                // Wait for Q, K, V data to arrive.
+                if (s_axis_tvalid && !transfer_in_progress) begin
+                    dma_ag_start = 1'b1;
+                    dma_ag_len   = ATTN_LOAD_WORDS;
+                    next_state   = S_SETUP_ATTN;
+                end
+            end
+            S_SETUP_ATTN: begin
+                // Once all ATTN inputs are loaded, begin the computation.
+                if (dma_ag_done) begin
+                    next_state = S_RUN_ATTN;
+                    next_step = Q; // Start with the first step of attention.
+                end
+            end
             S_RUN_ATTN: begin
-                sequencer_start = 1'b1;
-                if (sequencer_done) begin
+                sequencer_start = 1'b1; // Keep the sequencer running.
+                if (sequencer_done) begin // When the sequencer finishes a step...
+                    // ...transition to the next step in the sequence.
                     case (current_step_r)
                         Q:  next_step = K;
                         K:  next_step = V;
                         V:  next_step = QK;
                         QK: next_step = AV;
                         AV: next_step = OW;
-                        OW: begin next_state = S_DONE_ATTN; next_step = Idle; end
+                        OW: begin // Last step of ATTN is done.
+                            next_state = S_WAIT_ATTN_READ_READY; 
+                            next_step = Idle; 
+                        end
                         default: next_step = Idle;
                     endcase
                 end
             end
+            S_WAIT_ATTN_READ_READY: begin
+                // Wait for the host to be ready to accept the results.
+                if (m_axis_tready && !transfer_in_progress) begin
+                    dma_ag_start = 1'b1;
+                    dma_ag_len   = ATTN_OUTPUT_WORDS;
+                    next_state   = S_DONE_ATTN;
+                end
+            end
+            S_DONE_ATTN: begin
+                // When the results have been fully streamed out, return to idle.
+                if (dma_ag_done) next_state = S_IDLE;
+            end
 
-            S_DONE_ATTN: if (dma_read_done_i) next_state = S_IDLE;
-
+            // --- FFN Computation Path ---
+            S_WAIT_FFN_DATA: begin
+                 // Wait for FFN input data to arrive.
+                 if (s_axis_tvalid && !transfer_in_progress) begin
+                    dma_ag_start = 1'b1;
+                    dma_ag_len   = FFN_LOAD_WORDS;
+                    next_state   = S_SETUP_FFN;
+                end
+            end
+            S_SETUP_FFN: begin
+                // Once FFN input is loaded, begin computation.
+                if (dma_ag_done) begin
+                    next_state = S_RUN_FFN;
+                    next_step = F1; // Start with the first FFN step.
+                end
+            end
             S_RUN_FFN: begin
                 sequencer_start = 1'b1;
                 if (sequencer_done) begin
                     case (current_step_r)
                         F1: next_step = F2;
-                        F2: begin next_state = S_DONE_FFN; next_step = Idle; end
+                        F2: begin // Last FFN step is done.
+                            next_state = S_WAIT_FFN_READ_READY; 
+                            next_step = Idle; 
+                        end
                         default: next_step = Idle;
                     endcase
                 end
             end
-
-            S_DONE_FFN: if (dma_read_done_i) next_state = S_IDLE;
+            S_WAIT_FFN_READ_READY: begin
+                // Wait for the host to be ready for the final results.
+                if (m_axis_tready && !transfer_in_progress) begin
+                    dma_ag_start = 1'b1;
+                    dma_ag_len   = FFN_OUTPUT_WORDS;
+                    next_state   = S_DONE_FFN;
+                end
+            end
+            S_DONE_FFN: begin
+                // When final results are sent, return to idle.
+                if (dma_ag_done) next_state = S_IDLE;
+            end
 
             default: next_state = S_IDLE;
         endcase
@@ -282,16 +399,24 @@ module ITA_FPGA_WRAPPER #(
 
     // --- FSM Output Logic ---
     assign accelerator_idle_o = (current_state == S_IDLE);
-    assign wb_done_o          = (current_state == S_SETUP_WB && dma_write_done_i);
-    assign attn_done_o        = (current_state == S_DONE_ATTN);
-    assign ffn_done_o         = (current_state == S_DONE_FFN);
+    assign wb_done_o          = (current_state == S_SETUP_WB && dma_ag_done);
+    assign attn_done_o        = (current_state == S_DONE_ATTN && dma_ag_done);
+    assign ffn_done_o         = (current_state == S_DONE_FFN && dma_ag_done);
 
-    assign dma_mode = (current_state == S_SETUP_WB) || (current_state == S_SETUP_ATTN) ||
-                        (current_state == S_SETUP_FFN) || (current_state == S_DONE_ATTN) ||
-                        (current_state == S_DONE_FFN);
+    // --- DMA/Mux Control Logic ---
+    // The memory controller is in DMA mode during all setup and done states.
+    // It's in ITA (HWPE) mode only during the RUN states.
+    assign dma_mode_o = (current_state inside {S_WAIT_WB_DATA, S_SETUP_WB,
+                                             S_WAIT_ATTN_DATA, S_SETUP_ATTN,
+                                             S_WAIT_FFN_DATA, S_SETUP_FFN,
+                                             S_WAIT_ATTN_READ_READY, S_DONE_ATTN,
+                                             S_WAIT_FFN_READ_READY, S_DONE_FFN});
 
-    // dma_we_o is 1 for a DMA read (from URAM), 0 for a DMA write (to URAM)
-    assign dma_we = (current_state == S_DONE_ATTN) || (current_state == S_DONE_FFN);
+    // dma_we_o is 1 for a DMA write (to URAM), 0 for a DMA read (from URAM)
+    // We are writing TO the URAM during the SETUP states.
+    assign dma_we_o = (current_state inside {S_WAIT_WB_DATA, S_SETUP_WB,
+                                            S_WAIT_ATTN_DATA, S_SETUP_ATTN,
+                                            S_WAIT_FFN_DATA, S_SETUP_FFN});
     
     // --- Internal Signals for TCDM Connection ---
     logic [MP-1:0]                        tcdm_req;
@@ -315,6 +440,10 @@ module ITA_FPGA_WRAPPER #(
     };
     `HCI_INTF_ARRAY(tcdm_mem, clk_i, MP-1:0);
     
+    // --- Sub-module Instantiations ---
+
+    // The sequencer is responsible for the low-level, tile-by-tile programming
+    // of the HWPE during the RUN states.
     ita_sequencer #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
@@ -350,42 +479,39 @@ module ITA_FPGA_WRAPPER #(
         .N_TILES_INNER_DIM(N_TILES_INNER_DIM)
     );
 
-    // --- Instantiate the ITA HWPE Wrapper ---
+    // The HWPE wrapper contains the actual processing engine.
     ita_hwpe_wrap #(
         .AccDataWidth(AccDataWidth),
         .IdWidth     (IdWidth),
         .MemDataWidth(MemDataWidth)
     ) i_ita_hwpe_wrap (
-        .clk_i        (clk_i),
-        .rst_ni       (rst_ni),
-        .test_mode_i  (test_mode_i),
-        .evt_o        (evt_o),
-        .busy_o       (busy_o),
-
-        // TCDM Master Ports (connected internally)
-        .tcdm_req_o   (tcdm_req),
-        .tcdm_add_o   (tcdm_add),
-        .tcdm_wen_o   (tcdm_wen),
-        .tcdm_be_o    (tcdm_be),
-        .tcdm_data_o  (tcdm_data),
-        .tcdm_gnt_i   (tcdm_gnt),
-        .tcdm_r_data_i (tcdm_r_data),
-        .tcdm_r_valid_i(tcdm_r_valid),
-
-        // Peripheral Slave Port (exposed to the outside)
-        .periph_req_i  (periph_req_seq),
-        .periph_gnt_o  (periph_gnt_seq),
-        .periph_add_i  (periph_add_seq),
-        .periph_wen_i  (periph_wen_seq),
-        .periph_be_i   (periph_be_seq),
-        .periph_data_i (periph_data_seq),
-        .periph_id_i   (ID), // Use the defined ID
+        .clk_i          (clk_i),
+        .rst_ni         (rst_ni),
+        .test_mode_i    (test_mode_i),
+        .evt_o          (evt_o),
+        .busy_o         (busy_o),
+        .tcdm_req_o     (tcdm_req),
+        .tcdm_add_o     (tcdm_add),
+        .tcdm_wen_o     (tcdm_wen),
+        .tcdm_be_o      (tcdm_be),
+        .tcdm_data_o    (tcdm_data),
+        .tcdm_gnt_i     (tcdm_gnt),
+        .tcdm_r_data_i  (tcdm_r_data),
+        .tcdm_r_valid_i (tcdm_r_valid),
+        .periph_req_i   (periph_req_seq),
+        .periph_gnt_o   (periph_gnt_seq),
+        .periph_add_i   (periph_add_seq),
+        .periph_wen_i   (periph_wen_seq),
+        .periph_be_i    (periph_be_seq),
+        .periph_data_i  (periph_data_seq),
+        .periph_id_i    (ID),
         .periph_r_data_o(periph_r_data_seq),
         .periph_r_valid_o(periph_r_valid_seq),
-        .periph_r_id_o (periph_r_id_seq)
+        .periph_r_id_o  (periph_r_id_seq)
     );
 
-    // --- Instantiate the URAM Memory Controller ---
+    // The memory controller arbitrates access to the URAM between the
+    // HWPE (ITA mode) and the external AXI-Stream interfaces (DMA mode).
     uram_memory_controller_ita_dma #(
         .MP            (MP),
         .TOTAL_WORDS   (TOTAL_WORDS),
@@ -393,67 +519,51 @@ module ITA_FPGA_WRAPPER #(
     ) i_uram_memory_controller_ita_dma (
         .clk_i (clk_i),
         .rst_ni(rst_ni),
-        .tcdm  (tcdm_mem), // Connect the HCI interface array
-        
-        // Control from FSM
-        .dma_mode_i(dma_mode),
-        .dma_we_i(dma_we),
-        
-        // Address gen signals
+        .tcdm  (tcdm_mem),
+        .dma_mode_i(dma_mode_o),
+        .dma_we_i(dma_we_o),
         .dma_addr_i(uram_addr),
         .dma_addr_valid_i(uram_addr_valid),
         .dma_addr_ready_o(uram_addr_ready),
-        
-        //  Data in signals (Write)
         .dma_wdata_i(s_axis_tdata),
         .dma_wdata_valid_i(s_axis_tvalid),
         .dma_wdata_ready_o(s_axis_tready),
-        
-        // Data out signals (Read)
         .dma_rdata_o(m_axis_tdata),
         .dma_rdata_valid_o(m_axis_tvalid),
         .dma_rdata_ready_i(m_axis_tready)
     );
     
-    dma_address_generator (
-        //================================================================
-        // Inputs
-        //================================================================
-        .clk(clk_i),                        // System clock
-        .reset_n(rst_ni),                   // Active-low asynchronous reset
-        .en_load(),                         // Pulse to load the base address ####################### TODO CONNECT THIS CORRECTLY.
-        .base_address(),                    // The LOGICAL base address from the CPU
-        .dma_we(dma_we),                            // Raw Write Enable control: 1 for Write, 0 for Read
-        
-        //================================================================
-        // AXI Stream Master Interface
-        //================================================================
+    // The address generator provides the URAM addresses for DMA transfers.
+    dma_address_generator #(
+        .C_M_AXIS_TDATA_WIDTH(C_M_AXIS_TDATA_WIDTH)
+    ) i_dma_address_generator (
+        .clk(clk_i),
+        .reset_n(rst_ni),
+        .start_i(dma_ag_start),
+        .base_address_in(base_addr_i),
+        .transfer_len_i(dma_ag_len),
+        .done_o(dma_ag_done),
         .m_axis_tdata(uram_addr),
         .m_axis_tvalid(uram_addr_valid),
         .m_axis_tready(uram_addr_ready),
         .m_axis_tlast() 
-      );
+    );
 
     // --- Connect HWPE TCDM signals to the HCI Interface ---
     generate
         for (genvar i = 0; i < MP; i++) begin : g_tcdm_binding
-            // Driving signals from HWPE to Memory Controller
             assign tcdm_mem[i].req  = tcdm_req[i];
             assign tcdm_mem[i].add  = tcdm_add[i];
             assign tcdm_mem[i].wen  = tcdm_wen[i];
             assign tcdm_mem[i].be   = tcdm_be[i];
             assign tcdm_mem[i].data = tcdm_data[i];
-
-            // Driving signals from Memory Controller back to HWPE
             assign tcdm_gnt[i]      = tcdm_mem[i].gnt;
             assign tcdm_r_valid[i]  = tcdm_mem[i].r_valid;
             assign tcdm_r_data[i]   = tcdm_mem[i].r_data;
-
-            // Tie off unused HCI ports to default values
-            assign tcdm_mem[i].user     = '0;
-            assign tcdm_mem[i].id       = '0;
-            assign tcdm_mem[i].ecc      = '0;
-            assign tcdm_mem[i].ereq     = '0;
+            assign tcdm_mem[i].user    = '0;
+            assign tcdm_mem[i].id      = '0;
+            assign tcdm_mem[i].ecc     = '0;
+            assign tcdm_mem[i].ereq    = '0;
             assign tcdm_mem[i].r_eready = 1'b1;
         end
     endgenerate

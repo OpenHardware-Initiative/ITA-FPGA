@@ -72,56 +72,11 @@ module ITA_AXI_WRAPPER#(
     input wire  S_AXI_RREADY
     
 );
+    //================================================================
+    // AXI Lite Slave Logic
+    //================================================================
 
-
-/////////////////////////////////////////////////
-//          START AXI STREAM
-/////////////////////////////////////////////////
-
-    // Internal signals now correctly sized by the parameter
-    reg [C_M_AXIS_TDATA_WIDTH-1:0] processed_data;
-    reg output_valid;
-    reg output_last;
-
- always @(posedge aclk) begin
-        if (!aresetn) begin
-            processed_data <= 0;
-            output_valid <= 1'b0;
-            output_last <= 1'b0;
-        end else begin
-            // De-assert valid if the downstream component accepts the data
-            if (output_valid && m_axis_tready) begin
-                output_valid <= 1'b0;
-            end
-            
-            // Process new data when valid input is present and we are ready for it
-            if (s_axis_tvalid && s_axis_tready) begin
-                // Use the parameter to define the constant's width for safety
-                processed_data <= s_axis_tdata + 2;
-                output_valid <= 1'b1;
-                output_last <= s_axis_tlast;
-            end
-        end
-    end
-    
-    
-    // AXI Stream handshaking
-    // Ready to accept new data if we don't have a valid transaction pending 
-    // or if the pending transaction is being accepted by the downstream logic this cycle.
-    assign s_axis_tready = ~output_valid | m_axis_tready;
-    assign m_axis_tdata  = processed_data;
-    assign m_axis_tvalid = output_valid;
-    assign m_axis_tlast  = output_last;
-    
-/////////////////////////////////////////////////
-//          END AXI STREAM
-/////////////////////////////////////////////////
-
-/////////////////////////////////////////////////
-//          START AXI LITE
-/////////////////////////////////////////////////
-
-// Internal AXI4LITE signals
+    // Internal AXI4LITE signals
     reg [C_S_AXI_ADDR_WIDTH-1 : 0]  axi_awaddr;
     reg                             axi_awready;
     reg                             axi_wready;
@@ -158,24 +113,27 @@ module ITA_AXI_WRAPPER#(
             axi_awaddr  <= 0;
         end
         else begin
-            if (~axi_awready && S_AXI_AWVALID && S_AXI_WVALID) begin
+            // AWREADY is asserted when slave is ready to accept a new address.
+            // It is deasserted when a transaction is in progress.
+            if (~axi_awready && S_AXI_BREADY && axi_bvalid) begin
                 axi_awready <= 1'b1;
-            end else if (S_AXI_BREADY && axi_bvalid) begin
-                axi_awready <= 1'b1;
-            end else begin
+            end else if (S_AXI_AWVALID) begin
                 axi_awready <= 1'b0;
             end
 
-            if (~axi_wready && S_AXI_AWVALID && S_AXI_WVALID) begin
-                axi_wready <= 1'b1;
-            end else begin
-                axi_wready <= 1'b0;
+            // WREADY is asserted when an address has been latched and slave is ready for data.
+            if (~axi_wready && S_AXI_WVALID && S_AXI_AWVALID) begin
+                 axi_wready <= 1'b1;
+            end else if (S_AXI_BREADY && axi_bvalid) begin
+                 axi_wready <= 1'b0;
             end
 
-            if (S_AXI_AWVALID && axi_awready) begin
+            // Latch the write address when the master provides a valid address
+            if (S_AXI_AWVALID && ~axi_awready) begin
                 axi_awaddr <= S_AXI_AWADDR;
             end
 
+            // BVALID is asserted when both address and data phases are complete.
             if (axi_wready && S_AXI_WVALID && ~axi_bvalid) begin
                 axi_bvalid <= 1'b1;
             end 
@@ -184,7 +142,9 @@ module ITA_AXI_WRAPPER#(
             end
         end
     end
-
+    
+    
+    integer i;
     // --- User Logic: Register Write Logic ---
     always @(posedge aclk) begin
         if (aresetn == 1'b0) begin
@@ -197,11 +157,12 @@ module ITA_AXI_WRAPPER#(
                 // Address bits [3:2] select the register for a 32-bit data bus
                 case (axi_awaddr[C_S_AXI_ADDR_WIDTH-1:2])
                     2'h0: // Address 0x00
-                        for (integer i = 0; i < (C_S_AXI_DATA_WIDTH/8); i = i + 1)
+                        for (i = 0; i < (C_S_AXI_DATA_WIDTH/8); i = i + 1)
                             if (S_AXI_WSTRB[i])
                                 slv_reg0[i*8 +: 8] <= S_AXI_WDATA[i*8 +: 8];
                     2'h1: // Address 0x04
-                        for (integer i = 0; i < (C_S_AXI_DATA_WIDTH/8); i = i + 1)
+                        
+                        for (i = 0; i < (C_S_AXI_DATA_WIDTH/8); i = i + 1)
                             if (S_AXI_WSTRB[i])
                                 slv_reg1[i*8 +: 8] <= S_AXI_WDATA[i*8 +: 8];
                     // Writes to other addresses (like the read-only status reg) are ignored
@@ -222,14 +183,20 @@ module ITA_AXI_WRAPPER#(
             axi_araddr  <= 0;
         end 
         else begin
-            if (~axi_arready && S_AXI_ARVALID) begin
+            // ARREADY is asserted when the slave is ready to accept a read address.
+            if (~axi_arready && S_AXI_RVALID && S_AXI_RREADY) begin
                 axi_arready <= 1'b1;
-            end else begin
+            end else if(S_AXI_ARVALID) begin
                 axi_arready <= 1'b0;
             end
 
-            if (S_AXI_ARVALID && axi_arready) begin
+            // Latch the read address from the master
+            if (S_AXI_ARVALID && ~axi_arready) begin
                 axi_araddr <= S_AXI_ARADDR;
+            end
+
+            // RVALID is asserted once a read address is latched.
+            if (S_AXI_ARVALID && ~axi_arready) begin
                 axi_rvalid <= 1'b1;
             end 
             else if (axi_rvalid && S_AXI_RREADY) begin
@@ -263,14 +230,15 @@ module ITA_AXI_WRAPPER#(
     wire dma_read_done_i;
 
     // Status signals (drive slv_reg2)
-    wire wb_done_o;
-    wire attn_done_o;
-    wire ffn_done_o;
-    wire accelerator_idle_o;
-    wire dma_mode_o;
-    wire dma_we_o;
-    wire evt_o;
-    wire busy_o;
+    wire [1:0] evt_o; // Assuming N_CORES is 1 for this wrapper
+    wire       busy_o;
+    wire       wb_done_o;
+    wire       attn_done_o;
+    wire       ffn_done_o;
+    wire       accelerator_idle_o;
+    wire       dma_mode_o;
+    wire       dma_we_o;
+
 
     // De-concatenate control register to drive ITA inputs
     assign start_wb_i         = slv_reg1[0];
@@ -282,35 +250,36 @@ module ITA_AXI_WRAPPER#(
     // Concatenate status outputs from ITA to drive the status register
     // This is a continuous assignment, so the status register is always up-to-date
     always @(*) begin
-        slv_reg2 = {24'b0, busy_o, evt_o, dma_we_o, dma_mode_o, accelerator_idle_o, ffn_done_o, attn_done_o, wb_done_o};
+        slv_reg2 = {23'b0, busy_o, evt_o, dma_we_o, dma_mode_o, accelerator_idle_o, ffn_done_o, attn_done_o, wb_done_o};
     end
-    
-/////////////////////////////////////////////////
-//          FINISH AXI LITE
-/////////////////////////////////////////////////
-    
     
     // INSTANTIATION OF ITA
     ITA_FPGA_WRAPPER #(
+        // Pass through relevant parameters
+        .C_S_AXIS_TDATA_WIDTH(C_S_AXIS_TDATA_WIDTH),
+        .C_M_AXIS_TDATA_WIDTH(C_M_AXIS_TDATA_WIDTH),
         .M_TILE_LEN(64),
         .SEQUENCE_LEN(128),
         .PROJECTION_SPACE(128),
         .EMBEDDING_SIZE(256),
-        .FEEDFORWARD_SIZE(256),
-        .ACTIVATION(Relu)
+        .FEEDFORWARD_SIZE(256)
+        //.ACTIVATION(Relu) // Assuming Relu is a defined parameter
     ) i_ITA_FPGA_WRAPPER (
         .clk_i(aclk),
         .rst_ni(aresetn),
         .test_mode_i(1'b0),
+        
+        // Base Address from AXI Register slv_reg0
+        .base_addr_i(slv_reg0),
 
-        // Control Inputs
+        // Control Inputs from AXI Register slv_reg1
         .start_wb_i(start_wb_i),
         .start_attn_i(start_attn_i),
         .start_ffn_i(start_ffn_i),
         .dma_write_done_i(dma_write_done_i),
         .dma_read_done_i(dma_read_done_i),
 
-        // Status Outputs
+        // Status Outputs to AXI Register slv_reg2
         .wb_done_o(wb_done_o),
         .attn_done_o(attn_done_o),
         .ffn_done_o(ffn_done_o),
@@ -323,8 +292,8 @@ module ITA_AXI_WRAPPER#(
         // HWPE Status
         .evt_o(evt_o),
         .busy_o(busy_o),
-        
-         // AXI STREAM SLAVE PORT
+
+        // AXI STREAM SLAVE PORT
         .s_axis_tdata(s_axis_tdata),
         .s_axis_tvalid(s_axis_tvalid),
         .s_axis_tready(s_axis_tready),
