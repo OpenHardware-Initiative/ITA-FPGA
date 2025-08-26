@@ -62,9 +62,9 @@ module ita_sequencer #(
     input logic [3:0]                N_TILES_EMBEDDING_DIM,
     input logic [3:0]                N_TILES_PROJECTION_DIM,
     input logic [3:0]                N_TILES_FEEDFORWARD_DIM,
-    input logic [N_STATES-1:0]       N_TILES_OUTER_X,
-    input logic [N_STATES-1:0]       N_TILES_OUTER_Y,
-    input logic [N_STATES-1:0]       N_TILES_INNER_DIM
+    input logic [31:0]       N_TILES_OUTER_X [N_STATES-1:0],
+    input logic [31:0]       N_TILES_OUTER_Y [N_STATES-1:0],
+    input logic [31:0]      N_TILES_INNER_DIM [N_STATES-1:0]
 );
 
     localparam unsigned ITA_REG_OFFSET = 32'h20;

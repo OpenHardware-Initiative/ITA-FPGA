@@ -135,9 +135,9 @@ module ITA_FPGA_WRAPPER #(
     localparam int N_TILES_FEEDFORWARD_DIM = FEEDFORWARD_SIZE / M_TILE_LEN;
     localparam int ID = 0;
 
-    logic [N_STATES-1:0] N_TILES_OUTER_X;
-    logic [N_STATES-1:0] N_TILES_OUTER_Y;
-    logic [N_STATES-1:0] N_TILES_INNER_DIM;
+    logic [31:0] N_TILES_OUTER_X [N_STATES-1:0];
+    logic [31:0] N_TILES_OUTER_Y [N_STATES-1:0];
+    logic [31:0] N_TILES_INNER_DIM [N_STATES-1:0];
     logic [31:0] BASE_PTR [0:22];
     logic [N_STATES-1:0][31:0] BASE_PTR_INPUT;
     logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT0;
@@ -159,7 +159,6 @@ module ITA_FPGA_WRAPPER #(
 
     localparam int FFN_LOAD_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;   // Input to F1 step
     localparam int FFN_OUTPUT_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE; // Output of F2 step
-    
 
     // This block is synthesizable and calculates all memory pointers and tile
     // dimensions at compile time. It's a direct hardware mapping of the
