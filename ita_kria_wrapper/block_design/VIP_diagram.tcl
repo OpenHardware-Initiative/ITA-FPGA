@@ -63,7 +63,7 @@ if { $list_projs eq "" } {
 
 # CHANGE DESIGN NAME HERE
 variable design_name
-set design_name design_1
+set design_name VIP_diagram
 
 # If you do not already have an existing IP Integrator design open,
 # you can create a design using the following command:
