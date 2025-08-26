@@ -198,7 +198,7 @@ module ita_sequencer #(
             end
             default: ;
         endcase
-        ctrl_stream_val[4] = ((tile_inner_cnt + 1) % N_TILES_INNER_DIM[step_i] == 0) ? 1'b0 : 1'b1;
+        ctrl_stream_val[4] = ((current_tile + 1) % N_TILES_INNER_DIM[step_i] == 0) ? 1'b0 : 1'b1;
     end
 
     assign ita_reg_en = (SINGLE_ATTENTION == 1) ? 1'b1 : (ita_reg_cnt < N_CONTEXT);

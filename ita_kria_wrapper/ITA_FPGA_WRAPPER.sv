@@ -31,11 +31,11 @@ module ITA_FPGA_WRAPPER #(
     
     // Data Parameters
     parameter int M_TILE_LEN = 64,
-    parameter int SEQUENCE_LEN = 128,
-    parameter int PROJECTION_SPACE = 128,
-    parameter int EMBEDDING_SIZE = 256,
+    parameter int SEQUENCE_LEN = 64,
+    parameter int PROJECTION_SPACE = 192,
+    parameter int EMBEDDING_SIZE = 128,
     parameter int FEEDFORWARD_SIZE = 256,
-    parameter activation_e ACTIVATION = Relu,
+    parameter activation_e ACTIVATION = Identity,
     parameter int SINGLE_ATTENTION = 0,
     parameter int N_CONTEXT = 8
 ) (
@@ -125,8 +125,6 @@ module ITA_FPGA_WRAPPER #(
     logic        uram_addr_ready;      // Ready signal for the address bus.
     logic        transfer_in_progress; // A latch to prevent re-triggering a DMA transfer mid-operation.
 
-    
-    
     // --- Parameter and Pointer Calculation (from Testbench) ---
     // This logic remains unchanged as it defines the accelerator's geometry.
     localparam int N_TILES_SEQUENCE_DIM    = SEQUENCE_LEN / M_TILE_LEN;
