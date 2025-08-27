@@ -166,7 +166,7 @@ module ITA_FPGA_WRAPPER #(
     localparam int ATTN_W_LOAD_WORDS  = (H * 4 * EMBEDDING_SIZE * PROJECTION_SPACE) / (C_S_AXIS_TDATA_WIDTH / 8);
     localparam int ATTN_B_LOAD_WORDS  = (H * (9 * PROJECTION_SPACE + 3 * EMBEDDING_SIZE)) / (C_S_AXIS_TDATA_WIDTH / 8);
     localparam int ATTN_WB_LOAD_WORDS = ATTN_W_LOAD_WORDS + ATTN_B_LOAD_WORDS;
-    localparam int ATTN_LOAD_WORDS    = (3 * SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int ATTN_LOAD_WORDS    = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 4);
     localparam int ATTN_OUTPUT_WORDS  = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_M_AXIS_TDATA_WIDTH / 8);
 
     // FFN Layer
@@ -315,7 +315,7 @@ module ITA_FPGA_WRAPPER #(
             S_WAIT_ATTN_WB_DATA: begin
                 if (s_axis_tvalid && !transfer_in_progress) begin
                     dma_ag_start     = 1'b1;
-                    dma_ag_base_addr = BASE_PTR_WEIGHT0[Q]; // Start of ATTN WB block
+                    dma_ag_base_addr = BASE_PTR_INPUT[Q]; // Start of ATTN WB block
                     dma_ag_len       = ATTN_WB_LOAD_WORDS;
                     next_state       = S_SETUP_ATTN_WB;
                 end

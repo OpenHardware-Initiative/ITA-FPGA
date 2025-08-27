@@ -81,7 +81,7 @@ module ita_sequencer #(
 
     localparam unsigned ITA_REG_OFFSET = 32'h20;
     localparam int N_ELEMENTS_PER_TILE = M_TILE_LEN * M_TILE_LEN;
-    localparam int PROGRAM_STEPS = 16;
+    localparam int PROGRAM_STEPS = 17;
 
     // FSM to control the sequencing of register writes and triggers
     typedef enum logic [3:0] {
@@ -91,6 +91,7 @@ module ita_sequencer #(
         S_CALC,
         S_PROG_REG,
         S_WAIT_GNT,
+        S_WAIT_CYCLE,
         S_POST_PROGRAM_DELAY,
         S_TRIGGER,
         S_CHECK_DONE,
@@ -246,6 +247,7 @@ module ita_sequencer #(
     end
 
     // --- FSM Combinational Logic ---
+    logic [31:0] periph_data_o_prev;
     always_comb begin
         // Default assignments
         next_state = current_state;
@@ -305,30 +307,33 @@ module ita_sequencer #(
 
                 case (reg_prog_cnt)
                     // Pointers
-                    0:  begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_INPUT_PTR;   periph_data_o=input_ptr;   end
-                    1:  begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_WEIGHT_PTR0; periph_data_o=weight_ptr0; end
-                    2:  if (weight_ptr_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_WEIGHT_PTR1; periph_data_o=weight_ptr1; end else periph_req_o=1'b0;
-                    3:  if (bias_ptr_en)   begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_BIAS_PTR;    periph_data_o=bias_ptr;    end else periph_req_o=1'b0;
-                    4:  begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_OUTPUT_PTR;  periph_data_o=output_ptr;  end
+                    0:  begin periph_add_o=32'h14; periph_data_o=32'h00; end
+                    1:  begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_INPUT_PTR;   periph_data_o=input_ptr;   end
+                    2:  begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_WEIGHT_PTR0; periph_data_o=weight_ptr0; end
+                    3:  if (weight_ptr_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_WEIGHT_PTR1; periph_data_o=weight_ptr1; end else periph_req_o=1'b0;
+                    4:  if (bias_ptr_en)   begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_BIAS_PTR;    periph_data_o=bias_ptr;    end else periph_req_o=1'b0;
+                    5:  begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_OUTPUT_PTR;  periph_data_o=output_ptr;  end
                     // Tile Dims and other regs
                     // NOTE: The register map values (e.g., ITA_REG_TILES=6) are now taken from your package file
-                    5:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_TILES; periph_data_o = N_TILES_SEQUENCE_DIM | N_TILES_EMBEDDING_DIM << 4 | N_TILES_PROJECTION_DIM << 8 | N_TILES_FEEDFORWARD_DIM << 12; end else periph_req_o=1'b0;
-                    6:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_EPS_MULT0; periph_data_o=rqs_eps_mult0_i; end else periph_req_o=1'b0;
-                    7:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_EPS_MULT1; periph_data_o=rqs_eps_mult1_i; end else periph_req_o=1'b0;
+                    6:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_TILES; periph_data_o = N_TILES_SEQUENCE_DIM | N_TILES_EMBEDDING_DIM << 4 | N_TILES_PROJECTION_DIM << 8 | N_TILES_FEEDFORWARD_DIM << 12; end else periph_req_o=1'b0;
+                    7:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_EPS_MULT0; periph_data_o=rqs_eps_mult0_i; end else periph_req_o=1'b0;
+                    8:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_EPS_MULT1; periph_data_o=rqs_eps_mult1_i; end else periph_req_o=1'b0;
                     // 8: Case for EPS_MULT2 REMOVED
-                    8:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_RIGHT_SHIFT0; periph_data_o=rqs_rshift0_i; end else periph_req_o=1'b0;
-                    9:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_RIGHT_SHIFT1; periph_data_o=rqs_rshift1_i; end else periph_req_o=1'b0;
+                    9:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_RIGHT_SHIFT0; periph_data_o=rqs_rshift0_i; end else periph_req_o=1'b0;
+                    10:  if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_RIGHT_SHIFT1; periph_data_o=rqs_rshift1_i; end else periph_req_o=1'b0;
                     // 11: Case for RIGHT_SHIFT2 REMOVED
-                    10: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_ADD0; periph_data_o=rqs_add0_i; end else periph_req_o=1'b0;
-                    11: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_ADD1; periph_data_o=rqs_add1_i; end else periph_req_o=1'b0;
+                    11: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_ADD0; periph_data_o=rqs_add0_i; end else periph_req_o=1'b0;
+                    12: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_ADD1; periph_data_o=rqs_add1_i; end else periph_req_o=1'b0;
                     // 14, 15, 16: Cases for ADD2, ADD3, ADD4 REMOVED
-                    12: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_GELU_B_C; periph_data_o=activation_gelu_const_i; end else periph_req_o=1'b0;
-                    13: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_ACTIVATION_REQUANT; periph_data_o=activation_rqs_const_i; end else periph_req_o=1'b0;
+                    13: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_GELU_B_C; periph_data_o=activation_gelu_const_i; end else periph_req_o=1'b0;
+                    14: if (ita_reg_en) begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_ACTIVATION_REQUANT; periph_data_o=activation_rqs_const_i; end else periph_req_o=1'b0;
                     // Control Registers
-                    14: begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_CTRL_ENGINE; periph_data_o=ctrl_engine_val; end
-                    15: begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_CTRL_STREAM; periph_data_o=ctrl_stream_val; end
+                    15: begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_CTRL_ENGINE; periph_data_o=ctrl_engine_val; end
+                    16: begin periph_add_o=ITA_REG_OFFSET + 4*ITA_REG_CTRL_STREAM; periph_data_o=ctrl_stream_val; end
                     default: periph_req_o = 1'b0;
                 endcase
+                
+                periph_data_o_prev = periph_data_o;
 
                 if (periph_gnt_i || !periph_req_o) begin
                     if (reg_prog_cnt == PROGRAM_STEPS - 1) begin
@@ -340,10 +345,16 @@ module ita_sequencer #(
             end
 
             S_WAIT_GNT: begin
+                next_state = S_WAIT_CYCLE;
+                periph_data_o = periph_data_o_prev;
+                periph_be_o = 4'hF;
+            end
+
+            S_WAIT_CYCLE: begin
                 next_state = S_PROG_REG;
                 reg_prog_cnt_next = reg_prog_cnt + 1;
             end
-
+            
             S_POST_PROGRAM_DELAY: begin
                 next_state = S_TRIGGER;
             end
