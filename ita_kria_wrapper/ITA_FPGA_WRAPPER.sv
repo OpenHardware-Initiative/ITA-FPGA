@@ -35,7 +35,7 @@ module ITA_FPGA_WRAPPER #(
     parameter int PROJECTION_SPACE = 192,
     parameter int EMBEDDING_SIZE = 128,
     parameter int FEEDFORWARD_SIZE = 256,
-    parameter activation_e ACTIVATION = Identity,
+    parameter activation_e ACTIVATION = Relu,
     parameter int SINGLE_ATTENTION = 0,
     parameter int N_CONTEXT = 8
 ) (
@@ -43,28 +43,23 @@ module ITA_FPGA_WRAPPER #(
     input  logic clk_i,
     input  logic rst_ni,
     input  logic test_mode_i,
-    
-    // Base address for the current DMA operation, provided by the host.
-    input logic [C_M_AXIS_TDATA_WIDTH-1:0] base_addr_i,
 
     // Events from HWPE
     output logic [N_CORES-1:0][1:0] evt_o,
     output logic                    busy_o,
     
     // --- FSM Control Interface from CPU/System ---
-    input  logic start_wb_i,         // Pulse to start writing weights/biases
-    input  logic start_attn_i,       // Pulse to start the Attention block computation
-    input  logic start_ffn_i,        // Pulse to start the FFN block computation
+    input  logic start_load_attn_wb_i, // Pulse to load Attention weights/biases
+    input  logic start_load_ffn_wb_i,  // Pulse to load FFN weights/biases
+    input  logic start_attn_i,         // Pulse to load ATTN inputs (Q,K,V) and run
+    input  logic start_ffn_i,          // Pulse to load FFN input and run
     
     // --- FSM Status Outputs to CPU/System ---
-    output logic wb_done_o,          // Asserted when WB setup is complete
-    output logic attn_done_o,        // Asserted when Attention block is done, results ready
-    output logic ffn_done_o,         // Asserted when FFN block is done, final results ready
-    output logic accelerator_idle_o, // Asserted when FSM is in the top-level IDLE state
-
-    // DMA/Mux Control (Now driven by this module)
-    output logic dma_mode_o, // To uram_memory_controller: 1=DMA mode, 0=ITA (HWPE) mode
-    output logic dma_we_o,   // To uram_memory_controller: 1=Write to URAM, 0=Read from URAM
+    output logic attn_wb_done_o,       // Asserted when ATTN WB load is complete
+    output logic ffn_wb_done_o,        // Asserted when FFN WB load is complete
+    output logic attn_done_o,          // Asserted when Attention block is done
+    output logic ffn_done_o,           // Asserted when FFN block is done
+    output logic accelerator_idle_o,   // Asserted when FSM is in IDLE
     
     // SLAVE AXI STREAM Signals -> Wrapper (for loading data into URAM)
     input  logic [C_S_AXIS_TDATA_WIDTH-1:0] s_axis_tdata,
@@ -74,16 +69,36 @@ module ITA_FPGA_WRAPPER #(
     // MASTER AXI STREAM Signals <- Wrapper (for reading results from URAM)
     output logic [C_M_AXIS_TDATA_WIDTH-1:0] m_axis_tdata,
     output logic m_axis_tvalid,
-    input  logic m_axis_tready
+    input  logic m_axis_tready,
+
+    // RQS and activation constants (PROGRAMMING THE ACCELERATOR)
+
+    input  logic [31:0] activation_gelu_const_i,
+    input  logic [31:0] activation_rqs_const_i,
+
+    input  logic [31:0] rqs_eps_mult0_i,
+    input  logic [31:0] rqs_eps_mult1_i,
+    input  logic [31:0] rqs_eps_mult2_i,
+    input  logic [31:0] rqs_rshift0_i,
+    input  logic [31:0] rqs_rshift1_i,
+    input  logic [31:0] rqs_rshift2_i,
+    input  logic [31:0] rqs_add0_i,
+    input  logic [31:0] rqs_add1_i,
+    input  logic [31:0] rqs_add2_i,
+    input  logic [31:0] rqs_add3_i,
+    input  logic [31:0] rqs_add4_i
     
 );
     
     // --- FSM State Definition (Expanded for Autonomous DMA Control) ---
     typedef enum logic [4:0] {
         S_IDLE,                 // Waiting for a start command from the host.
-        // Weight/Bias Loading States
-        S_WAIT_WB_DATA,         // Waiting for the first valid data word on s_axis to begin the WB load.
-        S_SETUP_WB,             // Actively loading weights/biases from s_axis into URAM.
+        // Attention WB Loading
+        S_WAIT_ATTN_WB_DATA,
+        S_SETUP_ATTN_WB,
+        // FFN WB Loading
+        S_WAIT_FFN_WB_DATA,
+        S_SETUP_FFN_WB,
         // Attention Path States
         S_WAIT_ATTN_DATA,       // Waiting for the first valid data word (Q, K, V) to begin the ATTN load.
         S_SETUP_ATTN,           // Actively loading ATTN inputs from s_axis into URAM.
@@ -118,6 +133,7 @@ module ITA_FPGA_WRAPPER #(
     
     // --- DMA Address Generator Control & Status ---
     logic        dma_ag_start;         // Pulse to start the address generator.
+    logic [31:0] dma_ag_base_addr;     // Internal wire to select the base address
     logic [31:0] dma_ag_len;           // Number of addresses to generate for the current transfer.
     logic        dma_ag_done;          // Pulse from the address generator when the transfer is complete.
     logic [31:0] uram_addr;            // Address bus to the memory controller.
@@ -131,6 +147,7 @@ module ITA_FPGA_WRAPPER #(
     localparam int N_TILES_EMBEDDING_DIM   = EMBEDDING_SIZE / M_TILE_LEN;
     localparam int N_TILES_PROJECTION_DIM  = PROJECTION_SPACE / M_TILE_LEN;
     localparam int N_TILES_FEEDFORWARD_DIM = FEEDFORWARD_SIZE / M_TILE_LEN;
+    localparam int N_ELEMENTS_PER_TILE     = M_TILE_LEN * M_TILE_LEN;
     localparam int ID = 0;
 
     logic [31:0] N_TILES_OUTER_X [N_STATES-1:0];
@@ -144,60 +161,64 @@ module ITA_FPGA_WRAPPER #(
     logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
     logic [31:0] WB_TOTAL_BYTES;
     logic [31:0] WB_LOAD_WORDS;
-    
-    // --- Pre-calculated Transfer Lengths (in 32-bit words) ---
-    // These are calculated at compile time based on the accelerator's geometry.
-    localparam int WORDS_PER_BYTE = 4;
-    
-    localparam int Q_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
-    localparam int K_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
-    localparam int V_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;
-    localparam int ATTN_LOAD_WORDS = Q_WORDS + K_WORDS + V_WORDS;
-    localparam int ATTN_OUTPUT_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE; // Output of OW step
 
-    localparam int FFN_LOAD_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE;   // Input to F1 step
-    localparam int FFN_OUTPUT_WORDS = (SEQUENCE_LEN * EMBEDDING_SIZE) / WORDS_PER_BYTE; // Output of F2 step
+    // Attention Layer
+    localparam int ATTN_W_LOAD_WORDS  = (H * 4 * EMBEDDING_SIZE * PROJECTION_SPACE) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int ATTN_B_LOAD_WORDS  = (H * (9 * PROJECTION_SPACE + 3 * EMBEDDING_SIZE)) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int ATTN_WB_LOAD_WORDS = ATTN_W_LOAD_WORDS + ATTN_B_LOAD_WORDS;
+    localparam int ATTN_LOAD_WORDS    = (3 * SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int ATTN_OUTPUT_WORDS  = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_M_AXIS_TDATA_WIDTH / 8);
+
+    // FFN Layer
+    localparam int FFN_W_LOAD_WORDS   = (2 * EMBEDDING_SIZE * FEEDFORWARD_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int FFN_B_LOAD_WORDS   = (3 * FEEDFORWARD_SIZE + 3 * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int FFN_WB_LOAD_WORDS  = FFN_W_LOAD_WORDS + FFN_B_LOAD_WORDS;
+    localparam int FFN_LOAD_WORDS     = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
+    localparam int FFN_OUTPUT_WORDS   = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_M_AXIS_TDATA_WIDTH / 8);
 
     // This block is synthesizable and calculates all memory pointers and tile
     // dimensions at compile time. It's a direct hardware mapping of the
     // testbench's setup phase.
     initial begin
-        N_TILES_OUTER_X[Q] = N_TILES_PROJECTION_DIM;
-        N_TILES_OUTER_X[K] = N_TILES_PROJECTION_DIM;
-        N_TILES_OUTER_X[V] = N_TILES_SEQUENCE_DIM;
+        // Number of output tiles in X direction per step
+        N_TILES_OUTER_X[Q ] = N_TILES_PROJECTION_DIM;
+        N_TILES_OUTER_X[K ] = N_TILES_PROJECTION_DIM;
+        N_TILES_OUTER_X[V ] = N_TILES_SEQUENCE_DIM; // V is calculated transposed
         N_TILES_OUTER_X[QK] = N_TILES_SEQUENCE_DIM;
         N_TILES_OUTER_X[AV] = N_TILES_PROJECTION_DIM;
         N_TILES_OUTER_X[OW] = N_TILES_EMBEDDING_DIM;
         N_TILES_OUTER_X[F1] = N_TILES_FEEDFORWARD_DIM;
         N_TILES_OUTER_X[F2] = N_TILES_EMBEDDING_DIM;
-        N_TILES_OUTER_Y[Q] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_Y[K] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_Y[V] = N_TILES_PROJECTION_DIM;
-        N_TILES_OUTER_Y[QK] = 1;
-        N_TILES_OUTER_Y[AV] = 1;
+        // Number of output tiles in Y direction per step
+        N_TILES_OUTER_Y[Q ] = N_TILES_SEQUENCE_DIM;
+        N_TILES_OUTER_Y[K ] = N_TILES_SEQUENCE_DIM;
+        N_TILES_OUTER_Y[V ] = N_TILES_PROJECTION_DIM; // V is calculated transposed
+        N_TILES_OUTER_Y[QK] = 1; // Only one tile row is calculated before switching to AV)
+        N_TILES_OUTER_Y[AV] = 1; // Only one tile row is calculated before switching to QK)
         N_TILES_OUTER_Y[OW] = N_TILES_SEQUENCE_DIM;
         N_TILES_OUTER_Y[F1] = N_TILES_SEQUENCE_DIM;
         N_TILES_OUTER_Y[F2] = N_TILES_SEQUENCE_DIM;
-        N_TILES_INNER_DIM[Q] = N_TILES_EMBEDDING_DIM;
-        N_TILES_INNER_DIM[K] = N_TILES_EMBEDDING_DIM;
-        N_TILES_INNER_DIM[V] = N_TILES_EMBEDDING_DIM;
+        // Number of inner tiles per step
+        N_TILES_INNER_DIM[Q ] = N_TILES_EMBEDDING_DIM;
+        N_TILES_INNER_DIM[K ] = N_TILES_EMBEDDING_DIM;
+        N_TILES_INNER_DIM[V ] = N_TILES_EMBEDDING_DIM;
         N_TILES_INNER_DIM[QK] = N_TILES_PROJECTION_DIM;
         N_TILES_INNER_DIM[AV] = N_TILES_SEQUENCE_DIM;
         N_TILES_INNER_DIM[OW] = N_TILES_PROJECTION_DIM;
         N_TILES_INNER_DIM[F1] = N_TILES_EMBEDDING_DIM;
         N_TILES_INNER_DIM[F2] = N_TILES_FEEDFORWARD_DIM;
 
-        BASE_PTR[0] = 0;
-        BASE_PTR[1] = BASE_PTR[0] + SEQUENCE_LEN * EMBEDDING_SIZE;
-        BASE_PTR[2] = BASE_PTR[1] + SEQUENCE_LEN * EMBEDDING_SIZE;
-        BASE_PTR[3] = BASE_PTR[2] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[4] = BASE_PTR[3] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[5] = BASE_PTR[4] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[6] = BASE_PTR[5] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[7] = BASE_PTR[6] + PROJECTION_SPACE * 3;
-        BASE_PTR[8] = BASE_PTR[7] + PROJECTION_SPACE * 3;
-        BASE_PTR[9] = BASE_PTR[8] + PROJECTION_SPACE * 3;
-        BASE_PTR[10] = BASE_PTR[9] + EMBEDDING_SIZE * 3;
+        BASE_PTR[0 ] = 0;
+        BASE_PTR[1 ] = BASE_PTR[0 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
+        BASE_PTR[2 ] = BASE_PTR[1 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
+        BASE_PTR[3 ] = BASE_PTR[2 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
+        BASE_PTR[4 ] = BASE_PTR[3 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
+        BASE_PTR[5 ] = BASE_PTR[4 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
+        BASE_PTR[6 ] = BASE_PTR[5 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
+        BASE_PTR[7 ] = BASE_PTR[6 ] + PROJECTION_SPACE * 3;
+        BASE_PTR[8 ] = BASE_PTR[7 ] + PROJECTION_SPACE * 3;
+        BASE_PTR[9 ] = BASE_PTR[8 ] + PROJECTION_SPACE * 3;
+        BASE_PTR[10] = BASE_PTR[9 ] + EMBEDDING_SIZE * 3;
         BASE_PTR[11] = BASE_PTR[10] + SEQUENCE_LEN * EMBEDDING_SIZE;
         BASE_PTR[12] = BASE_PTR[11] + EMBEDDING_SIZE * FEEDFORWARD_SIZE;
         BASE_PTR[13] = BASE_PTR[12] + FEEDFORWARD_SIZE * EMBEDDING_SIZE;
@@ -210,42 +231,40 @@ module ITA_FPGA_WRAPPER #(
         BASE_PTR[20] = BASE_PTR[19] + SEQUENCE_LEN * PROJECTION_SPACE;
         BASE_PTR[21] = BASE_PTR[20] + SEQUENCE_LEN * EMBEDDING_SIZE;
         BASE_PTR[22] = BASE_PTR[21] + SEQUENCE_LEN * FEEDFORWARD_SIZE;
-        
-        WB_TOTAL_BYTES = BASE_PTR[15]; // All weights/biases are stored before the first output buffer.
-        WB_LOAD_WORDS  = WB_TOTAL_BYTES / WORDS_PER_BYTE;
 
-        BASE_PTR_INPUT[Q] = BASE_PTR[0];
-        BASE_PTR_INPUT[K] = BASE_PTR[1];
-        BASE_PTR_INPUT[V] = BASE_PTR[4];
-        BASE_PTR_INPUT[QK] = BASE_PTR[15];
-        BASE_PTR_INPUT[AV] = BASE_PTR[18];
-        BASE_PTR_INPUT[OW] = BASE_PTR[19];
-        BASE_PTR_INPUT[F1] = BASE_PTR[10];
-        BASE_PTR_INPUT[F2] = BASE_PTR[21];
-        BASE_PTR_WEIGHT0[Q] = BASE_PTR[2];
-        BASE_PTR_WEIGHT0[K] = BASE_PTR[3];
-        BASE_PTR_WEIGHT0[V] = BASE_PTR[1];
-        BASE_PTR_WEIGHT0[QK] = BASE_PTR[16];
-        BASE_PTR_WEIGHT0[AV] = BASE_PTR[17];
-        BASE_PTR_WEIGHT0[OW] = BASE_PTR[5];
-        BASE_PTR_WEIGHT0[F1] = BASE_PTR[11];
-        BASE_PTR_WEIGHT0[F2] = BASE_PTR[12];
-        BASE_PTR_BIAS[Q] = BASE_PTR[6];
-        BASE_PTR_BIAS[K] = BASE_PTR[7];
-        BASE_PTR_BIAS[V] = BASE_PTR[8];
-        BASE_PTR_BIAS[QK] = 32'hXXXX;
-        BASE_PTR_BIAS[AV] = 32'hXXXX;
-        BASE_PTR_BIAS[OW] = BASE_PTR[9];
-        BASE_PTR_BIAS[F1] = BASE_PTR[13];
-        BASE_PTR_BIAS[F2] = BASE_PTR[14];
-        BASE_PTR_OUTPUT[Q] = BASE_PTR[15];
-        BASE_PTR_OUTPUT[K] = BASE_PTR[16];
-        BASE_PTR_OUTPUT[V] = BASE_PTR[17];
-        BASE_PTR_OUTPUT[QK] = BASE_PTR[18];
-        BASE_PTR_OUTPUT[AV] = BASE_PTR[19];
-        BASE_PTR_OUTPUT[OW] = BASE_PTR[20];
-        BASE_PTR_OUTPUT[F1] = BASE_PTR[21];
-        BASE_PTR_OUTPUT[F2] = BASE_PTR[22];
+        // Base pointers
+        BASE_PTR_INPUT[Q ]   = BASE_PTR[0 ];  // q
+        BASE_PTR_INPUT[K ]   = BASE_PTR[1 ];  // k
+        BASE_PTR_INPUT[V ]   = BASE_PTR[4 ];  // Wv
+        BASE_PTR_INPUT[QK]   = BASE_PTR[15];  // Q
+        BASE_PTR_INPUT[AV]   = BASE_PTR[18];  // QK
+        BASE_PTR_INPUT[OW]   = BASE_PTR[19];  // AV
+        BASE_PTR_INPUT[F1]   = BASE_PTR[10];  // ff
+        BASE_PTR_INPUT[F2]   = BASE_PTR[21];  // F1
+        BASE_PTR_WEIGHT0[Q ] = BASE_PTR[2 ];  // Wq
+        BASE_PTR_WEIGHT0[K ] = BASE_PTR[3 ];  // Wk
+        BASE_PTR_WEIGHT0[V ] = BASE_PTR[1 ];  // k
+        BASE_PTR_WEIGHT0[QK] = BASE_PTR[16];  // K
+        BASE_PTR_WEIGHT0[AV] = BASE_PTR[17];  // V
+        BASE_PTR_WEIGHT0[OW] = BASE_PTR[5 ];  // Wo
+        BASE_PTR_WEIGHT0[F1] = BASE_PTR[11];  // Wf1
+        BASE_PTR_WEIGHT0[F2] = BASE_PTR[12];  // Wf2
+        BASE_PTR_BIAS[Q ]    = BASE_PTR[6 ];  // Bq
+        BASE_PTR_BIAS[K ]    = BASE_PTR[7 ];  // Bk
+        BASE_PTR_BIAS[V ]    = BASE_PTR[8 ];  // Bv
+        BASE_PTR_BIAS[QK]    = 32'hXXXX;
+        BASE_PTR_BIAS[AV]    = 32'hXXXX;
+        BASE_PTR_BIAS[OW]    = BASE_PTR[9 ];  // Bo
+        BASE_PTR_BIAS[F1]    = BASE_PTR[13];  // Bf1
+        BASE_PTR_BIAS[F2]    = BASE_PTR[14];  // Bf2
+        BASE_PTR_OUTPUT[Q ]  = BASE_PTR[15];  // Q
+        BASE_PTR_OUTPUT[K ]  = BASE_PTR[16];  // K
+        BASE_PTR_OUTPUT[V ]  = BASE_PTR[17];  // V
+        BASE_PTR_OUTPUT[QK]  = BASE_PTR[18];  // QK
+        BASE_PTR_OUTPUT[AV]  = BASE_PTR[19];  // AV
+        BASE_PTR_OUTPUT[OW]  = BASE_PTR[20];  // OW
+        BASE_PTR_OUTPUT[F1]  = BASE_PTR[21];  // F1
+        BASE_PTR_OUTPUT[F2]  = BASE_PTR[22];  // F2
 
         for (int i = 0; i < 5; i++) begin
             BASE_PTR_WEIGHT1[i] = BASE_PTR_WEIGHT0[i+1];
@@ -280,27 +299,41 @@ module ITA_FPGA_WRAPPER #(
         next_step = current_step_r;
         sequencer_start = 1'b0;
         dma_ag_start = 1'b0;
+        dma_ag_base_addr = 32'b0;
         dma_ag_len = 32'b0;
 
         case (current_state)
             S_IDLE: begin
                 // Wait for a command from the host processor.
-                if (start_wb_i)   next_state = S_WAIT_WB_DATA;
-                if (start_attn_i) next_state = S_WAIT_ATTN_DATA;
-                if (start_ffn_i)  next_state = S_WAIT_FFN_DATA;
+                if (start_load_attn_wb_i) next_state = S_WAIT_ATTN_WB_DATA;
+                if (start_load_ffn_wb_i)  next_state = S_WAIT_FFN_WB_DATA;
+                if (start_attn_i)         next_state = S_WAIT_ATTN_DATA;
+                if (start_ffn_i)          next_state = S_WAIT_FFN_DATA;
             end
-
-            // --- Weight & Bias Loading Path ---
-            S_WAIT_WB_DATA: begin
-                // Wait for the host to start sending data.
+            
+            // --- Attention WB Loading Path ---
+            S_WAIT_ATTN_WB_DATA: begin
                 if (s_axis_tvalid && !transfer_in_progress) begin
-                    dma_ag_start = 1'b1; // Trigger the address generator.
-                    dma_ag_len   = WB_LOAD_WORDS; // Tell it how many addresses to generate.
-                    next_state   = S_SETUP_WB;    // Move to the active loading state.
+                    dma_ag_start     = 1'b1;
+                    dma_ag_base_addr = BASE_PTR_WEIGHT0[Q]; // Start of ATTN WB block
+                    dma_ag_len       = ATTN_WB_LOAD_WORDS;
+                    next_state       = S_SETUP_ATTN_WB;
                 end
             end
-            S_SETUP_WB: begin
-                // Stay in this state until the address generator signals completion.
+            S_SETUP_ATTN_WB: begin
+                if (dma_ag_done) next_state = S_IDLE;
+            end
+
+            // --- FFN WB Loading Path ---
+            S_WAIT_FFN_WB_DATA: begin
+                if (s_axis_tvalid && !transfer_in_progress) begin
+                    dma_ag_start     = 1'b1;
+                    dma_ag_base_addr = BASE_PTR_WEIGHT0[F1]; // Start of FFN WB block
+                    dma_ag_len       = FFN_WB_LOAD_WORDS;
+                    next_state       = S_SETUP_FFN_WB;
+                end
+            end
+            S_SETUP_FFN_WB: begin
                 if (dma_ag_done) next_state = S_IDLE;
             end
 
@@ -309,6 +342,7 @@ module ITA_FPGA_WRAPPER #(
                 // Wait for Q, K, V data to arrive.
                 if (s_axis_tvalid && !transfer_in_progress) begin
                     dma_ag_start = 1'b1;
+                    dma_ag_base_addr = BASE_PTR_INPUT[Q];
                     dma_ag_len   = ATTN_LOAD_WORDS;
                     next_state   = S_SETUP_ATTN;
                 end
@@ -342,6 +376,7 @@ module ITA_FPGA_WRAPPER #(
                 // Wait for the host to be ready to accept the results.
                 if (m_axis_tready && !transfer_in_progress) begin
                     dma_ag_start = 1'b1;
+                    dma_ag_base_addr = BASE_PTR_OUTPUT[OW];
                     dma_ag_len   = ATTN_OUTPUT_WORDS;
                     next_state   = S_DONE_ATTN;
                 end
@@ -356,6 +391,7 @@ module ITA_FPGA_WRAPPER #(
                  // Wait for FFN input data to arrive.
                  if (s_axis_tvalid && !transfer_in_progress) begin
                     dma_ag_start = 1'b1;
+                    dma_ag_base_addr = BASE_PTR_INPUT[F1];
                     dma_ag_len   = FFN_LOAD_WORDS;
                     next_state   = S_SETUP_FFN;
                 end
@@ -384,6 +420,7 @@ module ITA_FPGA_WRAPPER #(
                 // Wait for the host to be ready for the final results.
                 if (m_axis_tready && !transfer_in_progress) begin
                     dma_ag_start = 1'b1;
+                    dma_ag_base_addr = BASE_PTR_OUTPUT[F2];
                     dma_ag_len   = FFN_OUTPUT_WORDS;
                     next_state   = S_DONE_FFN;
                 end
@@ -399,24 +436,27 @@ module ITA_FPGA_WRAPPER #(
 
     // --- FSM Output Logic ---
     assign accelerator_idle_o = (current_state == S_IDLE);
-    assign wb_done_o          = (current_state == S_SETUP_WB && dma_ag_done);
+    assign attn_wb_done_o     = (current_state == S_SETUP_ATTN_WB && dma_ag_done);
+    assign ffn_wb_done_o      = (current_state == S_SETUP_FFN_WB && dma_ag_done);
     assign attn_done_o        = (current_state == S_DONE_ATTN && dma_ag_done);
     assign ffn_done_o         = (current_state == S_DONE_FFN && dma_ag_done);
 
     // --- DMA/Mux Control Logic ---
     // The memory controller is in DMA mode during all setup and done states.
     // It's in ITA (HWPE) mode only during the RUN states.
-    assign dma_mode_o = (current_state inside {S_WAIT_WB_DATA, S_SETUP_WB,
-                                             S_WAIT_ATTN_DATA, S_SETUP_ATTN,
-                                             S_WAIT_FFN_DATA, S_SETUP_FFN,
+    assign dma_mode_o = (current_state inside {S_WAIT_ATTN_WB_DATA, S_SETUP_ATTN_WB,
+                                             S_WAIT_FFN_WB_DATA,  S_SETUP_FFN_WB,
+                                             S_WAIT_ATTN_DATA,    S_SETUP_ATTN,
+                                             S_WAIT_FFN_DATA,     S_SETUP_FFN,
                                              S_WAIT_ATTN_READ_READY, S_DONE_ATTN,
-                                             S_WAIT_FFN_READ_READY, S_DONE_FFN});
+                                             S_WAIT_FFN_READ_READY,  S_DONE_FFN});
 
     // dma_we_o is 1 for a DMA write (to URAM), 0 for a DMA read (from URAM)
     // We are writing TO the URAM during the SETUP states.
-    assign dma_we_o = (current_state inside {S_WAIT_WB_DATA, S_SETUP_WB,
-                                            S_WAIT_ATTN_DATA, S_SETUP_ATTN,
-                                            S_WAIT_FFN_DATA, S_SETUP_FFN});
+    assign dma_we_o = (current_state inside {S_WAIT_ATTN_WB_DATA, S_SETUP_ATTN_WB,
+                                            S_WAIT_FFN_WB_DATA,  S_SETUP_FFN_WB,
+                                            S_WAIT_ATTN_DATA,    S_SETUP_ATTN,
+                                            S_WAIT_FFN_DATA,     S_SETUP_FFN});
     
     // --- Internal Signals for TCDM Connection ---
     logic [MP-1:0]                        tcdm_req;
@@ -465,6 +505,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_wen_o(periph_wen_seq),
         .periph_be_o(periph_be_seq),
         .periph_data_o(periph_data_seq),
+        // --- Pass through the pre-calculated pointers ---
         .BASE_PTR_INPUT(BASE_PTR_INPUT), 
         .BASE_PTR_WEIGHT0(BASE_PTR_WEIGHT0),
         .BASE_PTR_WEIGHT1(BASE_PTR_WEIGHT1), 
@@ -476,7 +517,17 @@ module ITA_FPGA_WRAPPER #(
         .N_TILES_FEEDFORWARD_DIM(N_TILES_FEEDFORWARD_DIM), 
         .N_TILES_OUTER_X(N_TILES_OUTER_X),
         .N_TILES_OUTER_Y(N_TILES_OUTER_Y), 
-        .N_TILES_INNER_DIM(N_TILES_INNER_DIM)
+        .N_TILES_INNER_DIM(N_TILES_INNER_DIM),
+        // --- Pass through the RQS and Activation Constants ---
+        .rqs_eps_mult0_i(rqs_eps_mult0_i),
+        .rqs_eps_mult1_i(rqs_eps_mult1_i),
+        .rqs_rshift0_i(rqs_rshift0_i),
+        .rqs_rshift1_i(rqs_rshift1_i),
+        .rqs_add0_i(rqs_add0_i),
+        .rqs_add1_i(rqs_add1_i),
+        
+        .activation_gelu_const_i(activation_gelu_const_i),
+        .activation_rqs_const_i(activation_rqs_const_i)
     );
 
     // The HWPE wrapper contains the actual processing engine.
@@ -540,7 +591,7 @@ module ITA_FPGA_WRAPPER #(
         .clk(clk_i),
         .reset_n(rst_ni),
         .start_i(dma_ag_start),
-        .base_address_in(base_addr_i),
+        .base_address_in(dma_ag_base_addr),
         .transfer_len_i(dma_ag_len),
         .done_o(dma_ag_done),
         .m_axis_tdata(uram_addr),
