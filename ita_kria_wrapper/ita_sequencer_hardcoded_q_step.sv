@@ -249,7 +249,7 @@ module ita_sequencer_hardcoded_q_step #(
                 // Re-drive address and data to prevent latches. This must be identical to the case statement above.
                 case (write_step_cnt)
                     // --- TILE 0 (y=0, x=0, i=0) ---
-                    0:   begin periph_add_o = 32'h20; periph_data_o = 32'; end // INPUT_PTR
+                    0:   begin periph_add_o = 32'h20; periph_data_o = 32'h00000; end // INPUT_PTR
                     1:   begin periph_add_o = 32'h24; periph_data_o = 32'h04000; end // WEIGHT_PTR0
                     2:   begin periph_add_o = 32'h28; periph_data_o = 32'h05000; end // WEIGHT_PTR1
                     3:   begin periph_add_o = 32'h2C; periph_data_o = 32'h06000; end // BIAS_PTR
