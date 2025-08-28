@@ -1,5 +1,3 @@
-`timescale 1ns/1ps
-
 `include "hci_helpers.svh"
 
 import ita_hwpe_package::*;
@@ -99,22 +97,26 @@ module ITA_FPGA_WRAPPER #(
         // FFN WB Loading
         S_WAIT_FFN_WB_DATA,
         S_SETUP_FFN_WB,
+        // Computation Control States
+        S_START_COMPUTE,        // New state to generate a 1-cycle start pulse
+        S_WAIT_COMPUTE_DONE,    // New state to wait for sequencer to finish a step
+        S_INTER_STEP_DELAY,     // New state for the 5-cycle delay between steps
         // Attention Path States
         S_WAIT_ATTN_DATA,       // Waiting for the first valid data word (Q, K, V) to begin the ATTN load.
         S_SETUP_ATTN,           // Actively loading ATTN inputs from s_axis into URAM.
-        S_RUN_ATTN,             // Computation phase: Sequencer is programming and triggering the HWPE.
         S_WAIT_ATTN_READ_READY, // Computation is done, waiting for the host to be ready (m_axis_tready) to receive results.
         S_DONE_ATTN,            // Actively streaming ATTN results from URAM to m_axis.
         // FFN Path States
         S_WAIT_FFN_DATA,        // Waiting for the first valid data word (FFN input) to begin the FFN load.
         S_SETUP_FFN,            // Actively loading FFN input from s_axis into URAM.
-        S_RUN_FFN,              // Computation phase: Sequencer is programming and triggering the HWPE for FFN.
         S_WAIT_FFN_READ_READY,  // Computation is done, waiting for the host to be ready to receive final results.
         S_DONE_FFN              // Actively streaming final FFN results from URAM to m_axis.
     } state_t;
     
     state_t current_state, next_state; // FSM state registers
     step_e  current_step_r, next_step; // Sub-state for RUN states (Q, K, V, etc.)
+
+    logic [2:0] delay_cnt, delay_cnt_next; // Counter for the inter-step delay
     
     // --- Sequencer Control & Status Wires ---
     logic sequencer_start; // To start the ita_sequencer for a specific step
@@ -149,10 +151,147 @@ module ITA_FPGA_WRAPPER #(
     localparam int N_TILES_FEEDFORWARD_DIM = FEEDFORWARD_SIZE / M_TILE_LEN;
     localparam int N_ELEMENTS_PER_TILE     = M_TILE_LEN * M_TILE_LEN;
     localparam int ID = 0;
-
+    
+    /*// --- Tile Dimensions ---
     logic [31:0] N_TILES_OUTER_X [N_STATES-1:0];
     logic [31:0] N_TILES_OUTER_Y [N_STATES-1:0];
     logic [31:0] N_TILES_INNER_DIM [N_STATES-1:0];
+    
+    // Use explicit array literals to define the content with a guaranteed order.
+    // This is the most robust method to prevent the circular shift issue.
+    // Index mapping: 0=Idle, 1=Q, 2=K, 3=V, 4=QK, 5=AV, 6=OW, 7=F1, 8=F2
+    localparam logic [31:0] OUTER_X_VALUES [0:N_STATES-1] = '{
+        32'hX,                      // [0] Idle
+        N_TILES_PROJECTION_DIM,     // [1] Q
+        N_TILES_PROJECTION_DIM,     // [2] K
+        N_TILES_SEQUENCE_DIM,       // [3] V
+        N_TILES_SEQUENCE_DIM,       // [4] QK
+        N_TILES_PROJECTION_DIM,     // [5] AV
+        N_TILES_EMBEDDING_DIM,      // [6] OW
+        N_TILES_FEEDFORWARD_DIM,    // [7] F1
+        N_TILES_EMBEDDING_DIM       // [8] F2
+    };
+    
+    localparam logic [31:0] OUTER_Y_VALUES [0:N_STATES-1] = '{
+        32'hX,                      // [0] Idle
+        N_TILES_SEQUENCE_DIM,       // [1] Q
+        N_TILES_SEQUENCE_DIM,       // [2] K
+        N_TILES_PROJECTION_DIM,     // [3] V
+        1,                          // [4] QK
+        1,                          // [5] AV
+        N_TILES_SEQUENCE_DIM,       // [6] OW
+        N_TILES_SEQUENCE_DIM,       // [7] F1
+        N_TILES_SEQUENCE_DIM        // [8] F2
+    };
+    
+    localparam logic [31:0] INNER_DIM_VALUES [0:N_STATES-1] = '{
+        32'hX,                      // [0] Idle
+        N_TILES_EMBEDDING_DIM,      // [1] Q
+        N_TILES_EMBEDDING_DIM,      // [2] K
+        N_TILES_EMBEDDING_DIM,      // [3] V
+        N_TILES_PROJECTION_DIM,     // [4] QK
+        N_TILES_SEQUENCE_DIM,       // [5] AV
+        N_TILES_PROJECTION_DIM,     // [6] OW
+        N_TILES_EMBEDDING_DIM,      // [7] F1
+        N_TILES_FEEDFORWARD_DIM     // [8] F2
+    };
+    
+    // Use a generate block to perform a direct, 1-to-1 mapping to the output signals.
+    generate
+        genvar i;
+        for (i = 0; i < N_STATES; i=i+1) begin : map_tile_dims
+            assign N_TILES_OUTER_X[i]   = OUTER_X_VALUES[i];
+            assign N_TILES_OUTER_Y[i]   = OUTER_Y_VALUES[i];
+            assign N_TILES_INNER_DIM[i] = INNER_DIM_VALUES[i];
+        end
+    endgenerate*/
+    
+    // 1. Declare the golden arrays as 'logic' (unpacked array of nets)
+    logic [31:0] GOLDEN_OUTER_X     [0:N_STATES-1];
+    logic [31:0] GOLDEN_OUTER_Y     [0:N_STATES-1];
+    logic [31:0] GOLDEN_INNER_DIM   [0:N_STATES-1];
+
+    // 2. Assign the constant array literal to the nets
+    // Index mapping: 0=Idle, 1=Q, 2=K, 3=V, 4=QK, 5=AV, 6=OW, 7=F1, 8=F2
+    assign GOLDEN_OUTER_X   = '{ 32'hX, 3, 3, 1, 1, 3, 2, 4, 2 };
+    assign GOLDEN_OUTER_Y   = '{ 32'hX, 1, 1, 3, 1, 1, 1, 1, 1 };
+    assign GOLDEN_INNER_DIM = '{ 32'hX, 2, 2, 2, 3, 1, 3, 2, 4 };
+    
+    
+    // --- Base Pointers (Assignments are identical to the procedural testbench) ---
+    logic [31:0] BASE_PTR [0:22];
+    logic [N_STATES-1:0][31:0] BASE_PTR_INPUT;
+    logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT0;
+    logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT1;
+    logic [N_STATES-1:0][31:0] BASE_PTR_BIAS;
+    logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
+    
+    assign BASE_PTR[0]  = 0;
+    assign BASE_PTR[1]  = BASE_PTR[0]  + SEQUENCE_LEN * EMBEDDING_SIZE;
+    assign BASE_PTR[2]  = BASE_PTR[1]  + SEQUENCE_LEN * EMBEDDING_SIZE;
+    assign BASE_PTR[3]  = BASE_PTR[2]  + PROJECTION_SPACE * EMBEDDING_SIZE;
+    assign BASE_PTR[4]  = BASE_PTR[3]  + PROJECTION_SPACE * EMBEDDING_SIZE;
+    assign BASE_PTR[5]  = BASE_PTR[4]  + PROJECTION_SPACE * EMBEDDING_SIZE;
+    assign BASE_PTR[6]  = BASE_PTR[5]  + PROJECTION_SPACE * EMBEDDING_SIZE;
+    assign BASE_PTR[7]  = BASE_PTR[6]  + PROJECTION_SPACE * 3;
+    assign BASE_PTR[8]  = BASE_PTR[7]  + PROJECTION_SPACE * 3;
+    assign BASE_PTR[9]  = BASE_PTR[8]  + PROJECTION_SPACE * 3;
+    assign BASE_PTR[10] = BASE_PTR[9]  + EMBEDDING_SIZE * 3;
+    assign BASE_PTR[11] = BASE_PTR[10] + SEQUENCE_LEN * EMBEDDING_SIZE;
+    assign BASE_PTR[12] = BASE_PTR[11] + EMBEDDING_SIZE * FEEDFORWARD_SIZE;
+    assign BASE_PTR[13] = BASE_PTR[12] + FEEDFORWARD_SIZE * EMBEDDING_SIZE;
+    assign BASE_PTR[14] = BASE_PTR[13] + FEEDFORWARD_SIZE * 3;
+    assign BASE_PTR[15] = BASE_PTR[14] + EMBEDDING_SIZE * 3;
+    assign BASE_PTR[16] = BASE_PTR[15] + SEQUENCE_LEN * PROJECTION_SPACE;
+    assign BASE_PTR[17] = BASE_PTR[16] + SEQUENCE_LEN * PROJECTION_SPACE;
+    assign BASE_PTR[18] = BASE_PTR[17] + SEQUENCE_LEN * PROJECTION_SPACE;
+    assign BASE_PTR[19] = BASE_PTR[18] + SEQUENCE_LEN * SEQUENCE_LEN;
+    assign BASE_PTR[20] = BASE_PTR[19] + SEQUENCE_LEN * PROJECTION_SPACE;
+    assign BASE_PTR[21] = BASE_PTR[20] + SEQUENCE_LEN * EMBEDDING_SIZE;
+    assign BASE_PTR[22] = BASE_PTR[21] + SEQUENCE_LEN * FEEDFORWARD_SIZE;
+    
+    assign BASE_PTR_INPUT[Q]   = BASE_PTR[0];
+    assign BASE_PTR_INPUT[K]   = BASE_PTR[1];
+    assign BASE_PTR_INPUT[V]   = BASE_PTR[4];
+    assign BASE_PTR_INPUT[QK]  = BASE_PTR[15];
+    assign BASE_PTR_INPUT[AV]  = BASE_PTR[18];
+    assign BASE_PTR_INPUT[OW]  = BASE_PTR[19];
+    assign BASE_PTR_INPUT[F1]  = BASE_PTR[10];
+    assign BASE_PTR_INPUT[F2]  = BASE_PTR[21];
+    
+    assign BASE_PTR_WEIGHT0[Q]  = BASE_PTR[2];
+    assign BASE_PTR_WEIGHT0[K]  = BASE_PTR[3];
+    assign BASE_PTR_WEIGHT0[V]  = BASE_PTR[1];
+    assign BASE_PTR_WEIGHT0[QK] = BASE_PTR[16];
+    assign BASE_PTR_WEIGHT0[AV] = BASE_PTR[17];
+    assign BASE_PTR_WEIGHT0[OW] = BASE_PTR[5];
+    assign BASE_PTR_WEIGHT0[F1] = BASE_PTR[11];
+    assign BASE_PTR_WEIGHT0[F2] = BASE_PTR[12];
+    
+    assign BASE_PTR_WEIGHT1[1] = BASE_PTR_WEIGHT0[2]; // Corresponds to i=0 in TB (Q -> K)
+    assign BASE_PTR_WEIGHT1[2] = BASE_PTR_WEIGHT0[3]; // Corresponds to i=1 in TB (K -> V)
+    assign BASE_PTR_WEIGHT1[3] = BASE_PTR_WEIGHT0[4]; // Corresponds to i=2 in TB (V -> QK)
+    assign BASE_PTR_WEIGHT1[4] = BASE_PTR_WEIGHT0[5]; // Corresponds to i=3 in TB (QK -> AV)
+    assign BASE_PTR_WEIGHT1[5] = BASE_PTR_WEIGHT0[6]; // Corresponds to i=4 in TB (AV -> OW)
+    assign BASE_PTR_WEIGHT1[7] = BASE_PTR_WEIGHT0[F2]; // Special case for F1
+    
+    assign BASE_PTR_BIAS[Q]  = BASE_PTR[6];
+    assign BASE_PTR_BIAS[K]  = BASE_PTR[7];
+    assign BASE_PTR_BIAS[V]  = BASE_PTR[8];
+    assign BASE_PTR_BIAS[OW] = BASE_PTR[9];
+    assign BASE_PTR_BIAS[F1] = BASE_PTR[13];
+    assign BASE_PTR_BIAS[F2] = BASE_PTR[14];
+    
+    assign BASE_PTR_OUTPUT[Q]  = BASE_PTR[15];
+    assign BASE_PTR_OUTPUT[K]  = BASE_PTR[16];
+    assign BASE_PTR_OUTPUT[V]  = BASE_PTR[17];
+    assign BASE_PTR_OUTPUT[QK] = BASE_PTR[18];
+    assign BASE_PTR_OUTPUT[AV] = BASE_PTR[19];
+    assign BASE_PTR_OUTPUT[OW] = BASE_PTR[20];
+    assign BASE_PTR_OUTPUT[F1] = BASE_PTR[21];
+    assign BASE_PTR_OUTPUT[F2] = BASE_PTR[22];
+    
+
     logic [31:0] BASE_PTR [0:22];
     logic [N_STATES-1:0][31:0] BASE_PTR_INPUT;
     logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT0;
@@ -176,114 +315,17 @@ module ITA_FPGA_WRAPPER #(
     localparam int FFN_LOAD_WORDS     = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
     localparam int FFN_OUTPUT_WORDS   = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_M_AXIS_TDATA_WIDTH / 8);
 
-    // This block is synthesizable and calculates all memory pointers and tile
-    // dimensions at compile time. It's a direct hardware mapping of the
-    // testbench's setup phase.
-    initial begin
-        // Number of output tiles in X direction per step
-        N_TILES_OUTER_X[Q ] = N_TILES_PROJECTION_DIM;
-        N_TILES_OUTER_X[K ] = N_TILES_PROJECTION_DIM;
-        N_TILES_OUTER_X[V ] = N_TILES_SEQUENCE_DIM; // V is calculated transposed
-        N_TILES_OUTER_X[QK] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_X[AV] = N_TILES_PROJECTION_DIM;
-        N_TILES_OUTER_X[OW] = N_TILES_EMBEDDING_DIM;
-        N_TILES_OUTER_X[F1] = N_TILES_FEEDFORWARD_DIM;
-        N_TILES_OUTER_X[F2] = N_TILES_EMBEDDING_DIM;
-        // Number of output tiles in Y direction per step
-        N_TILES_OUTER_Y[Q ] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_Y[K ] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_Y[V ] = N_TILES_PROJECTION_DIM; // V is calculated transposed
-        N_TILES_OUTER_Y[QK] = 1; // Only one tile row is calculated before switching to AV)
-        N_TILES_OUTER_Y[AV] = 1; // Only one tile row is calculated before switching to QK)
-        N_TILES_OUTER_Y[OW] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_Y[F1] = N_TILES_SEQUENCE_DIM;
-        N_TILES_OUTER_Y[F2] = N_TILES_SEQUENCE_DIM;
-        // Number of inner tiles per step
-        N_TILES_INNER_DIM[Q ] = N_TILES_EMBEDDING_DIM;
-        N_TILES_INNER_DIM[K ] = N_TILES_EMBEDDING_DIM;
-        N_TILES_INNER_DIM[V ] = N_TILES_EMBEDDING_DIM;
-        N_TILES_INNER_DIM[QK] = N_TILES_PROJECTION_DIM;
-        N_TILES_INNER_DIM[AV] = N_TILES_SEQUENCE_DIM;
-        N_TILES_INNER_DIM[OW] = N_TILES_PROJECTION_DIM;
-        N_TILES_INNER_DIM[F1] = N_TILES_EMBEDDING_DIM;
-        N_TILES_INNER_DIM[F2] = N_TILES_FEEDFORWARD_DIM;
-
-        BASE_PTR[0 ] = 0;
-        BASE_PTR[1 ] = BASE_PTR[0 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
-        BASE_PTR[2 ] = BASE_PTR[1 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
-        BASE_PTR[3 ] = BASE_PTR[2 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[4 ] = BASE_PTR[3 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[5 ] = BASE_PTR[4 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[6 ] = BASE_PTR[5 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
-        BASE_PTR[7 ] = BASE_PTR[6 ] + PROJECTION_SPACE * 3;
-        BASE_PTR[8 ] = BASE_PTR[7 ] + PROJECTION_SPACE * 3;
-        BASE_PTR[9 ] = BASE_PTR[8 ] + PROJECTION_SPACE * 3;
-        BASE_PTR[10] = BASE_PTR[9 ] + EMBEDDING_SIZE * 3;
-        BASE_PTR[11] = BASE_PTR[10] + SEQUENCE_LEN * EMBEDDING_SIZE;
-        BASE_PTR[12] = BASE_PTR[11] + EMBEDDING_SIZE * FEEDFORWARD_SIZE;
-        BASE_PTR[13] = BASE_PTR[12] + FEEDFORWARD_SIZE * EMBEDDING_SIZE;
-        BASE_PTR[14] = BASE_PTR[13] + FEEDFORWARD_SIZE * 3;
-        BASE_PTR[15] = BASE_PTR[14] + EMBEDDING_SIZE * 3;
-        BASE_PTR[16] = BASE_PTR[15] + SEQUENCE_LEN * PROJECTION_SPACE;
-        BASE_PTR[17] = BASE_PTR[16] + SEQUENCE_LEN * PROJECTION_SPACE;
-        BASE_PTR[18] = BASE_PTR[17] + SEQUENCE_LEN * PROJECTION_SPACE;
-        BASE_PTR[19] = BASE_PTR[18] + SEQUENCE_LEN * SEQUENCE_LEN;
-        BASE_PTR[20] = BASE_PTR[19] + SEQUENCE_LEN * PROJECTION_SPACE;
-        BASE_PTR[21] = BASE_PTR[20] + SEQUENCE_LEN * EMBEDDING_SIZE;
-        BASE_PTR[22] = BASE_PTR[21] + SEQUENCE_LEN * FEEDFORWARD_SIZE;
-
-        // Base pointers
-        BASE_PTR_INPUT[Q ]   = BASE_PTR[0 ];  // q
-        BASE_PTR_INPUT[K ]   = BASE_PTR[1 ];  // k
-        BASE_PTR_INPUT[V ]   = BASE_PTR[4 ];  // Wv
-        BASE_PTR_INPUT[QK]   = BASE_PTR[15];  // Q
-        BASE_PTR_INPUT[AV]   = BASE_PTR[18];  // QK
-        BASE_PTR_INPUT[OW]   = BASE_PTR[19];  // AV
-        BASE_PTR_INPUT[F1]   = BASE_PTR[10];  // ff
-        BASE_PTR_INPUT[F2]   = BASE_PTR[21];  // F1
-        BASE_PTR_WEIGHT0[Q ] = BASE_PTR[2 ];  // Wq
-        BASE_PTR_WEIGHT0[K ] = BASE_PTR[3 ];  // Wk
-        BASE_PTR_WEIGHT0[V ] = BASE_PTR[1 ];  // k
-        BASE_PTR_WEIGHT0[QK] = BASE_PTR[16];  // K
-        BASE_PTR_WEIGHT0[AV] = BASE_PTR[17];  // V
-        BASE_PTR_WEIGHT0[OW] = BASE_PTR[5 ];  // Wo
-        BASE_PTR_WEIGHT0[F1] = BASE_PTR[11];  // Wf1
-        BASE_PTR_WEIGHT0[F2] = BASE_PTR[12];  // Wf2
-        BASE_PTR_BIAS[Q ]    = BASE_PTR[6 ];  // Bq
-        BASE_PTR_BIAS[K ]    = BASE_PTR[7 ];  // Bk
-        BASE_PTR_BIAS[V ]    = BASE_PTR[8 ];  // Bv
-        BASE_PTR_BIAS[QK]    = 32'hXXXX;
-        BASE_PTR_BIAS[AV]    = 32'hXXXX;
-        BASE_PTR_BIAS[OW]    = BASE_PTR[9 ];  // Bo
-        BASE_PTR_BIAS[F1]    = BASE_PTR[13];  // Bf1
-        BASE_PTR_BIAS[F2]    = BASE_PTR[14];  // Bf2
-        BASE_PTR_OUTPUT[Q ]  = BASE_PTR[15];  // Q
-        BASE_PTR_OUTPUT[K ]  = BASE_PTR[16];  // K
-        BASE_PTR_OUTPUT[V ]  = BASE_PTR[17];  // V
-        BASE_PTR_OUTPUT[QK]  = BASE_PTR[18];  // QK
-        BASE_PTR_OUTPUT[AV]  = BASE_PTR[19];  // AV
-        BASE_PTR_OUTPUT[OW]  = BASE_PTR[20];  // OW
-        BASE_PTR_OUTPUT[F1]  = BASE_PTR[21];  // F1
-        BASE_PTR_OUTPUT[F2]  = BASE_PTR[22];  // F2
-
-        for (int i = 0; i < 5; i++) begin
-            BASE_PTR_WEIGHT1[i] = BASE_PTR_WEIGHT0[i+1];
-        end
-        BASE_PTR_WEIGHT1[7] = BASE_PTR_WEIGHT0[F2];
-    end
-    
     // --- FSM Sequential Logic ---
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             current_state <= S_IDLE;
             current_step_r <= Idle;
             transfer_in_progress <= 1'b0;
+            delay_cnt <= '0;
         end else begin
             current_state <= next_state;
             current_step_r <= next_step;
-            // Manage the transfer flag: set it when a transfer starts,
-            // and clear it when the transfer is done or we return to IDLE.
-            // This prevents re-triggering on subsequent valid/ready signals.
+            delay_cnt <= delay_cnt_next;
             if (dma_ag_start) begin
                 transfer_in_progress <= 1'b1;
             end else if (dma_ag_done || next_state == S_IDLE) begin
@@ -297,6 +339,7 @@ module ITA_FPGA_WRAPPER #(
         // Default assignments to prevent latches
         next_state = current_state;
         next_step = current_step_r;
+        delay_cnt_next = delay_cnt;
         sequencer_start = 1'b0;
         dma_ag_start = 1'b0;
         dma_ag_base_addr = 32'b0;
@@ -350,26 +393,8 @@ module ITA_FPGA_WRAPPER #(
             S_SETUP_ATTN: begin
                 // Once all ATTN inputs are loaded, begin the computation.
                 if (dma_ag_done) begin
-                    next_state = S_RUN_ATTN;
+                    next_state = S_START_COMPUTE;
                     next_step = Q; // Start with the first step of attention.
-                end
-            end
-            S_RUN_ATTN: begin
-                sequencer_start = 1'b1; // Keep the sequencer running.
-                if (sequencer_done) begin // When the sequencer finishes a step...
-                    // ...transition to the next step in the sequence.
-                    case (current_step_r)
-                        Q:  next_step = K;
-                        K:  next_step = V;
-                        V:  next_step = QK;
-                        QK: next_step = AV;
-                        AV: next_step = OW;
-                        OW: begin // Last step of ATTN is done.
-                            next_state = S_WAIT_ATTN_READ_READY; 
-                            next_step = Idle; 
-                        end
-                        default: next_step = Idle;
-                    endcase
                 end
             end
             S_WAIT_ATTN_READ_READY: begin
@@ -399,21 +424,8 @@ module ITA_FPGA_WRAPPER #(
             S_SETUP_FFN: begin
                 // Once FFN input is loaded, begin computation.
                 if (dma_ag_done) begin
-                    next_state = S_RUN_FFN;
+                    next_state = S_START_COMPUTE;
                     next_step = F1; // Start with the first FFN step.
-                end
-            end
-            S_RUN_FFN: begin
-                sequencer_start = 1'b1;
-                if (sequencer_done) begin
-                    case (current_step_r)
-                        F1: next_step = F2;
-                        F2: begin // Last FFN step is done.
-                            next_state = S_WAIT_FFN_READ_READY; 
-                            next_step = Idle; 
-                        end
-                        default: next_step = Idle;
-                    endcase
                 end
             end
             S_WAIT_FFN_READ_READY: begin
@@ -428,6 +440,43 @@ module ITA_FPGA_WRAPPER #(
             S_DONE_FFN: begin
                 // When final results are sent, return to idle.
                 if (dma_ag_done) next_state = S_IDLE;
+            end
+            // --- New Computation Control Flow ---
+            S_START_COMPUTE: begin
+                sequencer_start = 1'b1; // Generate 1-cycle start pulse
+                next_state = S_WAIT_COMPUTE_DONE;
+            end
+
+            S_WAIT_COMPUTE_DONE: begin
+                if (sequencer_done) begin
+                    // Step is finished. Check if it was the last one in a major block.
+                    case (current_step_r)
+                        OW: next_state = S_WAIT_ATTN_READ_READY; // End of Attention
+                        F2: next_state = S_WAIT_FFN_READ_READY;  // End of FFN
+                        default: begin
+                            next_state = S_INTER_STEP_DELAY;     // Go to delay before next step
+                            delay_cnt_next = '0;
+                        end
+                    endcase
+                end
+            end
+
+            S_INTER_STEP_DELAY: begin
+                if (delay_cnt == 4) begin // 5-cycle delay is over
+                    next_state = S_START_COMPUTE; // Go start the next step
+                    // Determine the next step based on the one that just finished
+                    case (current_step_r)
+                        Q:  next_step = K;
+                        K:  next_step = V;
+                        V:  next_step = QK;
+                        QK: next_step = AV;
+                        AV: next_step = OW;
+                        F1: next_step = F2;
+                        default: next_state = S_IDLE; // Safety case
+                    endcase
+                end else begin
+                    delay_cnt_next = delay_cnt + 1; // Wait
+                end
             end
 
             default: next_state = S_IDLE;
@@ -467,6 +516,7 @@ module ITA_FPGA_WRAPPER #(
     logic [MP-1:0][MemDataWidth-1:0]      tcdm_data;
     logic [MP-1:0][MemDataWidth-1:0]      tcdm_r_data;
     logic [MP-1:0]                        tcdm_r_valid;
+    
 
     // --- HCI Interface for URAM Controller ---
     localparam hci_size_parameter_t `HCI_SIZE_PARAM(tcdm_mem) = '{
@@ -484,7 +534,7 @@ module ITA_FPGA_WRAPPER #(
 
     // The sequencer is responsible for the low-level, tile-by-tile programming
     // of the HWPE during the RUN states.
-    ita_sequencer #(
+    /*ita_sequencer #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -515,9 +565,9 @@ module ITA_FPGA_WRAPPER #(
         .N_TILES_EMBEDDING_DIM(N_TILES_EMBEDDING_DIM), 
         .N_TILES_PROJECTION_DIM(N_TILES_PROJECTION_DIM),
         .N_TILES_FEEDFORWARD_DIM(N_TILES_FEEDFORWARD_DIM), 
-        .N_TILES_OUTER_X(N_TILES_OUTER_X),
-        .N_TILES_OUTER_Y(N_TILES_OUTER_Y), 
-        .N_TILES_INNER_DIM(N_TILES_INNER_DIM),
+        .N_TILES_OUTER_X(GOLDEN_OUTER_X),
+        .N_TILES_OUTER_Y(GOLDEN_OUTER_Y), 
+        .N_TILES_INNER_DIM(GOLDEN_INNER_DIM),
         // --- Pass through the RQS and Activation Constants ---
         .rqs_eps_mult0_i(rqs_eps_mult0_i),
         .rqs_eps_mult1_i(rqs_eps_mult1_i),
@@ -526,6 +576,32 @@ module ITA_FPGA_WRAPPER #(
         .rqs_add0_i(rqs_add0_i),
         .rqs_add1_i(rqs_add1_i),
         
+        .activation_gelu_const_i(activation_gelu_const_i),
+        .activation_rqs_const_i(activation_rqs_const_i)
+    );*/
+    
+    ita_sequencer_hardcoded_q_step #(
+        .INTER_TILE_DELAY_CYCLES(5)
+    ) i_ita_sequencer (
+        .clk_i(clk_i),
+        .rst_ni(rst_ni),
+        .start_i(sequencer_start),
+        .step_i(current_step_r), // This port is ignored by the module but must be connected
+        .done_o(sequencer_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq),
+        // --- Pass through ONLY the RQS and Activation Constants ---
+        .rqs_eps_mult0_i(rqs_eps_mult0_i),
+        .rqs_eps_mult1_i(rqs_eps_mult1_i),
+        .rqs_rshift0_i(rqs_rshift0_i),
+        .rqs_rshift1_i(rqs_rshift1_i),
+        .rqs_add0_i(rqs_add0_i),
+        .rqs_add1_i(rqs_add1_i),
         .activation_gelu_const_i(activation_gelu_const_i),
         .activation_rqs_const_i(activation_rqs_const_i)
     );

@@ -5,7 +5,7 @@
 `timescale 1ns / 1ps
 `include "hci_helpers.svh"
 
-module ita_hwpe_tb;
+module ita_hwpe_tb_tuki;
   
   import ita_package::*;
   import ita_hwpe_package::*;
