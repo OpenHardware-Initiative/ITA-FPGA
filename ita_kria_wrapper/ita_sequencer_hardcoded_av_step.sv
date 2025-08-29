@@ -36,7 +36,7 @@ module ita_sequencer_hardcoded_av_step #(
     output logic [3:0]             periph_be_o,
     output logic [31:0]            periph_data_o
 );
-    typedef enum logic [3:0] {
+    typedef enum logic [4:0] {
         S_IDLE,
         S_CHECK_BUSY,
         S_WAIT_CYCLE,
@@ -47,13 +47,17 @@ module ita_sequencer_hardcoded_av_step #(
         S_WRITE_ACK,
         S_SEND_TRIGGER,
         S_FINISH_STEP,
-        S_CHOOSE_STATE
+        S_CHOOSE_STATE,
+        S_WAIT_5,
+        S_WRITE_REQS
     } seq_state_t;
 
     seq_state_t  current_state, next_state;
     logic [7:0]  write_step_cnt, write_step_cnt_next, tile_cnt, next_tile_cnt;
     logic [$clog2(INTER_TILE_DELAY_CYCLES):0] delay_cnt, delay_cnt_next;
     logic [31:0] prev_data;
+    localparam int unsigned WAIT5_CYCLES = 5000; // 5us wait / 1ns period
+    logic [$clog2(WAIT5_CYCLES)-1:0] wait5_cnt, wait5_cnt_n;
 
     // FSM state registers
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -62,11 +66,13 @@ module ita_sequencer_hardcoded_av_step #(
             write_step_cnt <= '0;
             delay_cnt      <= '0;
             tile_cnt       <= '0;
+            wait5_cnt      <= '0; //counter
         end else begin
             current_state  <= next_state;
             write_step_cnt <= write_step_cnt_next;
             delay_cnt      <= delay_cnt_next;
             tile_cnt       <= next_tile_cnt;
+            wait5_cnt      <= wait5_cnt_n; //counter
         end
     end
 
@@ -76,6 +82,7 @@ module ita_sequencer_hardcoded_av_step #(
         write_step_cnt_next = write_step_cnt;
         delay_cnt_next      = delay_cnt;
         next_tile_cnt       = tile_cnt;
+        wait5_cnt_n         = wait5_cnt; //counter
         done_o              = 1'b0;
         periph_req_o        = 1'b0;
         periph_add_o        = '0;
@@ -113,11 +120,27 @@ module ita_sequencer_hardcoded_av_step #(
                     periph_add_o = 32'd00; 
                     periph_data_o = 32'h0;
                     periph_be_o  = 4'hF;
-                #(5us);
-             case (tile_cnt)
+                    next_state = S_WAIT_5;
+            end  
+
+            S_WAIT_5: begin
+                if (wait5_cnt == WAIT5_CYCLES-1) begin
+                wait5_cnt_n = '0;            // clear for next time
+                next_state  = S_WRITE_REQS;  // proceed after full 5us
+                end else begin
+                    wait5_cnt_n = wait5_cnt + 1'b1;
+                    next_state  = S_WAIT_5;      // keep waiting
+                end
+            end
+
+            S_WRITE_REQS: begin
+                case (tile_cnt)
                     0: next_state = S_WRITE_REQ_0;
                     1: next_state = S_WRITE_REQ_1;
                     2: next_state = S_WRITE_REQ_2;
+                    3: next_state = S_WRITE_REQ_3;
+                    4: next_state = S_WRITE_REQ_4;
+                    5: next_state = S_WRITE_REQ_5;
                     default: next_state = S_FINISH_STEP; // All tiles done
                 endcase
             end          
