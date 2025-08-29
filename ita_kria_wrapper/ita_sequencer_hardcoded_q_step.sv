@@ -257,22 +257,13 @@ module ita_sequencer_hardcoded_q_step #(
                 periph_req_o = 1'b1;
                 periph_wen_o = 1'b0; 
                 case (write_step_cnt)
-                    0:   begin periph_add_o = 32'd32; periph_data_o = 32'h1000; end // INPUT_PTR
-                    1:   begin periph_add_o = 32'd36; periph_data_o = 32'h7000; end // WEIGHT_PTR0
-                    2:   begin periph_add_o = 32'd40; periph_data_o = 32'h8000; end // WEIGHT_PTR1
-                    3:   begin periph_add_o = 32'd44; periph_data_o = 32'h1c0c0; end // BIAS_PTR
-                    4:   begin periph_add_o = 32'd48; periph_data_o = 32'h2fcc0; end // OUTPUT_PTR
-                    5:   begin periph_add_o = 32'd56; periph_data_o = 32'h4321; end // TILES
-                    6:   begin periph_add_o = 32'd60; periph_data_o = 32'h40756F6C; end // EPS_MULT0
-                    7:   begin periph_add_o = 32'd64; periph_data_o = 32'h49677b43; end // EPS_MULT1
-                    8:   begin periph_add_o = 32'd68; periph_data_o = 32'h0F101010; end // RIGHT_SHIFT0
-                    9:   begin periph_add_o = 32'd72; periph_data_o = 32'h1110100b; end // RIGHT_SHIFT1
-                    10:  begin periph_add_o = 32'd76; periph_data_o = 32'h0; end // ADD0
-                    11:  begin periph_add_o = 32'd80; periph_data_o = 32'h00000; end // ADD1
-                    12:  begin periph_add_o = 32'd92; periph_data_o = 32'he44dffb0; end // GELU_B_C
-                    13:  begin periph_add_o = 32'd96; periph_data_o = 32'h144a; end // ACTIVATION_REQUANT
-                    14:  begin periph_add_o = 32'd84; periph_data_o = 32'h08; end // CTRL_ENGINE
-                    15:  begin periph_add_o = 32'd88; periph_data_o = 32'h12; end // CTRL_STREAM
+                    0:   begin periph_add_o = 32'd32; periph_data_o = 32'h00000; end // INPUT_PTR
+                    1:   begin periph_add_o = 32'd36; periph_data_o = 32'h08000; end // WEIGHT_PTR0
+                    2:   begin periph_add_o = 32'd40; periph_data_o = 32'h09000; end // WEIGHT_PTR1
+                    3:   begin periph_add_o = 32'd44; periph_data_o = 32'h1c180; end // BIAS_PTR
+                    4:   begin periph_add_o = 32'd48; periph_data_o = 32'h30cc0; end // OUTPUT_PTR
+                    5:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
+                    6:   begin periph_add_o = 32'd88; periph_data_o = 32'h00012; end // EPS_MULT0
                 endcase
 
                 if (write_step_cnt == 6) begin
@@ -288,22 +279,13 @@ module ita_sequencer_hardcoded_q_step #(
                 periph_req_o = 1'b1;
                 periph_wen_o = 1'b0; 
                 case (write_step_cnt)
-                    0:   begin periph_add_o = 32'h20; periph_data_o = 32'h00000; end // INPUT_PTR
-                    1:   begin periph_add_o = 32'h24; periph_data_o = 32'h04000; end // WEIGHT_PTR0
-                    2:   begin periph_add_o = 32'h28; periph_data_o = 32'h05000; end // WEIGHT_PTR1
-                    3:   begin periph_add_o = 32'h2C; periph_data_o = 32'h06000; end // BIAS_PTR
-                    4:   begin periph_add_o = 32'h30; periph_data_o = 32'h00180; end // OUTPUT_PTR
-                    5:   begin periph_add_o = 32'h34; periph_data_o = 32'h04321; end // TILES
-                    6:   begin periph_add_o = 32'h38; periph_data_o = 32'h40756F6C; end // EPS_MULT0
-                    7:   begin periph_add_o = 32'h3C; periph_data_o = 32'h67437B43; end // EPS_MULT1
-                    8:   begin periph_add_o = 32'h40; periph_data_o = 32'h0F101010; end // RIGHT_SHIFT0
-                    9:   begin periph_add_o = 32'h44; periph_data_o = 32'h1007100B; end // RIGHT_SHIFT1
-                    10:  begin periph_add_o = 32'h48; periph_data_o = 32'h0000000; end // ADD0
-                    11:  begin periph_add_o = 32'h4C; periph_data_o = 32'h00000; end // ADD1
-                    12:  begin periph_add_o = 32'h50; periph_data_o = 32'h00000; end // GELU_B_C
-                    13:  begin periph_add_o = 32'h54; periph_data_o = 32'h00000; end // ACTIVATION_REQUANT
-                    14:  begin periph_add_o = 32'h60; periph_data_o = 32'h01; end // CTRL_ENGINE
-                    15:  begin periph_add_o = 32'h64; periph_data_o = 32'h13; end // CTRL_STREAM
+                    0:   begin periph_add_o = 32'd32; periph_data_o = 32'h01000; end // INPUT_PTR
+                    1:   begin periph_add_o = 32'd36; periph_data_o = 32'h09000; end // WEIGHT_PTR0
+                    2:   begin periph_add_o = 32'd40; periph_data_o = 32'h0a000; end // WEIGHT_PTR1
+                    3:   begin periph_add_o = 32'd44; periph_data_o = 32'h1c180; end // BIAS_PTR
+                    4:   begin periph_add_o = 32'd48; periph_data_o = 32'h30cc0; end // OUTPUT_PTR
+                    5:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
+                    6:   begin periph_add_o = 32'd88; periph_data_o = 32'h00002; end // EPS_MULT0
                 endcase
 
                 if (write_step_cnt == 6) begin
