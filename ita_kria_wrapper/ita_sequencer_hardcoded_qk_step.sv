@@ -19,7 +19,7 @@
 import ita_package::*;
 import ita_hwpe_package::*;
 
-module ita_sequencer_hardcoded_q_step #(
+module ita_sequencer_hardcoded_qk_step #(
     parameter int INTER_TILE_DELAY_CYCLES = 5
 ) (
     input  logic clk_i,
