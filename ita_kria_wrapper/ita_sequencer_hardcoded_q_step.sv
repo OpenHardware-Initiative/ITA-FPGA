@@ -34,16 +34,7 @@ module ita_sequencer_hardcoded_q_step #(
     output logic [31:0]            periph_add_o,
     output logic                   periph_wen_o,
     output logic [3:0]             periph_be_o,
-    output logic [31:0]            periph_data_o,
-    // Constants are still needed for the hardcoded values
-    input  logic [31:0] rqs_eps_mult0_i,
-    input  logic [31:0] rqs_eps_mult1_i,
-    input  logic [31:0] rqs_rshift0_i,
-    input  logic [31:0] rqs_rshift1_i,
-    input  logic [31:0] rqs_add0_i,
-    input  logic [31:0] rqs_add1_i,
-    input  logic [31:0] activation_gelu_const_i,
-    input  logic [31:0] activation_rqs_const_i
+    output logic [31:0]            periph_data_o
 );
     typedef enum logic [3:0] {
         S_IDLE,
@@ -58,7 +49,8 @@ module ita_sequencer_hardcoded_q_step #(
         S_WRITE_WAIT_GNT,
         S_WRITE_ACK,
         S_SEND_TRIGGER,
-        S_FINISH_STEP
+        S_FINISH_STEP,
+        S_CHOOSE_STATE
     } seq_state_t;
 
     seq_state_t  current_state, next_state;
@@ -91,7 +83,7 @@ module ita_sequencer_hardcoded_q_step #(
         periph_req_o        = 1'b0;
         periph_add_o        = '0;
         periph_wen_o        = 1'b1; // Default to read
-        periph_be_o         = 4'h0;
+        periph_be_o         = 4'hf;
         periph_data_o       = '0;
 
         case (current_state)
@@ -108,9 +100,24 @@ module ita_sequencer_hardcoded_q_step #(
 
             S_CHECK_BUSY: begin
                 write_step_cnt_next = 0;
-                #(50ns);
                 if (!hwpe_busy_i) begin
-                    case (tile_cnt)
+                    periph_req_o = 1'b1;
+                    periph_wen_o = 1'b0;
+                    periph_add_o = 32'd00; 
+                    periph_data_o = 32'h0;
+                    periph_be_o  = 4'hF;
+                    next_state = S_CHOOSE_STATE;
+                end
+            end
+            
+            S_CHOOSE_STATE: begin
+                    periph_req_o = 1'b0;
+                    periph_wen_o = 1'b1;
+                    periph_add_o = 32'd00; 
+                    periph_data_o = 32'h0;
+                    periph_be_o  = 4'hF;
+                #(5us);
+             case (tile_cnt)
                     0: next_state = S_WRITE_REQ_0;
                     1: next_state = S_WRITE_REQ_1;
                     2: next_state = S_WRITE_REQ_2;
@@ -119,8 +126,7 @@ module ita_sequencer_hardcoded_q_step #(
                     5: next_state = S_WRITE_REQ_5;
                     default: next_state = S_FINISH_STEP; // All tiles done
                 endcase
-                end
-            end
+            end          
 
             S_WAIT_CYCLE: begin
                 case (tile_cnt)
@@ -134,10 +140,11 @@ module ita_sequencer_hardcoded_q_step #(
                 endcase
 
                 periph_req_o = 1'b0;
-                periph_wen_o = 1'b0;
+                periph_wen_o = 1'b1;
                 periph_data_o = prev_data; 
                 periph_data_o = 32'h0;
                 periph_be_o  = 4'hF;
+                @(posedge clk_i);
                 
             end
             S_SEND_TRIGGER: begin
@@ -177,12 +184,12 @@ module ita_sequencer_hardcoded_q_step #(
                     13:  begin periph_add_o = 32'd96; periph_data_o = 32'h144a; end // ACTIVATION_REQUANT
                     14:  begin periph_add_o = 32'd84; periph_data_o = 32'h08; end // CTRL_ENGINE
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h13; end // CTRL_STREAM
-                    16:  begin periph_add_o = 32'd00; periph_data_o = 32'h0; end
                 endcase
 
                 prev_data = periph_data_o;
                 
-                if (write_step_cnt == 16) begin
+                if (write_step_cnt == 15) begin
+                   
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
@@ -212,13 +219,12 @@ module ita_sequencer_hardcoded_q_step #(
                     13:  begin periph_add_o = 32'd96; periph_data_o = 32'h144a; end // ACTIVATION_REQUANT
                     14:  begin periph_add_o = 32'd84; periph_data_o = 32'h8; end // CTRL_ENGINE
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h2; end // CTRL_STREAM
-                    16:  begin periph_add_o = 32'd00; periph_data_o = 32'h0; end
 
                 endcase
 
                 prev_data = periph_data_o;
 
-                if (write_step_cnt == 16) begin
+                if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
@@ -247,13 +253,11 @@ module ita_sequencer_hardcoded_q_step #(
                     13:  begin periph_add_o = 32'd96; periph_data_o = 32'h144a; end // ACTIVATION_REQUANT
                     14:  begin periph_add_o = 32'd84; periph_data_o = 32'h08; end // CTRL_ENGINE
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h12; end // CTRL_STREAM
-                    16:  begin periph_add_o = 32'd00; periph_data_o = 32'h0; end
-
                 endcase
 
                 prev_data = periph_data_o;
 
-                if (write_step_cnt == 16) begin
+                if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
@@ -282,13 +286,13 @@ module ita_sequencer_hardcoded_q_step #(
                     13:  begin periph_add_o = 32'd96; periph_data_o = 32'h144a; end // ACTIVATION_REQUANT
                     14:  begin periph_add_o = 32'd84; periph_data_o = 32'h08; end // CTRL_ENGINE
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h2; end // CTRL_STREAM
-                    16:  begin periph_add_o = 32'd00; periph_data_o = 32'h0; end
+
 
                 endcase
 
                 prev_data = periph_data_o;
 
-                if (write_step_cnt == 16) begin
+                if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
@@ -308,7 +312,6 @@ module ita_sequencer_hardcoded_q_step #(
                     4:   begin periph_add_o = 32'd48; periph_data_o = 32'h30cc0; end // OUTPUT_PTR
                     5:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
                     6:   begin periph_add_o = 32'd88; periph_data_o = 32'h00012; end // EPS_MULT0
-                    7:   begin periph_add_o = 32'd00; periph_data_o = 32'h0; end
 
                 endcase
 
@@ -334,14 +337,13 @@ module ita_sequencer_hardcoded_q_step #(
                     4:   begin periph_add_o = 32'd48; periph_data_o = 32'h30cc0; end // OUTPUT_PTR
                     5:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
                     6:   begin periph_add_o = 32'd88; periph_data_o = 32'h00002; end // EPS_MULT0
-                    7:   begin periph_add_o = 32'd00; periph_data_o = 32'h0; end
 
                 endcase
 
                 prev_data = periph_data_o;
 
                 if (write_step_cnt == 6) begin
-                    next_state = S_FINISH_STEP;
+                    next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
                     next_state = S_WAIT_CYCLE;
@@ -349,7 +351,7 @@ module ita_sequencer_hardcoded_q_step #(
                 end
                 
             end
-
+            
             S_FINISH_STEP: begin
                 done_o = 1'b1;
                 next_state = S_IDLE;

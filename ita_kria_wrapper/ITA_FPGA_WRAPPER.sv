@@ -88,29 +88,33 @@ module ITA_FPGA_WRAPPER #(
     
 );
     
-    // --- FSM State Definition (Expanded for Autonomous DMA Control) ---
-    typedef enum logic [4:0] {
-        S_IDLE,                 // Waiting for a start command from the host.
+    // --- FSM State Definition  ---
+    typedef enum logic [5:0] {
+        S_IDLE,
         // Attention WB Loading
         S_WAIT_ATTN_WB_DATA,
         S_SETUP_ATTN_WB,
         // FFN WB Loading
         S_WAIT_FFN_WB_DATA,
         S_SETUP_FFN_WB,
-        // Computation Control States
-        S_START_COMPUTE,        // New state to generate a 1-cycle start pulse
-        S_WAIT_COMPUTE_DONE,    // New state to wait for sequencer to finish a step
-        S_INTER_STEP_DELAY,     // New state for the 5-cycle delay between steps
         // Attention Path States
-        S_WAIT_ATTN_DATA,       // Waiting for the first valid data word (Q, K, V) to begin the ATTN load.
-        S_SETUP_ATTN,           // Actively loading ATTN inputs from s_axis into URAM.
-        S_WAIT_ATTN_READ_READY, // Computation is done, waiting for the host to be ready (m_axis_tready) to receive results.
-        S_DONE_ATTN,            // Actively streaming ATTN results from URAM to m_axis.
+        S_WAIT_ATTN_DATA,
+        S_SETUP_ATTN,
+        S_START_Q, S_WAIT_Q_DONE,
+        S_START_K, S_WAIT_K_DONE,
+        S_START_V, S_WAIT_V_DONE,
+        S_START_QK, S_WAIT_QK_DONE,
+        S_START_AV, S_WAIT_AV_DONE,
+        S_START_OW, S_WAIT_OW_DONE,
+        S_WAIT_ATTN_READ_READY,
+        S_DONE_ATTN,
         // FFN Path States
-        S_WAIT_FFN_DATA,        // Waiting for the first valid data word (FFN input) to begin the FFN load.
-        S_SETUP_FFN,            // Actively loading FFN input from s_axis into URAM.
-        S_WAIT_FFN_READ_READY,  // Computation is done, waiting for the host to be ready to receive final results.
-        S_DONE_FFN              // Actively streaming final FFN results from URAM to m_axis.
+        S_WAIT_FFN_DATA,
+        S_SETUP_FFN,
+        S_START_F1, S_WAIT_F1_DONE,
+        S_START_F2, S_WAIT_F2_DONE,
+        S_WAIT_FFN_READ_READY,
+        S_DONE_FFN
     } state_t;
     
     state_t current_state, next_state; // FSM state registers
@@ -119,8 +123,8 @@ module ITA_FPGA_WRAPPER #(
     logic [2:0] delay_cnt, delay_cnt_next; // Counter for the inter-step delay
     
     // --- Sequencer Control & Status Wires ---
-    logic sequencer_start; // To start the ita_sequencer for a specific step
-    logic sequencer_done;  // From ita_sequencer, indicates one step is complete
+    logic q_start, k_start, v_start, qk_start, av_start, ow_start, f1_start, f2_start ; // To start the ita_sequencer for a specific step
+    logic q_done, k_done, v_done, qk_done, av_done, ow_done, f1_done, f2_done;  // From ita_sequencer, indicates one step is complete
 
     // --- Internal Peripheral Bus to program the HWPE ---
     logic periph_req_seq;
@@ -338,9 +342,8 @@ module ITA_FPGA_WRAPPER #(
     always_comb begin
         // Default assignments to prevent latches
         next_state = current_state;
-        next_step = current_step_r;
-        delay_cnt_next = delay_cnt;
-        sequencer_start = 1'b0;
+        q_start = 1'b0; k_start = 1'b0; v_start = 1'b0; qk_start = 1'b0;
+        av_start = 1'b0; ow_start = 1'b0; f1_start = 1'b0; f2_start = 1'b0;
         dma_ag_start = 1'b0;
         dma_ag_base_addr = 32'b0;
         dma_ag_len = 32'b0;
@@ -391,12 +394,27 @@ module ITA_FPGA_WRAPPER #(
                 end
             end
             S_SETUP_ATTN: begin
-                // Once all ATTN inputs are loaded, begin the computation.
-                if (dma_ag_done) begin
-                    next_state = S_START_COMPUTE;
-                    next_step = Q; // Start with the first step of attention.
-                end
+                if (dma_ag_done) next_state = S_START_Q;
             end
+            
+            S_START_Q: begin q_start = 1'b1; next_state = S_WAIT_Q_DONE; end
+            S_WAIT_Q_DONE: if (q_done) next_state = S_START_K;
+
+            S_START_K: begin k_start = 1'b1; next_state = S_WAIT_K_DONE; end
+            S_WAIT_K_DONE: if (k_done) next_state = S_START_V;
+
+            S_START_V: begin v_start = 1'b1; next_state = S_WAIT_V_DONE; end
+            S_WAIT_V_DONE: if (v_done) next_state = S_START_QK;
+
+            S_START_QK: begin qk_start = 1'b1; next_state = S_WAIT_QK_DONE; end
+            S_WAIT_QK_DONE: if (qk_done) next_state = S_START_AV;
+
+            S_START_AV: begin av_start = 1'b1; next_state = S_WAIT_AV_DONE; end
+            S_WAIT_AV_DONE: if (av_done) next_state = S_START_OW;
+
+            S_START_OW: begin ow_start = 1'b1; next_state = S_WAIT_OW_DONE; end
+            S_WAIT_OW_DONE: if (ow_done) next_state = S_WAIT_ATTN_READ_READY; 
+            
             S_WAIT_ATTN_READ_READY: begin
                 // Wait for the host to be ready to accept the results.
                 if (m_axis_tready && !transfer_in_progress) begin
@@ -406,6 +424,7 @@ module ITA_FPGA_WRAPPER #(
                     next_state   = S_DONE_ATTN;
                 end
             end
+            
             S_DONE_ATTN: begin
                 // When the results have been fully streamed out, return to idle.
                 if (dma_ag_done) next_state = S_IDLE;
@@ -421,13 +440,17 @@ module ITA_FPGA_WRAPPER #(
                     next_state   = S_SETUP_FFN;
                 end
             end
+            
             S_SETUP_FFN: begin
-                // Once FFN input is loaded, begin computation.
-                if (dma_ag_done) begin
-                    next_state = S_START_COMPUTE;
-                    next_step = F1; // Start with the first FFN step.
-                end
+                if (dma_ag_done) next_state = S_START_F1;
             end
+            
+            S_START_F1: begin f1_start = 1'b1; next_state = S_WAIT_F1_DONE; end
+            S_WAIT_F1_DONE: if (f1_done) next_state = S_START_F2;
+
+            S_START_F2: begin f2_start = 1'b1; next_state = S_WAIT_F2_DONE; end
+            S_WAIT_F2_DONE: if (f2_done) next_state = S_WAIT_FFN_READ_READY;
+            
             S_WAIT_FFN_READ_READY: begin
                 // Wait for the host to be ready for the final results.
                 if (m_axis_tready && !transfer_in_progress) begin
@@ -440,43 +463,6 @@ module ITA_FPGA_WRAPPER #(
             S_DONE_FFN: begin
                 // When final results are sent, return to idle.
                 if (dma_ag_done) next_state = S_IDLE;
-            end
-            // --- New Computation Control Flow ---
-            S_START_COMPUTE: begin
-                sequencer_start = 1'b1; // Generate 1-cycle start pulse
-                next_state = S_WAIT_COMPUTE_DONE;
-            end
-
-            S_WAIT_COMPUTE_DONE: begin
-                if (sequencer_done) begin
-                    // Step is finished. Check if it was the last one in a major block.
-                    case (current_step_r)
-                        OW: next_state = S_WAIT_ATTN_READ_READY; // End of Attention
-                        F2: next_state = S_WAIT_FFN_READ_READY;  // End of FFN
-                        default: begin
-                            next_state = S_INTER_STEP_DELAY;     // Go to delay before next step
-                            delay_cnt_next = '0;
-                        end
-                    endcase
-                end
-            end
-
-            S_INTER_STEP_DELAY: begin
-                if (delay_cnt == 4) begin // 5-cycle delay is over
-                    next_state = S_START_COMPUTE; // Go start the next step
-                    // Determine the next step based on the one that just finished
-                    case (current_step_r)
-                        Q:  next_step = K;
-                        K:  next_step = V;
-                        V:  next_step = QK;
-                        QK: next_step = AV;
-                        AV: next_step = OW;
-                        F1: next_step = F2;
-                        default: next_state = S_IDLE; // Safety case
-                    endcase
-                end else begin
-                    delay_cnt_next = delay_cnt + 1; // Wait
-                end
             end
 
             default: next_state = S_IDLE;
@@ -529,57 +515,7 @@ module ITA_FPGA_WRAPPER #(
         EHW: DEFAULT_EHW
     };
     `HCI_INTF_ARRAY(tcdm_mem, clk_i, MP-1:0);
-    
-    // --- Sub-module Instantiations ---
 
-    // The sequencer is responsible for the low-level, tile-by-tile programming
-    // of the HWPE during the RUN states.
-    /*ita_sequencer #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer (
-        .clk_i(clk_i), .rst_ni(rst_ni),
-        .start_i(sequencer_start),
-        .step_i(current_step_r),
-        .done_o(sequencer_done),
-        .hwpe_busy_i(busy_o),
-        .periph_req_o(periph_req_seq),
-        .periph_gnt_i(periph_gnt_seq),
-        .periph_add_o(periph_add_seq),
-        .periph_wen_o(periph_wen_seq),
-        .periph_be_o(periph_be_seq),
-        .periph_data_o(periph_data_seq),
-        // --- Pass through the pre-calculated pointers ---
-        .BASE_PTR_INPUT(BASE_PTR_INPUT), 
-        .BASE_PTR_WEIGHT0(BASE_PTR_WEIGHT0),
-        .BASE_PTR_WEIGHT1(BASE_PTR_WEIGHT1), 
-        .BASE_PTR_BIAS(BASE_PTR_BIAS),
-        .BASE_PTR_OUTPUT(BASE_PTR_OUTPUT), 
-        .N_TILES_SEQUENCE_DIM(N_TILES_SEQUENCE_DIM),
-        .N_TILES_EMBEDDING_DIM(N_TILES_EMBEDDING_DIM), 
-        .N_TILES_PROJECTION_DIM(N_TILES_PROJECTION_DIM),
-        .N_TILES_FEEDFORWARD_DIM(N_TILES_FEEDFORWARD_DIM), 
-        .N_TILES_OUTER_X(GOLDEN_OUTER_X),
-        .N_TILES_OUTER_Y(GOLDEN_OUTER_Y), 
-        .N_TILES_INNER_DIM(GOLDEN_INNER_DIM),
-        // --- Pass through the RQS and Activation Constants ---
-        .rqs_eps_mult0_i(rqs_eps_mult0_i),
-        .rqs_eps_mult1_i(rqs_eps_mult1_i),
-        .rqs_rshift0_i(rqs_rshift0_i),
-        .rqs_rshift1_i(rqs_rshift1_i),
-        .rqs_add0_i(rqs_add0_i),
-        .rqs_add1_i(rqs_add1_i),
-        
-        .activation_gelu_const_i(activation_gelu_const_i),
-        .activation_rqs_const_i(activation_rqs_const_i)
-    ); */
-    
     ita_sequencer_hardcoded_q_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
@@ -589,32 +525,20 @@ module ITA_FPGA_WRAPPER #(
         .ACTIVATION(ACTIVATION), 
         .SINGLE_ATTENTION(SINGLE_ATTENTION), 
         .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer (
+    ) i_ita_sequencer_q (
         .clk_i(clk_i), .rst_ni(rst_ni),
-        .start_i(sequencer_start),
+        .start_i(q_start),
         .step_i(current_step_r),
-        .done_o(sequencer_done),
+        .done_o(q_done),
         .hwpe_busy_i(busy_o),
         .periph_req_o(periph_req_seq),
         .periph_gnt_i(periph_gnt_seq),
         .periph_add_o(periph_add_seq),
         .periph_wen_o(periph_wen_seq),
         .periph_be_o(periph_be_seq),
-        .periph_data_o(periph_data_seq),
-        // --- Pass through the RQS and Activation Constants ---
-        .rqs_eps_mult0_i(rqs_eps_mult0_i),
-        .rqs_eps_mult1_i(rqs_eps_mult1_i),
-        .rqs_rshift0_i(rqs_rshift0_i),
-        .rqs_rshift1_i(rqs_rshift1_i),
-        .rqs_add0_i(rqs_add0_i),
-        .rqs_add1_i(rqs_add1_i),
-        
-        .activation_gelu_const_i(activation_gelu_const_i),
-         .activation_rqs_const_i(activation_rqs_const_i)
+        .periph_data_o(periph_data_seq)
     );
       
-
-
     // The HWPE wrapper contains the actual processing engine.
     ita_hwpe_wrap #(
         .AccDataWidth(AccDataWidth),
