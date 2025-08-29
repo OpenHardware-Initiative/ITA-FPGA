@@ -546,7 +546,7 @@ module ITA_FPGA_WRAPPER #(
         .ACTIVATION(ACTIVATION), 
         .SINGLE_ATTENTION(SINGLE_ATTENTION), 
         .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_q (
+    ) i_ita_sequencer_k (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(k_start),
         .done_o(k_done),
@@ -568,7 +568,7 @@ module ITA_FPGA_WRAPPER #(
         .ACTIVATION(ACTIVATION), 
         .SINGLE_ATTENTION(SINGLE_ATTENTION), 
         .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_q (
+    ) i_ita_sequencer_v (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(v_start),
         .done_o(v_done),
@@ -590,7 +590,7 @@ module ITA_FPGA_WRAPPER #(
         .ACTIVATION(ACTIVATION), 
         .SINGLE_ATTENTION(SINGLE_ATTENTION), 
         .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_q (
+    ) i_ita_sequencer_qk (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(qk_start),
         .done_o(qk_done),
@@ -612,7 +612,7 @@ module ITA_FPGA_WRAPPER #(
         .ACTIVATION(ACTIVATION), 
         .SINGLE_ATTENTION(SINGLE_ATTENTION), 
         .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_q (
+    ) i_ita_sequencer_av (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(av_start),
         .done_o(av_done),
@@ -634,7 +634,7 @@ module ITA_FPGA_WRAPPER #(
         .ACTIVATION(ACTIVATION), 
         .SINGLE_ATTENTION(SINGLE_ATTENTION), 
         .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_q (
+    ) i_ita_sequencer_ow (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(ow_start),
         .done_o(ow_done),
