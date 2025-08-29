@@ -56,7 +56,7 @@ module ita_sequencer_hardcoded_av_step #(
     logic [7:0]  write_step_cnt, write_step_cnt_next, tile_cnt, next_tile_cnt;
     logic [$clog2(INTER_TILE_DELAY_CYCLES):0] delay_cnt, delay_cnt_next;
     logic [31:0] prev_data;
-    localparam int unsigned WAIT5_CYCLES = 5000; // 5us wait / 1ns period
+    localparam int unsigned WAIT5_CYCLES = 500; // 5us wait / 1ns period
     logic [$clog2(WAIT5_CYCLES)-1:0] wait5_cnt, wait5_cnt_n;
 
     // FSM state registers
@@ -137,10 +137,7 @@ module ita_sequencer_hardcoded_av_step #(
                 case (tile_cnt)
                     0: next_state = S_WRITE_REQ_0;
                     1: next_state = S_WRITE_REQ_1;
-                    2: next_state = S_WRITE_REQ_2;
-                    3: next_state = S_WRITE_REQ_3;
-                    4: next_state = S_WRITE_REQ_4;
-                    5: next_state = S_WRITE_REQ_5;
+                    2: next_state = S_WRITE_REQ_2;                
                     default: next_state = S_FINISH_STEP; // All tiles done
                 endcase
             end          

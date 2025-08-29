@@ -285,20 +285,7 @@ module tb_ITA_FPGA_WRAPPER;
     initial begin
     
 
-        simdir = {"/home/coppholl/Projects/ITA-FPGA/ita_kria_wrapper/", 
-            "data_S",
-            $sformatf("%0d", SEQUENCE_LEN),
-            "_E",
-            $sformatf("%0d", EMBEDDING_SIZE),
-            "_P",
-            $sformatf("%0d", PROJECTION_SPACE),
-            "_F",
-            $sformatf("%0d", FEEDFORWARD_SIZE),
-            "_H1_B",
-            $sformatf("%0d", `ifdef BIAS `BIAS `else 0 `endif),
-            "_",
-            activation_e_to_string(ACTIVATION)
-            };
+        simdir = {"C:/Users/micha/Documents/GitHub/ITA-FPGA/ita_kria_wrapper/data_S64_E128_P192_F256_H1_B1_Relu"};
         // Base pointer calculations for the logical memory map
         BASE_PTR[0 ] = 0;
         BASE_PTR[1 ] = BASE_PTR[0 ] + SEQUENCE_LEN * EMBEDDING_SIZE;

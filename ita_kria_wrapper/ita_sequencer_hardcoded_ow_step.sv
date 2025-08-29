@@ -59,7 +59,7 @@ module ita_sequencer_hardcoded_ow_step #(
     logic [7:0]  write_step_cnt, write_step_cnt_next, tile_cnt, next_tile_cnt;
     logic [$clog2(INTER_TILE_DELAY_CYCLES):0] delay_cnt, delay_cnt_next;
     logic [31:0] prev_data;
-    localparam int unsigned WAIT5_CYCLES = 5000; // 5us wait / 1ns period
+    localparam int unsigned WAIT5_CYCLES = 500; // 5us wait / 1ns period
     logic [$clog2(WAIT5_CYCLES)-1:0] wait5_cnt, wait5_cnt_n;
 
     // FSM state registers
