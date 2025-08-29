@@ -72,6 +72,15 @@ package ita_package;
     logic [             E-1:0][WI-1:0] data;
   } write_port_t;
 
+  function string activation_e_to_string(input activation_e act);
+    case (act)
+      Identity: return "Identity";
+      Gelu:     return "Gelu";
+      Relu:     return "Relu";
+      default:  return "unknown";
+    endcase
+  endfunction
+
   // States
   typedef enum {Idle=0, Q=1, K=2, V=3, QK=4, AV=5, OW=6, F1=7, F2=8, MatMul=9} step_e;
 

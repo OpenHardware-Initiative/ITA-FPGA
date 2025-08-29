@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="ita_hwpe_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="cf_math_pkg" />
+            <top_module name="glbl" />
+            <top_module name="hci_package" />
+            <top_module name="hwpe_ctrl_package" />
+            <top_module name="hwpe_stream_package" />
+            <top_module name="ita_hwpe_package" />
+            <top_module name="ita_hwpe_tb" />
+            <top_module name="ita_package" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="23,933 ps"></ZoomStartTime>
+      <ZoomEndTime time="24,040 ps"></ZoomEndTime>
+      <Cursor1Time time="23,959 ps"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="168"></NameColumnWidth>
+      <ValueColumnWidth column_width="81"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="68" />
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_SEQUENCE_DIM">
+      <obj_property name="ElementShortName">N_TILES_SEQUENCE_DIM[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_SEQUENCE_DIM[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_EMBEDDING_DIM">
+      <obj_property name="ElementShortName">N_TILES_EMBEDDING_DIM[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_EMBEDDING_DIM[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_PROJECTION_DIM">
+      <obj_property name="ElementShortName">N_TILES_PROJECTION_DIM[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_PROJECTION_DIM[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_FEEDFORWARD_DIM">
+      <obj_property name="ElementShortName">N_TILES_FEEDFORWARD_DIM[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_FEEDFORWARD_DIM[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_ELEMENTS_PER_TILE">
+      <obj_property name="ElementShortName">N_ELEMENTS_PER_TILE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_ELEMENTS_PER_TILE[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_OUTER_X">
+      <obj_property name="ElementShortName">N_TILES_OUTER_X[0:8][31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_OUTER_X[0:8][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_OUTER_Y">
+      <obj_property name="ElementShortName">N_TILES_OUTER_Y[0:8][31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_OUTER_Y[0:8][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_TILES_INNER_DIM">
+      <obj_property name="ElementShortName">N_TILES_INNER_DIM[0:8][31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_TILES_INNER_DIM[0:8][31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/BASE_PTR">
+      <obj_property name="ElementShortName">BASE_PTR[0:22][31:0]</obj_property>
+      <obj_property name="ObjectShortName">BASE_PTR[0:22][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/BASE_PTR_INPUT">
+      <obj_property name="ElementShortName">BASE_PTR_INPUT[8:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">BASE_PTR_INPUT[8:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/BASE_PTR_WEIGHT0">
+      <obj_property name="ElementShortName">BASE_PTR_WEIGHT0[8:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">BASE_PTR_WEIGHT0[8:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/BASE_PTR_WEIGHT1">
+      <obj_property name="ElementShortName">BASE_PTR_WEIGHT1[8:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">BASE_PTR_WEIGHT1[8:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/BASE_PTR_BIAS">
+      <obj_property name="ElementShortName">BASE_PTR_BIAS[8:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">BASE_PTR_BIAS[8:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/BASE_PTR_OUTPUT">
+      <obj_property name="ElementShortName">BASE_PTR_OUTPUT[8:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">BASE_PTR_OUTPUT[8:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/ita_hwpe_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/ita_hwpe_tb/rst_n">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/evt">
+      <obj_property name="ElementShortName">evt[8:0][1:0]</obj_property>
+      <obj_property name="ObjectShortName">evt[8:0][1:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/ita_hwpe_tb/busy">
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_req">
+      <obj_property name="ElementShortName">tcdm_req[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_req[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_gnt">
+      <obj_property name="ElementShortName">tcdm_gnt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_gnt[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add">
+      <obj_property name="ElementShortName">tcdm_add[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_add[31:0][31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="CustomSignalColor">#FF00FF</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[31]">
+         <obj_property name="ElementShortName">[31][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[31][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[30]">
+         <obj_property name="ElementShortName">[30][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[30][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[29]">
+         <obj_property name="ElementShortName">[29][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[29][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[28]">
+         <obj_property name="ElementShortName">[28][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[28][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[27]">
+         <obj_property name="ElementShortName">[27][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[27][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[26]">
+         <obj_property name="ElementShortName">[26][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[26][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[25]">
+         <obj_property name="ElementShortName">[25][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[25][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[24]">
+         <obj_property name="ElementShortName">[24][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[24][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[23]">
+         <obj_property name="ElementShortName">[23][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[23][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[22]">
+         <obj_property name="ElementShortName">[22][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[22][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[21]">
+         <obj_property name="ElementShortName">[21][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[21][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[20]">
+         <obj_property name="ElementShortName">[20][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[20][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[19]">
+         <obj_property name="ElementShortName">[19][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[19][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[18]">
+         <obj_property name="ElementShortName">[18][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[18][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[17]">
+         <obj_property name="ElementShortName">[17][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[17][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[16]">
+         <obj_property name="ElementShortName">[16][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[16][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[15]">
+         <obj_property name="ElementShortName">[15][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[15][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[14]">
+         <obj_property name="ElementShortName">[14][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[14][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[13]">
+         <obj_property name="ElementShortName">[13][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[13][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[12]">
+         <obj_property name="ElementShortName">[12][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[12][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[11]">
+         <obj_property name="ElementShortName">[11][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[11][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[10]">
+         <obj_property name="ElementShortName">[10][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[10][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[9]">
+         <obj_property name="ElementShortName">[9][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[8]">
+         <obj_property name="ElementShortName">[8][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[7]">
+         <obj_property name="ElementShortName">[7][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[6]">
+         <obj_property name="ElementShortName">[6][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[5]">
+         <obj_property name="ElementShortName">[5][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[4]">
+         <obj_property name="ElementShortName">[4][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[3]">
+         <obj_property name="ElementShortName">[3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[2]">
+         <obj_property name="ElementShortName">[2][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[1]">
+         <obj_property name="ElementShortName">[1][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[0]">
+         <obj_property name="ElementShortName">[0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[31]">
+         <obj_property name="ElementShortName">[31][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[31][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[30]">
+         <obj_property name="ElementShortName">[30][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[30][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[29]">
+         <obj_property name="ElementShortName">[29][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[29][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[28]">
+         <obj_property name="ElementShortName">[28][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[28][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[27]">
+         <obj_property name="ElementShortName">[27][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[27][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[26]">
+         <obj_property name="ElementShortName">[26][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[26][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[25]">
+         <obj_property name="ElementShortName">[25][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[25][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[24]">
+         <obj_property name="ElementShortName">[24][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[24][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[23]">
+         <obj_property name="ElementShortName">[23][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[23][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[22]">
+         <obj_property name="ElementShortName">[22][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[22][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[21]">
+         <obj_property name="ElementShortName">[21][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[21][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[20]">
+         <obj_property name="ElementShortName">[20][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[20][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[19]">
+         <obj_property name="ElementShortName">[19][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[19][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[18]">
+         <obj_property name="ElementShortName">[18][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[18][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[17]">
+         <obj_property name="ElementShortName">[17][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[17][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[16]">
+         <obj_property name="ElementShortName">[16][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[16][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[15]">
+         <obj_property name="ElementShortName">[15][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[15][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[14]">
+         <obj_property name="ElementShortName">[14][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[14][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[13]">
+         <obj_property name="ElementShortName">[13][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[13][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[12]">
+         <obj_property name="ElementShortName">[12][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[12][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[11]">
+         <obj_property name="ElementShortName">[11][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[11][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[10]">
+         <obj_property name="ElementShortName">[10][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[10][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[9]">
+         <obj_property name="ElementShortName">[9][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[8]">
+         <obj_property name="ElementShortName">[8][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[7]">
+         <obj_property name="ElementShortName">[7][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[6]">
+         <obj_property name="ElementShortName">[6][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[5]">
+         <obj_property name="ElementShortName">[5][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[4]">
+         <obj_property name="ElementShortName">[4][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[3]">
+         <obj_property name="ElementShortName">[3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[2]">
+         <obj_property name="ElementShortName">[2][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[1]">
+         <obj_property name="ElementShortName">[1][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_add[0]">
+         <obj_property name="ElementShortName">[0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_wen">
+      <obj_property name="ElementShortName">tcdm_wen[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_wen[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_be">
+      <obj_property name="ElementShortName">tcdm_be[31:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_be[31:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_data">
+      <obj_property name="ElementShortName">tcdm_data[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_data[31:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/m_data">
+      <obj_property name="ElementShortName">m_data[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">m_data[31:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/ita_hwpe_tb/sel_init">
+      <obj_property name="ElementShortName">sel_init</obj_property>
+      <obj_property name="ObjectShortName">sel_init</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_r_data">
+      <obj_property name="ElementShortName">tcdm_r_data[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_r_data[31:0][31:0]</obj_property>
+      <obj_property name="CustomSignalColor">#FFFF00</obj_property>
+      <obj_property name="UseCustomSignalColor">true</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/tcdm_r_valid">
+      <obj_property name="ElementShortName">tcdm_r_valid[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tcdm_r_valid[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/ita_hwpe_tb/clk_i">
+      <obj_property name="ElementShortName">clk_i</obj_property>
+      <obj_property name="ObjectShortName">clk_i</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/CLK_PERIOD">
+      <obj_property name="ElementShortName">CLK_PERIOD[63:0]</obj_property>
+      <obj_property name="ObjectShortName">CLK_PERIOD[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/APPL_DELAY">
+      <obj_property name="ElementShortName">APPL_DELAY[63:0]</obj_property>
+      <obj_property name="ObjectShortName">APPL_DELAY[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/ACQ_DELAY">
+      <obj_property name="ElementShortName">ACQ_DELAY[63:0]</obj_property>
+      <obj_property name="ObjectShortName">ACQ_DELAY[63:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/RST_CLK_CYCLES">
+      <obj_property name="ElementShortName">RST_CLK_CYCLES[31:0]</obj_property>
+      <obj_property name="ObjectShortName">RST_CLK_CYCLES[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/N_PE">
+      <obj_property name="ElementShortName">N_PE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">N_PE[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/M_TILE_LEN">
+      <obj_property name="ElementShortName">M_TILE_LEN[31:0]</obj_property>
+      <obj_property name="ObjectShortName">M_TILE_LEN[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/SEQUENCE_LEN">
+      <obj_property name="ElementShortName">SEQUENCE_LEN[31:0]</obj_property>
+      <obj_property name="ObjectShortName">SEQUENCE_LEN[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/PROJECTION_SPACE">
+      <obj_property name="ElementShortName">PROJECTION_SPACE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">PROJECTION_SPACE[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/EMBEDDING_SIZE">
+      <obj_property name="ElementShortName">EMBEDDING_SIZE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">EMBEDDING_SIZE[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/FEEDFORWARD_SIZE">
+      <obj_property name="ElementShortName">FEEDFORWARD_SIZE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">FEEDFORWARD_SIZE[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/ACTIVATION">
+      <obj_property name="ElementShortName">ACTIVATION[1:0]</obj_property>
+      <obj_property name="ObjectShortName">ACTIVATION[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/SINGLE_ATTENTION">
+      <obj_property name="ElementShortName">SINGLE_ATTENTION[31:0]</obj_property>
+      <obj_property name="ObjectShortName">SINGLE_ATTENTION[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/ITA_REG_OFFSET">
+      <obj_property name="ElementShortName">ITA_REG_OFFSET[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ITA_REG_OFFSET[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/MEMORY_SIZE">
+      <obj_property name="ElementShortName">MEMORY_SIZE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">MEMORY_SIZE[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/AccDataWidth">
+      <obj_property name="ElementShortName">AccDataWidth[31:0]</obj_property>
+      <obj_property name="ObjectShortName">AccDataWidth[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/IdWidth">
+      <obj_property name="ElementShortName">IdWidth[31:0]</obj_property>
+      <obj_property name="ObjectShortName">IdWidth[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/MemDataWidth">
+      <obj_property name="ElementShortName">MemDataWidth[31:0]</obj_property>
+      <obj_property name="ObjectShortName">MemDataWidth[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/MP">
+      <obj_property name="ElementShortName">MP[31:0]</obj_property>
+      <obj_property name="ObjectShortName">MP[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/HCI_SIZE_tcdm_mem">
+      <obj_property name="ElementShortName">HCI_SIZE_tcdm_mem</obj_property>
+      <obj_property name="ObjectShortName">HCI_SIZE_tcdm_mem</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/oup_o">
+      <obj_property name="ElementShortName">oup_o[7:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">oup_o[7:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/inp_weight_i">
+      <obj_property name="ElementShortName">inp_weight_i[127:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">inp_weight_i[127:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_inp1_mux/inp_i">
+      <obj_property name="ElementShortName">inp_i[63:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">inp_i[63:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group52">
+      <obj_property name="label">uram_mem</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/i_memory_model/bank_addra">
+      <obj_property name="ElementShortName">bank_addra[31:0][11:0]</obj_property>
+      <obj_property name="ObjectShortName">bank_addra[31:0][11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/i_memory_model/bank_addrb">
+      <obj_property name="ElementShortName">bank_addrb[31:0][11:0]</obj_property>
+      <obj_property name="ObjectShortName">bank_addrb[31:0][11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/i_memory_model/bank_dinb">
+      <obj_property name="ElementShortName">bank_dinb[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">bank_dinb[31:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/i_memory_model/bank_douta">
+      <obj_property name="ElementShortName">bank_douta[31:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">bank_douta[31:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/i_memory_model/bank_web">
+      <obj_property name="ElementShortName">bank_web[31:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">bank_web[31:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group231">
+      <obj_property name="label">ita_tcdm_interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/req">
+         <obj_property name="ElementShortName">req</obj_property>
+         <obj_property name="ObjectShortName">req</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/gnt">
+         <obj_property name="ElementShortName">gnt</obj_property>
+         <obj_property name="ObjectShortName">gnt</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/r_valid">
+         <obj_property name="ElementShortName">r_valid</obj_property>
+         <obj_property name="ObjectShortName">r_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/r_ready">
+         <obj_property name="ElementShortName">r_ready</obj_property>
+         <obj_property name="ObjectShortName">r_ready</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/add">
+         <obj_property name="ElementShortName">add[31:0]</obj_property>
+         <obj_property name="ObjectShortName">add[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/wen">
+         <obj_property name="ElementShortName">wen</obj_property>
+         <obj_property name="ObjectShortName">wen</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/data">
+         <obj_property name="ElementShortName">data[1023:0]</obj_property>
+         <obj_property name="ObjectShortName">data[1023:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/be">
+         <obj_property name="ElementShortName">be[127:0]</obj_property>
+         <obj_property name="ObjectShortName">be[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/user">
+         <obj_property name="ElementShortName">user[0:0]</obj_property>
+         <obj_property name="ObjectShortName">user[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/id">
+         <obj_property name="ElementShortName">id[1:0]</obj_property>
+         <obj_property name="ObjectShortName">id[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/r_data">
+         <obj_property name="ElementShortName">r_data[1023:0]</obj_property>
+         <obj_property name="ObjectShortName">r_data[1023:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/r_user">
+         <obj_property name="ElementShortName">r_user[0:0]</obj_property>
+         <obj_property name="ObjectShortName">r_user[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/r_id">
+         <obj_property name="ElementShortName">r_id[1:0]</obj_property>
+         <obj_property name="ObjectShortName">r_id[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/r_opc">
+         <obj_property name="ElementShortName">r_opc</obj_property>
+         <obj_property name="ObjectShortName">r_opc</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/ecc">
+         <obj_property name="ElementShortName">ecc[0:0]</obj_property>
+         <obj_property name="ObjectShortName">ecc[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/r_ecc">
+         <obj_property name="ElementShortName">r_ecc[0:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ecc[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/ereq">
+         <obj_property name="ElementShortName">ereq[0:0]</obj_property>
+         <obj_property name="ObjectShortName">ereq[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/egnt">
+         <obj_property name="ElementShortName">egnt[0:0]</obj_property>
+         <obj_property name="ObjectShortName">egnt[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/r_evalid">
+         <obj_property name="ElementShortName">r_evalid[0:0]</obj_property>
+         <obj_property name="ObjectShortName">r_evalid[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/dut/tcdm/r_eready">
+         <obj_property name="ElementShortName">r_eready[0:0]</obj_property>
+         <obj_property name="ObjectShortName">r_eready[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/dut/tcdm/clk_assert">
+         <obj_property name="ElementShortName">clk_assert</obj_property>
+         <obj_property name="ObjectShortName">clk_assert</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_controller/count_d">
+      <obj_property name="ElementShortName">count_d[11:0]</obj_property>
+      <obj_property name="ObjectShortName">count_d[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_controller/count_q">
+      <obj_property name="ElementShortName">count_q[11:0]</obj_property>
+      <obj_property name="ObjectShortName">count_q[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_controller/tile_d">
+      <obj_property name="ElementShortName">tile_d[11:0]</obj_property>
+      <obj_property name="ObjectShortName">tile_d[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_controller/tile_q">
+      <obj_property name="ElementShortName">tile_q[11:0]</obj_property>
+      <obj_property name="ObjectShortName">tile_q[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_controller/inner_tile_d">
+      <obj_property name="ElementShortName">inner_tile_d[11:0]</obj_property>
+      <obj_property name="ObjectShortName">inner_tile_d[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/i_controller/inner_tile_q">
+      <obj_property name="ElementShortName">inner_tile_q[11:0]</obj_property>
+      <obj_property name="ObjectShortName">inner_tile_q[11:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_ctrl/ctrl_stream_o">
+      <obj_property name="ElementShortName">ctrl_stream_o</obj_property>
+      <obj_property name="ObjectShortName">ctrl_stream_o</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_ctrl/ctrl_engine_o">
+      <obj_property name="ElementShortName">ctrl_engine_o</obj_property>
+      <obj_property name="ObjectShortName">ctrl_engine_o</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/ita_hwpe_tb/dut/i_ita/i_engine/i_ita/step">
+      <obj_property name="ElementShortName">step[31:0]</obj_property>
+      <obj_property name="ObjectShortName">step[31:0]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group132">
+      <obj_property name="label">periph</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/periph/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/periph/req">
+         <obj_property name="ElementShortName">req</obj_property>
+         <obj_property name="ObjectShortName">req</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/periph/gnt">
+         <obj_property name="ElementShortName">gnt</obj_property>
+         <obj_property name="ObjectShortName">gnt</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/periph/add">
+         <obj_property name="ElementShortName">add[31:0]</obj_property>
+         <obj_property name="ObjectShortName">add[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/periph/wen">
+         <obj_property name="ElementShortName">wen</obj_property>
+         <obj_property name="ObjectShortName">wen</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/periph/be">
+         <obj_property name="ElementShortName">be[3:0]</obj_property>
+         <obj_property name="ObjectShortName">be[3:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/periph/data">
+         <obj_property name="ElementShortName">data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">data[31:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/periph/id">
+         <obj_property name="ElementShortName">id[7:0]</obj_property>
+         <obj_property name="ObjectShortName">id[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/ita_hwpe_tb/periph/r_data">
+         <obj_property name="ElementShortName">r_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/ita_hwpe_tb/periph/r_valid">
+         <obj_property name="ElementShortName">r_valid</obj_property>
+         <obj_property name="ObjectShortName">r_valid</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>

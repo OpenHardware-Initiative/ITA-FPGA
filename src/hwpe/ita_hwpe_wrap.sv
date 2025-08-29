@@ -71,7 +71,9 @@ module ita_hwpe_wrap
     assign tcdm_wen_o  [i] = tcdm.wen;
     assign tcdm_be_o   [i] = tcdm.be[i*(MemDataWidth/8)+:(MemDataWidth/8)];
     assign tcdm_data_o [i] = tcdm.data[i*MemDataWidth+:MemDataWidth];
+
   end
+  
   assign tcdm.gnt      = &(tcdm_gnt_i);
   assign tcdm.r_valid  = &(tcdm_r_valid_i);
   assign tcdm.r_data   = { >> {tcdm_r_data_i} };
@@ -80,7 +82,8 @@ module ita_hwpe_wrap
   assign tcdm.r_opc    = '0;
   assign tcdm.r_ecc    = '0;
   assign tcdm.egnt     = '0;
-  assign tcdm.r_evalid = '0;
+  assign tcdm.r_evalid = '0; 
+  
 
   always_comb begin
     periph.req       = periph_req_i;

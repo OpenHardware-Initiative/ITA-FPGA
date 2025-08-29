@@ -10,8 +10,8 @@
 set proj_name "ITA-kria-vivado"
 #set part_name "xck26-sfvc784-2LV-c"
 set board_part "xilinx.com:kr260_som:part0:1.1"
-set top_rtl   "ita_hwpe_wrap"
-set top_tb    "ita_hwpe_tb"
+set top_rtl   "ITA_AXI_WRAPPER"
+set top_tb    "ita_hwpe_uram_tb"
 set ROOT [file dirname [info script]]
 
 # --- 2. Create the Project ---
@@ -56,6 +56,12 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/src/ita_accumulator.sv" \
     "$ROOT/src/ita_dotp.sv" \
     "$ROOT/src/hwpe/ita_hwpe_ctrl.sv" \
+    "$ROOT/ita_kria_wrapper/ita_uram_controller.sv" \
+    "$ROOT/ita_kria_wrapper/ita_hwpe_sequencer.sv" \
+    "$ROOT/ita_kria_wrapper/dma_address_generator.sv" \
+    "$ROOT/ita_kria_wrapper/uram_memory_controller_ita_dma.sv" \
+    "$ROOT/ita_kria_wrapper/ITA_FPGA_WRAPPER.sv" \
+    "$ROOT/ita_kria_wrapper/ITA_AXI_WRAPPER.v" \
 ]
 update_compile_order -fileset sources_1
 
@@ -129,6 +135,10 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/core/hci_core_fifo.sv" \
 ]
 update_compile_order -fileset sources_1
+
+# Add assertions header file
+add_files -fileset sources_1 "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/include/common_cells/assertions.svh"
+set_property file_type "Verilog Header" [get_files */assertions.svh]
 
 # Add common_cells, tech_cells, and hwpe-ctrl files
 add_files -norecurse -scan_for_includes [list \
@@ -266,6 +276,14 @@ add_files -norecurse -scan_for_includes [list \
 ]
 update_compile_order -fileset sources_1
 
+# ========================================================================
+# --- 4.5. Create Block Design ---
+# ========================================================================
+# This sources the Tcl script to generate the block design diagram.
+# No output products or wrappers are generated at this stage.
+#puts "INFO: Sourcing the Block Design Tcl script to create the diagram..."
+#source "$ROOT/ita_kria_wrapper/block_design/VIP_diagram.tcl"
+
 # --- 5. Set Include Directories ---
 puts "INFO: Setting include directories..."
 set_property include_dirs [list \
@@ -275,7 +293,7 @@ set_property include_dirs [list \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/common" \
     "$ROOT/.bender/git/checkouts/hwpe-ctrl-b4d268c729c1adb1/rtl" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl" \
-] [current_fileset]
+    ] [current_fileset]
 
 set_property include_dirs [list \
     "$ROOT/.bender/git/checkouts/cluster_interconnect-d5833d25198a0133/rtl/low_latency_interco" \
@@ -306,8 +324,8 @@ set verilog_macros [list \
     "EMBED_SIZE=128" \
     "PROJ_SPACE=192" \
     "FF_SIZE=256" \
-    "BIAS=0" \
-    "ACTIVATION=Identity" \
+    "BIAS=1" \
+    "ACTIVATION=Relu" \
     "HCI_ASSERT_DELAY=\#41ps" \
 ]
 
@@ -321,6 +339,7 @@ puts "INFO: Configuring simulation fileset..."
 add_files -fileset sim_1 -norecurse -scan_for_includes [list \
     "$ROOT/src/tb/activation_tb.sv" \
     "$ROOT/src/hwpe/tb/ita_hwpe_tb.sv" \
+    "$ROOT/src/hwpe/tb/ita_hwpe_uram_tb.sv" \
     "$ROOT/src/hwpe/tb/tb_dummy_memory.sv" \
     "$ROOT/src/tb/clk_rst_gen.sv" \
     "$ROOT/src/tb/ita_tb.sv" \
