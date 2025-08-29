@@ -85,7 +85,6 @@ module ITA_FPGA_WRAPPER #(
     input  logic [31:0] rqs_add2_i,
     input  logic [31:0] rqs_add3_i,
     input  logic [31:0] rqs_add4_i
-    
 );
     
     // --- FSM State Definition  ---
@@ -528,7 +527,6 @@ module ITA_FPGA_WRAPPER #(
     ) i_ita_sequencer_q (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(q_start),
-        .step_i(current_step_r),
         .done_o(q_done),
         .hwpe_busy_i(busy_o),
         .periph_req_o(periph_req_seq),
@@ -538,7 +536,117 @@ module ITA_FPGA_WRAPPER #(
         .periph_be_o(periph_be_seq),
         .periph_data_o(periph_data_seq)
     );
+
+    ita_sequencer_hardcoded_k_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_q (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(k_start),
+        .done_o(k_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq)
+    );
       
+    ita_sequencer_hardcoded_v_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_q (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(v_start),
+        .done_o(v_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq)
+    );
+
+    ita_sequencer_hardcoded_qk_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_q (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(qk_start),
+        .done_o(qk_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq)
+    );
+
+    ita_sequencer_hardcoded_av_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_q (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(av_start),
+        .done_o(av_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq)
+    );
+
+    ita_sequencer_hardcoded_ow_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_q (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(ow_start),
+        .done_o(ow_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq)
+    );
+
     // The HWPE wrapper contains the actual processing engine.
     ita_hwpe_wrap #(
         .AccDataWidth(AccDataWidth),
