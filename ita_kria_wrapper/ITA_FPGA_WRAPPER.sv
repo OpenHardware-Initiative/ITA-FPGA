@@ -534,7 +534,7 @@ module ITA_FPGA_WRAPPER #(
 
     // The sequencer is responsible for the low-level, tile-by-tile programming
     // of the HWPE during the RUN states.
-    ita_sequencer #(
+    /*ita_sequencer #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -578,7 +578,41 @@ module ITA_FPGA_WRAPPER #(
         
         .activation_gelu_const_i(activation_gelu_const_i),
         .activation_rqs_const_i(activation_rqs_const_i)
+    ); */
+    
+    ita_sequencer_hardcoded_q_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(sequencer_start),
+        .step_i(current_step_r),
+        .done_o(sequencer_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_seq),
+        .periph_gnt_i(periph_gnt_seq),
+        .periph_add_o(periph_add_seq),
+        .periph_wen_o(periph_wen_seq),
+        .periph_be_o(periph_be_seq),
+        .periph_data_o(periph_data_seq),
+        // --- Pass through the RQS and Activation Constants ---
+        .rqs_eps_mult0_i(rqs_eps_mult0_i),
+        .rqs_eps_mult1_i(rqs_eps_mult1_i),
+        .rqs_rshift0_i(rqs_rshift0_i),
+        .rqs_rshift1_i(rqs_rshift1_i),
+        .rqs_add0_i(rqs_add0_i),
+        .rqs_add1_i(rqs_add1_i),
+        
+        .activation_gelu_const_i(activation_gelu_const_i),
+         .activation_rqs_const_i(activation_rqs_const_i)
     );
+      
 
 
     // The HWPE wrapper contains the actual processing engine.
