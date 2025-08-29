@@ -63,6 +63,7 @@ module ita_sequencer_hardcoded_q_step #(
     seq_state_t  current_state, next_state;
     logic [7:0]  write_step_cnt, write_step_cnt_next, tile_cnt, next_tile_cnt;
     logic [$clog2(INTER_TILE_DELAY_CYCLES):0] delay_cnt, delay_cnt_next;
+    logic [31:0] prev_addr;
 
     // FSM state registers
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -111,6 +112,24 @@ module ita_sequencer_hardcoded_q_step #(
                 end
             end
 
+            S_WAIT_CYCLE: begin
+                case (tile_cnt)
+                    0: next_state = S_WRITE_REQ_0;
+                    1: next_state = S_WRITE_REQ_1;
+                    2: next_state = S_WRITE_REQ_2;
+                    3: next_state = S_WRITE_REQ_3;
+                    4: next_state = S_WRITE_REQ_4;
+                    5: next_state = S_WRITE_REQ_5;
+                    default: next_state = S_FINISH_STEP; // All tiles done
+                endcase
+
+                periph_req_o = 1'b0;
+                periph_wen_o = 1'b0;
+                periph_add_o = prev_addr; 
+                periph_data_o = 32'h0;
+                periph_be_o  = 4'hF;
+                
+            end
             S_SEND_TRIGGER: begin
                 periph_req_o = 1'b1;
                 periph_wen_o = 1'b0;
@@ -150,15 +169,17 @@ module ita_sequencer_hardcoded_q_step #(
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h13; end // CTRL_STREAM
                 endcase
 
+                prev_addr = periph_add_o;
+                
                 if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
-                    next_state = S_WRITE_REQ_0;
+                    next_state = S_WAIT_CYCLE;
                     write_step_cnt_next = write_step_cnt + 1;
                 end
-
             end
+
             
             S_WRITE_REQ_1: begin
                 periph_req_o = 1'b1;
@@ -182,11 +203,13 @@ module ita_sequencer_hardcoded_q_step #(
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h2; end // CTRL_STREAM
                 endcase
 
+                prev_addr = periph_add_o;
+
                 if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
-                    next_state = S_WRITE_REQ_1;
+                    next_state = S_WAIT_CYCLE;
                     write_step_cnt_next = write_step_cnt + 1;
                 end
             end
@@ -213,11 +236,13 @@ module ita_sequencer_hardcoded_q_step #(
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h12; end // CTRL_STREAM
                 endcase
 
+                prev_addr = periph_add_o;
+
                 if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
-                    next_state = S_WRITE_REQ_2;
+                    next_state = S_WAIT_CYCLE;
                     write_step_cnt_next = write_step_cnt + 1;
                 end
             end
@@ -244,11 +269,13 @@ module ita_sequencer_hardcoded_q_step #(
                     15:  begin periph_add_o = 32'd88; periph_data_o = 32'h2; end // CTRL_STREAM
                 endcase
 
+                prev_addr = periph_add_o;
+
                 if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
-                    next_state = S_WRITE_REQ_3;
+                    next_state = S_WAIT_CYCLE;
                     write_step_cnt_next = write_step_cnt + 1;
                 end
             end
@@ -266,11 +293,13 @@ module ita_sequencer_hardcoded_q_step #(
                     6:   begin periph_add_o = 32'd88; periph_data_o = 32'h00012; end // EPS_MULT0
                 endcase
 
+                prev_addr = periph_add_o;
+
                 if (write_step_cnt == 6) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
-                    next_state = S_WRITE_REQ_4;
+                    next_state = S_WAIT_CYCLE;
                     write_step_cnt_next = write_step_cnt + 1;
                 end
             end
@@ -288,11 +317,13 @@ module ita_sequencer_hardcoded_q_step #(
                     6:   begin periph_add_o = 32'd88; periph_data_o = 32'h00002; end // EPS_MULT0
                 endcase
 
+                prev_addr = periph_add_o;
+
                 if (write_step_cnt == 6) begin
                     next_state = S_FINISH_STEP;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
-                    next_state = S_WRITE_REQ_5;
+                    next_state = S_WAIT_CYCLE;
                     write_step_cnt_next = write_step_cnt + 1;
                 end
                 
