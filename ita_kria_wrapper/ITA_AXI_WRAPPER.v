@@ -281,10 +281,6 @@ module ITA_AXI_WRAPPER#(
         .attn_done_o(attn_done_o),
         .ffn_done_o(ffn_done_o),
         .accelerator_idle_o(accelerator_idle_o),
-
-        // DMA/Mux Control --> to slv_reg2
-        .dma_mode_o(dma_mode_o),
-        .dma_we_o(dma_we_o),
         
         // AXI STREAM SLAVE PORT
         .s_axis_tdata(s_axis_tdata),
