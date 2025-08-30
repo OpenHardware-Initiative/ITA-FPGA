@@ -253,4 +253,25 @@ module ita_sequencer_hardcoded_qk_step #(
             end
         endcase
     end
+     // New registered block for all module outputs
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            done_o        <= 1'b0;
+            periph_req_o  <= 1'b0;
+            periph_add_o  <= '0;
+            periph_wen_o  <= 1'b1; // Default to read, inactive state
+            periph_be_o   <= '0;
+            periph_data_o <= '0;
+            prev_data     <= '0;
+        end else begin
+            done_o        <= done_next;
+            periph_req_o  <= periph_req_next;
+            periph_add_o  <= periph_add_next;
+            periph_wen_o  <= periph_wen_next;
+            periph_be_o   <= periph_be_next;
+            periph_data_o <= periph_data_next;
+            // CORRECTED: Safely register prev_data to avoid combinational loop
+            prev_data     <= periph_data_next;
+        end
+    end
 endmodule

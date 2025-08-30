@@ -143,14 +143,14 @@ module ITA_FPGA_WRAPPER #(
     // The arbiter below will select which one is active.
 
     // --- From Sequencers to Mux ---
-    logic periph_req_q, periph_req_k, periph_req_v, periph_req_qk, periph_req_av, periph_req_ow;
-    logic [31:0] periph_add_q, periph_add_k, periph_add_v, periph_add_qk, periph_add_av, periph_add_ow;
-    logic periph_wen_q, periph_wen_k, periph_wen_v, periph_wen_qk, periph_wen_av, periph_wen_ow;
-    logic [3:0] periph_be_q, periph_be_k, periph_be_v, periph_be_qk, periph_be_av, periph_be_ow;
-    logic [31:0] periph_data_q, periph_data_k, periph_data_v, periph_data_qk, periph_data_av, periph_data_ow;
+    logic periph_req_q, periph_req_k, periph_req_v, periph_req_qk, periph_req_av, periph_req_ow, periph_req_f1, periph_req_f2;
+    logic [31:0] periph_add_q, periph_add_k, periph_add_v, periph_add_qk, periph_add_av, periph_add_ow, periph_add_f1, periph_add_f2;
+    logic periph_wen_q, periph_wen_k, periph_wen_v, periph_wen_qk, periph_wen_av, periph_wen_ow, periph_wen_f1, periph_wen_f2;
+    logic [3:0] periph_be_q, periph_be_k, periph_be_v, periph_be_qk, periph_be_av, periph_be_ow, periph_be_f1, periph_be_f2;
+    logic [31:0] periph_data_q, periph_data_k, periph_data_v, periph_data_qk, periph_data_av, periph_data_ow, periph_data_f1, periph_data_f2;
 
     // --- From Mux to Sequencers (Grant signals) ---
-    logic periph_gnt_q, periph_gnt_k, periph_gnt_v, periph_gnt_qk, periph_gnt_av, periph_gnt_ow;
+    logic periph_gnt_q, periph_gnt_k, periph_gnt_v, periph_gnt_qk, periph_gnt_av, periph_gnt_ow,  periph_gnt_f1, periph_gnt_f2;
     
     // --- DMA Address Generator Control & Status ---
     logic        dma_ag_start;         // Pulse to start the address generator.
@@ -369,7 +369,8 @@ module ITA_FPGA_WRAPPER #(
                 if (start_load_attn_wb_i) next_state = S_WAIT_ATTN_WB_DATA;
                 if (start_load_ffn_wb_i)  next_state = S_WAIT_FFN_WB_DATA;
                 if (start_attn_i)         next_state = S_WAIT_ATTN_DATA;
-                if (start_ffn_i)          next_state = S_WAIT_FFN_DATA;
+                //if (start_ffn_i)          next_state = S_WAIT_FFN_DATA; 
+                if (start_ffn_i)          next_state = S_START_F1;
             end
             
             // --- Attention WB Loading Path ---
@@ -428,7 +429,8 @@ module ITA_FPGA_WRAPPER #(
             S_WAIT_AV_DONE: if (av_done) next_state = S_START_OW;
 
             S_START_OW: begin ow_start = 1'b1; next_state = S_WAIT_OW_DONE; end
-            S_WAIT_OW_DONE: if (ow_done) next_state = S_WAIT_ATTN_READ_READY; 
+           // S_WAIT_OW_DONE: if (ow_done) next_state = S_WAIT_ATTN_READ_READY; 
+            S_WAIT_OW_DONE: if (ow_done) next_state = S_DONE_ATTN;
             
             S_WAIT_ATTN_READ_READY: begin
                 // Wait for the host to be ready to accept the results.
@@ -440,9 +442,16 @@ module ITA_FPGA_WRAPPER #(
                 end
             end
             
-            S_DONE_ATTN: begin
+            //this is how we will do it in reality
+           /* S_DONE_ATTN: begin
                 // When the results have been fully streamed out, return to idle.
                 if (dma_ag_done) next_state = S_IDLE;
+            end */ 
+            
+            //for testing purposes
+            S_DONE_ATTN: begin
+                // When the results have been fully streamed out, return to idle.
+                next_state = S_START_F1;
             end
 
             // --- FFN Computation Path ---
@@ -505,7 +514,7 @@ module ITA_FPGA_WRAPPER #(
         periph_data_seq = '0;
 
         periph_gnt_q = 1'b0; periph_gnt_k = 1'b0; periph_gnt_v = 1'b0; periph_gnt_qk = 1'b0;
-        periph_gnt_av = 1'b0; periph_gnt_ow = 1'b0; 
+        periph_gnt_av = 1'b0; periph_gnt_ow = 1'b0; periph_gnt_f1 = 1'b0; periph_gnt_f2 = 1'b0; 
 
         case (current_state)
             // --- Attention Path ---
@@ -556,6 +565,22 @@ module ITA_FPGA_WRAPPER #(
                 periph_be_seq   = periph_be_ow;
                 periph_data_seq = periph_data_ow;
                 periph_gnt_ow   = periph_gnt_seq; // Route grant back to OW
+            end
+            S_START_F1, S_WAIT_F1_DONE: begin
+                periph_req_seq  = periph_req_f1;
+                periph_add_seq  = periph_add_f1;
+                periph_wen_seq  = periph_wen_f1;
+                periph_be_seq   = periph_be_f1;
+                periph_data_seq = periph_data_f1;
+                periph_gnt_f1   = periph_gnt_seq; // Route grant back to OW
+            end
+            S_START_F2, S_WAIT_F2_DONE: begin
+                periph_req_seq  = periph_req_f2;
+                periph_add_seq  = periph_add_f2;
+                periph_wen_seq  = periph_wen_f2;
+                periph_be_seq   = periph_be_f2;
+                periph_data_seq = periph_data_f2;
+                periph_gnt_f2   = periph_gnt_seq; // Route grant back to OW
             end
             default: begin
                 // Use default assignments (all signals de-asserted)
@@ -733,6 +758,50 @@ module ITA_FPGA_WRAPPER #(
         .periph_wen_o(periph_wen_ow),
         .periph_be_o(periph_be_ow),
         .periph_data_o(periph_data_ow)
+    );
+    
+    ita_sequencer_hardcoded_f1_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_f1 (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(f1_start),
+        .done_o(f1_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_f1),
+        .periph_gnt_i(periph_gnt_f1),
+        .periph_add_o(periph_add_f1),
+        .periph_wen_o(periph_wen_f1),
+        .periph_be_o(periph_be_f1),
+        .periph_data_o(periph_data_f1)
+    );
+    
+    ita_sequencer_hardcoded_f2_step #(
+        .M_TILE_LEN(M_TILE_LEN), 
+        .SEQUENCE_LEN(SEQUENCE_LEN), 
+        .PROJECTION_SPACE(PROJECTION_SPACE),
+        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
+        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
+        .ACTIVATION(ACTIVATION), 
+        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
+        .N_CONTEXT(N_CONTEXT)
+    ) i_ita_sequencer_f2 (
+        .clk_i(clk_i), .rst_ni(rst_ni),
+        .start_i(f2_start),
+        .done_o(f2_done),
+        .hwpe_busy_i(busy_o),
+        .periph_req_o(periph_req_f2),
+        .periph_gnt_i(periph_gnt_f2),
+        .periph_add_o(periph_add_f2),
+        .periph_wen_o(periph_wen_f2),
+        .periph_be_o(periph_be_f2),
+        .periph_data_o(periph_data_f2)
     );
 
     // The HWPE wrapper contains the actual processing engine.
