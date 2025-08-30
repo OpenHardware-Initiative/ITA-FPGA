@@ -1,10 +1,3 @@
-// Copyright 2023 ETH Zurich and University of Bologna.
-// Solderpad Hardware License, Version 0.51, see LICENSE for details.
-// SPDX-License-Identifier: SHL-0.51
-
-// Author: Based on testbench analysis
-// Version: 9.0 (Corrected with Pipelined Program-Ahead FSM)
-
 `include "hci_helpers.svh"
 
 import ita_package::*;
@@ -21,7 +14,7 @@ module ita_sequencer #(
     parameter int SINGLE_ATTENTION = 0,
     parameter int N_CONTEXT = 8,
     parameter int ID = 0,
-    parameter int INTER_TILE_DELAY_CYCLES = 5 // This is the stabilization delay
+    parameter int INTER_TILE_DELAY_CYCLES = 5 
 ) (
     input  logic clk_i,
     input  logic rst_ni,
@@ -85,7 +78,7 @@ module ita_sequencer #(
 
     // --- State registers ---
     seq_state_t  current_state, next_state;
-    step_e       step_r, step_r_next; // Registered step_i
+    step_e       step_r, step_r_next; 
     logic [15:0] outer_tile_cnt, outer_tile_cnt_next;
     logic [7:0]  tile_inner_cnt, tile_inner_cnt_next;
     logic [4:0]  reg_prog_cnt, reg_prog_cnt_next;
@@ -262,7 +255,7 @@ module ita_sequencer #(
         periph_data_o             = '0;
         do_write                  = 1'b0;
 
-        // --- New Pipelined FSM Logic ---
+        // --- Pipelined FSM Logic ---
         case (current_state)
             S_IDLE: begin
                 if (start_i) begin

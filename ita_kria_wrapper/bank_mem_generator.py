@@ -2,9 +2,9 @@ import os
 import sys
 
 # --- Configuration ---
-# Your number of memory banks (MP value in Verilog)
+# Number of memory banks (MP value in Verilog)
 NUM_BANKS = 32
-# The name of your single, large, interleaved input memory file
+# The name of the single, large, interleaved input memory file
 INPUT_FILE = "simvectors/data_S64_E128_P192_F256_H1_B1_Relu/hwpe/mem.txt"
 # The name of the directory where the new bank files will be created
 OUTPUT_DIR = "ita_kria_wrapper/memory_banks"

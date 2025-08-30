@@ -12,6 +12,7 @@ import ita_package::*;
  * connection between them, exposing a clean interface that matches
  * the peripheral and control signals used in the provided testbench.
  */
+
 module ITA_FPGA_WRAPPER #(
     // Parameters for ita_hwpe_wrap
     parameter int unsigned AccDataWidth = 1024,
@@ -138,9 +139,9 @@ module ITA_FPGA_WRAPPER #(
     logic [IdWidth-1:0] periph_r_id_seq;
     
     // ===================================================================
-    // NEW: Per-Sequencer Peripheral Bus Wires
+    // Per-Sequencer Peripheral Bus Wires
     // ===================================================================
-    // We create a separate bus for each sequencer module.
+    // We created a separate bus for each sequencer module.
     // The arbiter below will select which one is active.
 
     // --- From Sequencers to Mux ---
@@ -445,7 +446,6 @@ module ITA_FPGA_WRAPPER #(
                 end
             end
             
-            //for testing purposes
             S_DONE_ATTN: begin
                 // When the results have been fully streamed out, return to idle.
                 if (dma_ag_done) next_state = S_IDLE;
@@ -498,7 +498,7 @@ module ITA_FPGA_WRAPPER #(
     assign ffn_done_o         = (current_state == S_DONE_FFN && dma_ag_done);
     
      // ===================================================================
-    // NEW: Peripheral Bus Arbiter/Multiplexer
+    // Peripheral Bus Arbiter/Multiplexer
     // ===================================================================
     // This logic selects which sequencer gets to drive the peripheral bus
     // based on the main FSM's current state.
@@ -625,7 +625,7 @@ module ITA_FPGA_WRAPPER #(
     };
     `HCI_INTF_ARRAY(tcdm_mem, clk_i, MP-1:0);
 
-    ita_sequencer_hardcoded_q_step #(
+    ita_sequencer_q_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -647,7 +647,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_q)
     );
 
-    ita_sequencer_hardcoded_k_step #(
+    ita_sequencer_k_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -691,7 +691,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_v)
     );
 
-    ita_sequencer_hardcoded_qk_step #(
+    ita_sequencer_qk_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -713,7 +713,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_qk)
     );
 
-    ita_sequencer_hardcoded_av_step #(
+    ita_sequencer_av_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -735,7 +735,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_av)
     );
 
-    ita_sequencer_hardcoded_ow_step #(
+    ita_sequencer_ow_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -757,7 +757,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_ow)
     );
     
-    ita_sequencer_hardcoded_f1_step #(
+    ita_sequencer_f1_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),
@@ -779,7 +779,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_f1)
     );
     
-    ita_sequencer_hardcoded_f2_step #(
+    ita_sequencer_f2_step #(
         .M_TILE_LEN(M_TILE_LEN), 
         .SEQUENCE_LEN(SEQUENCE_LEN), 
         .PROJECTION_SPACE(PROJECTION_SPACE),

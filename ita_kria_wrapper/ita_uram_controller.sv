@@ -158,7 +158,7 @@ endcase
   endgenerate
   
     // ====================================================================
-  // --- Read Return Path Logic (FULLY DIRECT MAPPED) ---
+  // --- Read Return Path Logic  ---
   // ====================================================================
   generate
     for (genvar i = 0; i < MP; i++) begin : g_port_return_logic
@@ -201,7 +201,7 @@ endcase
         .ADDR_WIDTH_A       (BANK_ADDR_W),
         .ADDR_WIDTH_B       (BANK_ADDR_W),
         .READ_LATENCY_A     (1),
-        .MEMORY_INIT_FILE   (MEM_INIT_FILES[i]), // Direct init, reversal is in TB
+        .MEMORY_INIT_FILE   (MEM_INIT_FILES[i]), 
         .CLOCKING_MODE      ("common_clock"),
         .READ_DATA_WIDTH_A  (32), .WRITE_DATA_WIDTH_A (32),
         .READ_DATA_WIDTH_B  (32), .WRITE_DATA_WIDTH_B (32),

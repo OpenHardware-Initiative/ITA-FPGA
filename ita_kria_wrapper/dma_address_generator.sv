@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 /**
- * @module dma_address_generator_robust
+ * @module dma_address_generator
  * @brief Robust address generator for DMA, mitigating critical hazards.
  * @details This version addresses critical review feedback:
  * 1. The output address is REGISTERED to prevent combinational glitches and
