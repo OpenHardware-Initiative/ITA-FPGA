@@ -48,6 +48,7 @@ module ita_sequencer_f1_step #(
     localparam int unsigned WAIT5_CYCLES = 250; // 5us wait / 1ns period
     logic [$clog2(WAIT5_CYCLES)-1:0] wait5_cnt, wait5_cnt_n;
     
+    // Intermediate signals for registered outputs
     logic        done_next;
     logic        periph_req_next;
     logic [31:0] periph_add_next;
@@ -83,7 +84,7 @@ module ita_sequencer_f1_step #(
         done_next              = 1'b0;
         periph_req_next        = 1'b0;
         periph_add_next        = '0;
-        periph_wen_next        = 1'b1; 
+        periph_wen_next        = 1'b1; // Default to read
         periph_be_next         = 4'hf;
         periph_data_next       = '0;
 
@@ -91,6 +92,11 @@ module ita_sequencer_f1_step #(
             S_IDLE: begin
                 if (start_i) begin
                     next_state = S_WRITE_REQ_0;
+                    periph_req_next = 1'b1;
+                    periph_wen_next = 1'b0;
+                    periph_add_next = 32'd20; 
+                    periph_data_next = 32'h0;
+                    periph_be_next  = 4'hF;
                 end
             end
 
@@ -183,26 +189,28 @@ module ita_sequencer_f1_step #(
                 periph_req_next = 1'b1;
                 periph_wen_next = 1'b0; 
                 case (write_step_cnt)
-                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1c840; end // INPUT_PTR
-                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h1e840; end // WEIGHT_PTR0
-                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h1f840; end // WEIGHT_PTR1
-                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e840; end // BIAS_PTR
-                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3dcc0; end // OUTPUT_PTR
-                    5:   begin periph_add_next = 32'd56; periph_data_next = 32'h04321; end
-                    6:   begin periph_add_next = 32'd60; periph_data_next = 32'h40756f6c; end
-                    7:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
-                    8:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
-                    9:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
-                    10:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
-                    11:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
-                    12:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
-                    13:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
-                    14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
-                    15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00013; end // EPS_MULT0
+                    0:   begin periph_add_next = 32'd20; periph_data_next = 32'h0; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd32; periph_data_next = 32'h1c840; end // INPUT_PTR
+                    2:   begin periph_add_next = 32'd36; periph_data_next = 32'h1e840; end // WEIGHT_PTR0
+                    3:   begin periph_add_next = 32'd40; periph_data_next = 32'h1f840; end // WEIGHT_PTR1
+                    4:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e840; end // BIAS_PTR
+                    5:   begin periph_add_next = 32'd48; periph_data_next = 32'h3dcc0; end // OUTPUT_PTR
+                    6:   begin periph_add_next = 32'd56; periph_data_next = 32'h04321; end
+                    7:   begin periph_add_next = 32'd60; periph_data_next = 32'h40756f6c; end
+                    8:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
+                    9:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
+                    10:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
+                    11:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
+                    12:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
+                    13:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
+                    14:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
+                    15:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
+                    16:   begin periph_add_next = 32'd88; periph_data_next = 32'h00013; end // EPS_MULT0
                 endcase
+
+                //prev_data = periph_data_o;
                 
-                if (write_step_cnt == 15) begin
-                   
+                if (write_step_cnt == 16) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
                 end else begin
@@ -226,14 +234,13 @@ module ita_sequencer_f1_step #(
                     7:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
                     8:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
                     9:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
-                    10:  begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
-                    11:  begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
-                    12:  begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
-                    13:  begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
-                    14:  begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
-                    15:  begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0  
+                    10:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
+                    11:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
+                    12:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
+                    13:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
+                    14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
+                    15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0  
                 endcase
-
 
                 if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
@@ -265,6 +272,7 @@ module ita_sequencer_f1_step #(
                     14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
                     15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00012; end // EPS_MULT0
                 endcase
+
 
                 if (write_step_cnt == 15) begin
                     next_state = S_CHECK_BUSY;
@@ -389,7 +397,6 @@ module ita_sequencer_f1_step #(
                     6:   begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0
                 endcase
 
-
                 if (write_step_cnt == 6) begin
                     next_state = S_CHECK_BUSY;
                     next_tile_cnt = tile_cnt + 1;
@@ -415,7 +422,7 @@ module ita_sequencer_f1_step #(
             end
         endcase
     end
-
+     // New registered block for all module outputs
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             done_o        <= 1'b0;
