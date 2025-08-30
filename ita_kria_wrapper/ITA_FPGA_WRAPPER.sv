@@ -68,11 +68,11 @@ module ITA_FPGA_WRAPPER #(
     // MASTER AXI STREAM Signals <- Wrapper (for reading results from URAM)
     output logic [C_M_AXIS_TDATA_WIDTH-1:0] m_axis_tdata,
     output logic m_axis_tvalid,
-    input  logic m_axis_tready,
+    input  logic m_axis_tready
 
     // RQS and activation constants (PROGRAMMING THE ACCELERATOR)
 
-    input  logic [31:0] activation_gelu_const_i,
+    /*input  logic [31:0] activation_gelu_const_i,
     input  logic [31:0] activation_rqs_const_i,
 
     input  logic [31:0] rqs_eps_mult0_i,
@@ -85,7 +85,7 @@ module ITA_FPGA_WRAPPER #(
     input  logic [31:0] rqs_add1_i,
     input  logic [31:0] rqs_add2_i,
     input  logic [31:0] rqs_add3_i,
-    input  logic [31:0] rqs_add4_i
+    input  logic [31:0] rqs_add4_i*/
 );
     
     // --- FSM State Definition  ---
@@ -313,12 +313,6 @@ module ITA_FPGA_WRAPPER #(
     assign BASE_PTR_OUTPUT[F2] = BASE_PTR[22];
     
 
-    logic [31:0] BASE_PTR [0:22];
-    logic [N_STATES-1:0][31:0] BASE_PTR_INPUT;
-    logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT0;
-    logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT1;
-    logic [N_STATES-1:0][31:0] BASE_PTR_BIAS;
-    logic [N_STATES-1:0][31:0] BASE_PTR_OUTPUT;
     logic [31:0] WB_TOTAL_BYTES;
     logic [31:0] WB_LOAD_WORDS;
 
@@ -625,16 +619,7 @@ module ITA_FPGA_WRAPPER #(
     };
     `HCI_INTF_ARRAY(tcdm_mem, clk_i, MP-1:0);
 
-    ita_sequencer_q_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_q (
+    ita_sequencer_q_step i_ita_sequencer_q (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(q_start),
         .done_o(q_done),
@@ -647,16 +632,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_q)
     );
 
-    ita_sequencer_k_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_k (
+    ita_sequencer_k_step i_ita_sequencer_k (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(k_start),
         .done_o(k_done),
@@ -669,16 +645,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_k)
     );
       
-    ita_sequencer_hardcoded_v_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_v (
+    ita_sequencer_v_step i_ita_sequencer_v (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(v_start),
         .done_o(v_done),
@@ -691,16 +658,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_v)
     );
 
-    ita_sequencer_qk_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_qk (
+    ita_sequencer_qk_step i_ita_sequencer_qk (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(qk_start),
         .done_o(qk_done),
@@ -713,16 +671,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_qk)
     );
 
-    ita_sequencer_av_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_av (
+    ita_sequencer_av_step i_ita_sequencer_av (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(av_start),
         .done_o(av_done),
@@ -735,16 +684,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_av)
     );
 
-    ita_sequencer_ow_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_ow (
+    ita_sequencer_ow_step i_ita_sequencer_ow (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(ow_start),
         .done_o(ow_done),
@@ -757,16 +697,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_ow)
     );
     
-    ita_sequencer_f1_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_f1 (
+    ita_sequencer_f1_step i_ita_sequencer_f1 (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(f1_start),
         .done_o(f1_done),
@@ -779,16 +710,7 @@ module ITA_FPGA_WRAPPER #(
         .periph_data_o(periph_data_f1)
     );
     
-    ita_sequencer_f2_step #(
-        .M_TILE_LEN(M_TILE_LEN), 
-        .SEQUENCE_LEN(SEQUENCE_LEN), 
-        .PROJECTION_SPACE(PROJECTION_SPACE),
-        .EMBEDDING_SIZE(EMBEDDING_SIZE), 
-        .FEEDFORWARD_SIZE(FEEDFORWARD_SIZE),
-        .ACTIVATION(ACTIVATION), 
-        .SINGLE_ATTENTION(SINGLE_ATTENTION), 
-        .N_CONTEXT(N_CONTEXT)
-    ) i_ita_sequencer_f2 (
+    ita_sequencer_f2_step i_ita_sequencer_f2 (
         .clk_i(clk_i), .rst_ni(rst_ni),
         .start_i(f2_start),
         .done_o(f2_done),

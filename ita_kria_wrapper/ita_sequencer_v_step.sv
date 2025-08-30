@@ -153,7 +153,6 @@ module ita_sequencer_v_step #(
                 periph_data_next = prev_data; 
                 periph_data_next = 32'h0;
                 periph_be_next  = 4'hF;
-                @(posedge clk_i);
                 
             end
             S_SEND_TRIGGER: begin

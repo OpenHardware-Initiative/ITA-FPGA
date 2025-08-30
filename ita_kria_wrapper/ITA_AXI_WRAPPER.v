@@ -52,7 +52,7 @@ module ITA_AXI_WRAPPER#(
     input wire  S_AXI_RREADY
     
 );
-    //================================================================
+   //================================================================
     // AXI Lite Slave Logic
     //================================================================
 
@@ -83,7 +83,7 @@ module ITA_AXI_WRAPPER#(
     assign S_AXI_RDATA   = axi_rdata;
     assign S_AXI_RRESP   = RESP_OKAY; // OKAY response, no errors
     assign S_AXI_RVALID  = axi_rvalid;
-    
+     
     // --- AXI Write Channel Logic ---
     always @(posedge aclk) begin
         if (aresetn == 1'b0) begin
@@ -122,8 +122,8 @@ module ITA_AXI_WRAPPER#(
             end
         end
     end
-    
-    
+     
+     
     integer i;
     // --- User Logic: Register Write Logic ---
     always @(posedge aclk) begin
@@ -141,7 +141,6 @@ module ITA_AXI_WRAPPER#(
                             if (S_AXI_WSTRB[i])
                                 slv_reg0[i*8 +: 8] <= S_AXI_WDATA[i*8 +: 8];
                     2'h1: // Address 0x04
-                        
                         for (i = 0; i < (C_S_AXI_DATA_WIDTH/8); i = i + 1)
                             if (S_AXI_WSTRB[i])
                                 slv_reg1[i*8 +: 8] <= S_AXI_WDATA[i*8 +: 8];
@@ -198,42 +197,59 @@ module ITA_AXI_WRAPPER#(
 
 
     //================================================================
-    // ITA Core Instantiation and Connections
+    // ITA Core Interface Logic
     //================================================================
 
     // Wires for connecting registers to the ITA core
     // Control signals (driven by slv_reg1)
-    wire start_wb_i;
+    wire start_load_attn_wb_i;
+    wire start_load_ffn_wb_i;
     wire start_attn_i;
     wire start_ffn_i;
-    wire dma_write_done_i;
-    wire dma_read_done_i;
 
     // Status signals (drive slv_reg2)
-    wire [1:0] evt_o; // Assuming N_CORES is 1 for this wrapper
+    wire [1:0] evt_o;
     wire       busy_o;
-    wire       wb_done_o;
+    wire       attn_wb_done_o;
+    wire       ffn_wb_done_o;
     wire       attn_done_o;
     wire       ffn_done_o;
     wire       accelerator_idle_o;
     wire       dma_mode_o;
     wire       dma_we_o;
 
+    // De-concatenate control register (slv_reg1) to drive ITA inputs.
+    // The driver/software is responsible for writing a '1' to a bit to
+    // trigger an action, and then writing a '0' to clear the trigger.
+    assign start_load_attn_wb_i = slv_reg1[0];
+    assign start_load_ffn_wb_i  = slv_reg1[1];
+    assign start_attn_i         = slv_reg1[2];
+    assign start_ffn_i          = slv_reg1[3];
+    // Unused control bits: slv_reg1[31:4]
 
-    // De-concatenate control register to drive ITA inputs
-    assign start_wb_i         = slv_reg1[0];
-    assign start_attn_i       = slv_reg1[1];
-    assign start_ffn_i        = slv_reg1[2];
-    assign dma_write_done_i   = slv_reg1[3];
-    assign dma_read_done_i    = slv_reg1[4];
-
-    // Concatenate status outputs from ITA to drive the status register
-    // This is a continuous assignment, so the status register is always up-to-date
+    // Concatenate status outputs from ITA to drive the status register (slv_reg2).
+    // This is a continuous assignment, making the status readable via AXI-Lite.
     always @(*) begin
-        slv_reg2 = {23'b0, busy_o, evt_o, dma_we_o, dma_mode_o, accelerator_idle_o, ffn_done_o, attn_done_o, wb_done_o};
+        slv_reg2 = 32'b0; // Default to 0
+        slv_reg2[0]   = attn_done_o;
+        slv_reg2[1]   = ffn_done_o;
+        slv_reg2[2]   = attn_wb_done_o;
+        slv_reg2[3]   = ffn_wb_done_o;
+        slv_reg2[4]   = accelerator_idle_o;
+        slv_reg2[5]   = dma_mode_o;
+        slv_reg2[6]   = dma_we_o;
+        slv_reg2[7]   = busy_o;
+        slv_reg2[9:8] = evt_o;
     end
-    
-    // INSTANTIATION OF ITA
+
+    // The ITA_FPGA_WRAPPER core does not have tlast ports.
+    // The input s_axis_tlast is unused.
+    // The output m_axis_tlast is tied low as the core does not signal end-of-packet.
+    assign m_axis_tlast = 1'b0;
+     
+    //================================================================
+    // ITA Core Instantiation
+    //================================================================
     ITA_FPGA_WRAPPER #(
         // Pass through relevant parameters
         .C_S_AXIS_TDATA_WIDTH(C_S_AXIS_TDATA_WIDTH),
@@ -243,34 +259,33 @@ module ITA_AXI_WRAPPER#(
         .PROJECTION_SPACE(128),
         .EMBEDDING_SIZE(256),
         .FEEDFORWARD_SIZE(256)
-        //.ACTIVATION(Relu) // Assuming Relu is a defined parameter
+        //.ACTIVATION(Relu) // This parameter is not defined in the AXI wrapper scope
     ) i_ITA_FPGA_WRAPPER (
         .clk_i(aclk),
         .rst_ni(aresetn),
         .test_mode_i(1'b0),
-        
-        // Base Address from AXI Register slv_reg0
-        .base_addr_i(slv_reg0),
+         
+        // HWPE Status --> to slv_reg2
+        .evt_o(evt_o),
+        .busy_o(busy_o),
 
-        // Control Inputs from AXI Register slv_reg1
-        .start_wb_i(start_wb_i),
+        // Control Inputs <-- from slv_reg1
+        .start_load_attn_wb_i(start_load_attn_wb_i),
+        .start_load_ffn_wb_i(start_load_ffn_wb_i),
         .start_attn_i(start_attn_i),
         .start_ffn_i(start_ffn_i),
 
-        // Status Outputs to AXI Register slv_reg2
-        .wb_done_o(wb_done_o),
+        // Status Outputs --> to slv_reg2
+        .attn_wb_done_o(attn_wb_done_o),
+        .ffn_wb_done_o(ffn_wb_done_o),
         .attn_done_o(attn_done_o),
         .ffn_done_o(ffn_done_o),
         .accelerator_idle_o(accelerator_idle_o),
 
-        // DMA/Mux Control
+        // DMA/Mux Control --> to slv_reg2
         .dma_mode_o(dma_mode_o),
         .dma_we_o(dma_we_o),
-
-        // HWPE Status
-        .evt_o(evt_o),
-        .busy_o(busy_o),
-
+        
         // AXI STREAM SLAVE PORT
         .s_axis_tdata(s_axis_tdata),
         .s_axis_tvalid(s_axis_tvalid),
@@ -281,5 +296,5 @@ module ITA_AXI_WRAPPER#(
         .m_axis_tvalid(m_axis_tvalid),
         .m_axis_tready(m_axis_tready)
     );
-    
+     
 endmodule
