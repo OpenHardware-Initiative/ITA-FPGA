@@ -105,6 +105,7 @@ module ITA_FPGA_WRAPPER #(
         S_START_QK, S_WAIT_QK_DONE,
         S_START_AV, S_WAIT_AV_DONE,
         S_START_OW, S_WAIT_OW_DONE,
+        S_OW_F1,
         S_WAIT_ATTN_READ_READY,
         S_DONE_ATTN,
         // FFN Path States
@@ -368,16 +369,15 @@ module ITA_FPGA_WRAPPER #(
                 // Wait for a command from the host processor.
                 if (start_load_attn_wb_i) next_state = S_WAIT_ATTN_WB_DATA;
                 if (start_load_ffn_wb_i)  next_state = S_WAIT_FFN_WB_DATA;
-                if (start_attn_i)         next_state = S_WAIT_ATTN_DATA;
-                //if (start_ffn_i)          next_state = S_WAIT_FFN_DATA; 
-                if (start_ffn_i)          next_state = S_START_F1;
+                if (start_attn_i)         next_state = S_WAIT_ATTN_DATA; 
+                if (start_ffn_i)          next_state = S_WAIT_FFN_DATA;
             end
             
             // --- Attention WB Loading Path ---
             S_WAIT_ATTN_WB_DATA: begin
                 if (s_axis_tvalid && !transfer_in_progress) begin
                     dma_ag_start     = 1'b1;
-                    dma_ag_base_addr = BASE_PTR_INPUT[Q]; // Start of ATTN WB block
+                    dma_ag_base_addr = BASE_PTR_WEIGHT0[Q]; // Start of ATTN WB block
                     dma_ag_len       = ATTN_WB_LOAD_WORDS;
                     next_state       = S_SETUP_ATTN_WB;
                 end
@@ -429,8 +429,11 @@ module ITA_FPGA_WRAPPER #(
             S_WAIT_AV_DONE: if (av_done) next_state = S_START_OW;
 
             S_START_OW: begin ow_start = 1'b1; next_state = S_WAIT_OW_DONE; end
-           // S_WAIT_OW_DONE: if (ow_done) next_state = S_WAIT_ATTN_READ_READY; 
-            S_WAIT_OW_DONE: if (ow_done) next_state = S_DONE_ATTN;
+            S_WAIT_OW_DONE: if (ow_done) next_state = S_OW_F1; //wait for step ow to end 
+            
+            S_OW_F1: begin
+              if (!busy_o) next_state = S_WAIT_ATTN_READ_READY;           
+            end
             
             S_WAIT_ATTN_READ_READY: begin
                 // Wait for the host to be ready to accept the results.
@@ -442,16 +445,10 @@ module ITA_FPGA_WRAPPER #(
                 end
             end
             
-            //this is how we will do it in reality
-           /* S_DONE_ATTN: begin
-                // When the results have been fully streamed out, return to idle.
-                if (dma_ag_done) next_state = S_IDLE;
-            end */ 
-            
             //for testing purposes
             S_DONE_ATTN: begin
                 // When the results have been fully streamed out, return to idle.
-                next_state = S_START_F1;
+                if (dma_ag_done) next_state = S_IDLE;
             end
 
             // --- FFN Computation Path ---

@@ -25,6 +25,37 @@ module tb_ITA_FPGA_WRAPPER;
     parameter activation_e ACTIVATION = `ifdef ACTIVATION `ACTIVATION `else Identity `endif;
     parameter integer SINGLE_ATTENTION = `ifdef SINGLE_ATTENTION `SINGLE_ATTENTION `else 0 `endif;
     localparam CLK_PERIOD = 10; // 100 MHz clock
+    
+    
+    typedef enum logic [5:0] {
+        S_IDLE,
+        // Attention WB Loading
+        S_WAIT_ATTN_WB_DATA,
+        S_SETUP_ATTN_WB,
+        // FFN WB Loading
+        S_WAIT_FFN_WB_DATA,
+        S_SETUP_FFN_WB,
+        // Attention Path States
+        S_WAIT_ATTN_DATA,
+        S_SETUP_ATTN,
+        S_START_Q, S_WAIT_Q_DONE,
+        S_START_K, S_WAIT_K_DONE,
+        S_START_V, S_WAIT_V_DONE,
+        S_START_QK, S_WAIT_QK_DONE,
+        S_START_AV, S_WAIT_AV_DONE,
+        S_START_OW, S_WAIT_OW_DONE,
+        S_OW_F1,
+        S_WAIT_ATTN_READ_READY,
+        S_DONE_ATTN,
+        // FFN Path States
+        S_WAIT_FFN_DATA,
+        S_SETUP_FFN,
+        S_START_F1, S_WAIT_F1_DONE,
+        S_START_F2, S_WAIT_F2_DONE,
+        S_WAIT_FFN_READ_READY,
+        S_DONE_FFN
+    } state_t;
+
 
     // ==============================================================================
     // MODIFICATION START: Corrected Word Count Calculations
@@ -119,8 +150,6 @@ module tb_ITA_FPGA_WRAPPER;
     logic [N_STATES-1:0][31:0] BASE_PTR_INPUT;
     logic [N_STATES-1:0][31:0] BASE_PTR_WEIGHT0;
     
-    
-
     // DUT Instantiation
     ITA_FPGA_WRAPPER #(
         .AccDataWidth(AccDataWidth), .MemDataWidth(MemDataWidth),
@@ -147,10 +176,11 @@ module tb_ITA_FPGA_WRAPPER;
     // =================================================================
 
     // MODIFICATION: Made file seeking more robust.
-    task automatic drive_s_axis_from_file(input string filename, input int byte_offset, input int num_words);
+    task automatic drive_s_axis_from_file(input string filename, input int byte_offset, input int num_words, input state_t dut_state);
         integer file, word_offset;
         logic [31:0] dummy_word;
         logic [C_S_AXIS_TDATA_WIDTH-1:0] data_word;
+
 
         word_offset = byte_offset / 4;
         $display("[%0t] INFO: Starting to drive %0d words from file '%s', starting at word offset %0d (byte offset %0h)", $time, num_words, filename, word_offset, byte_offset);
@@ -164,13 +194,30 @@ module tb_ITA_FPGA_WRAPPER;
             $fscanf(file, "%h", dummy_word);
         end
 
+//        for (int i = 0; i < num_words; i++) begin
+//            if ($feof(file)) begin $error("[%0t] FATAL: Reached EOF prematurely while reading from %s", $time, filename); $finish; end
+//            $fscanf(file, "%h", data_word);
+//            s_axis_tvalid <= 1'b1;
+//            s_axis_tdata <= data_word;
+//            @(posedge clk_i);
+//             while (s_axis_tready !== 1'b1) begin
+//              if (dut_state == S_WAIT_QK_DONE) begin
+//                  $display("[%0t] DEBUG: DUT state is S_WAIT_QK_DONE, forcing handshake complete.", $time);
+//                  break;
+//               end
+//              @(posedge clk_i);
+//            end
+//        end
+
         for (int i = 0; i < num_words; i++) begin
             if ($feof(file)) begin $error("[%0t] FATAL: Reached EOF prematurely while reading from %s", $time, filename); $finish; end
             $fscanf(file, "%h", data_word);
             s_axis_tvalid <= 1'b1;
             s_axis_tdata <= data_word;
-            @(posedge clk_i);
-            while (s_axis_tready !== 1'b1) @(posedge clk_i);
+//            @(posedge clk_i);
+             while (s_axis_tready !== 1'b1) begin
+              @(posedge clk_i);
+            end
         end
 
         s_axis_tvalid <= 1'b0;
@@ -287,7 +334,7 @@ module tb_ITA_FPGA_WRAPPER;
 
         simdir = {"C:/Users/micha/Documents/GitHub/ITA-FPGA/ita_kria_wrapper/data_S64_E128_P192_F256_H1_B1_Relu"};
         // Base pointer calculations for the logical memory map
-        BASE_PTR[0 ] = 0;
+        BASE_PTR[0 ] = 0; //input q
         BASE_PTR[1 ] = BASE_PTR[0 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
         BASE_PTR[2 ] = BASE_PTR[1 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
         BASE_PTR[3 ] = BASE_PTR[2 ] + PROJECTION_SPACE * EMBEDDING_SIZE;
@@ -315,9 +362,9 @@ module tb_ITA_FPGA_WRAPPER;
 
         // Assign pointers for easier access, matching DUT/sequencer view
         BASE_PTR_INPUT[Q]   = BASE_PTR[0];
-        BASE_PTR_INPUT[F1]  = BASE_PTR[11]; // Note: FFN Input is at a different location
+        BASE_PTR_INPUT[F1]  = BASE_PTR[10]; // Note: FFN Input is at a different location
         BASE_PTR_WEIGHT0[Q] = BASE_PTR[2];  // Wq is the start of ATTN WB
-        BASE_PTR_WEIGHT0[F1]= BASE_PTR[12]; // Wff is the start of FFN WB
+        BASE_PTR_WEIGHT0[F1]= BASE_PTR[11]; // Wff is the start of FFN WB
 
         $display("========================================");
         $display("   Starting ITA_FPGA_WRAPPER Testbench  ");
@@ -367,7 +414,7 @@ module tb_ITA_FPGA_WRAPPER;
         start_load_attn_wb_i <= 1'b1;
         @(posedge clk_i);
         start_load_attn_wb_i <= 1'b0;
-        drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_WEIGHT0_Q, ATTN_WB_LOAD_WORDS);
+        drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_WEIGHT0[Q], ATTN_WB_LOAD_WORDS, i_dut.current_state);
         wait (attn_wb_done_o === 1'b1);
         @(posedge clk_i);
         $display("[%0t] Attention WB loading complete.", $time);
@@ -378,7 +425,7 @@ module tb_ITA_FPGA_WRAPPER;
         start_load_ffn_wb_i <= 1'b1;
         @(posedge clk_i);
         start_load_ffn_wb_i <= 1'b0;
-        drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_WEIGHT0_FF1, FFN_WB_LOAD_WORDS);
+        drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_WEIGHT0[F1], FFN_WB_LOAD_WORDS, i_dut.current_state);
         wait (ffn_wb_done_o === 1'b1);
         @(posedge clk_i);
         $display("[%0t] FFN WB loading complete.", $time);
@@ -389,7 +436,7 @@ module tb_ITA_FPGA_WRAPPER;
         start_attn_i <= 1'b1;
         @(posedge clk_i);
         start_attn_i <= 1'b0;
-        drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_INPUT_Q, ATTN_LOAD_WORDS);
+        drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_INPUT[Q], ATTN_LOAD_WORDS, i_dut.current_state);
             // Simultaneously check the final output (OW) against its golden file
         verify_m_axis_output({simdir,"/","OW.txt"}, ATTN_OUTPUT_WORDS);
         wait (attn_done_o === 1'b1);
@@ -404,10 +451,11 @@ module tb_ITA_FPGA_WRAPPER;
         start_ffn_i <= 1'b0;
         fork
             // Drive the FFN input (which is the result of the previous layer, residing at BASE_PTR[10])
-            drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_INPUT_FF1, FFN_LOAD_WORDS);
+            drive_s_axis_from_file({simdir,"/","mem.txt"}, BASE_PTR_INPUT[F1], FFN_LOAD_WORDS, i_dut.current_state);
             // Changed to use the verification task
-            verify_m_axis_output({simdir,"/","F2.txt"}, FFN_OUTPUT_WORDS);
+//            
         join
+        verify_m_axis_output({simdir,"/","F2.txt"}, FFN_OUTPUT_WORDS);
         wait (ffn_done_o === 1'b1);
         @(posedge clk_i);
         $display("[%0t] FFN calculation and verification complete.", $time);
