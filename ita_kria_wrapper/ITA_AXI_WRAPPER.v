@@ -1,24 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 23.08.2025 21:39:23
-// Design Name: 
-// Module Name: adder_stream
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:`timescale 1ns/1ps
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module ITA_AXI_WRAPPER#(
     parameter integer C_S_AXIS_TDATA_WIDTH = 32,

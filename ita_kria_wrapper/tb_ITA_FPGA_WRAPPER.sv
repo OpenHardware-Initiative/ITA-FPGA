@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 
-// This is the MODIFIED and CORRECTED testbench
 module tb_ITA_FPGA_WRAPPER;
 
     // =================================================================

@@ -1,23 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 08/25/2025 04:17:00 PM
-// Design Name: 
-// Module Name: tb_ITA_AXI_WRAPPER
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 import axi_vip_pkg::*;
 import design_1_axi_vip_0_1_pkg::*;
@@ -120,7 +101,7 @@ module tb_ITA_AXI_WRAPPER(
       
    end
    
-   // MODIFICATION: Updated DUT instantiation to match your wrapper
+   // Updated DUT instantiation to match your wrapper
    design_1_wrapper DUT (
       .clk_in1_0(clock),
       .reset(reset)
@@ -164,7 +145,6 @@ module tb_ITA_AXI_WRAPPER(
     $display("MASTER_WRITE: Addr=0x%08h, Data=0x%08h, Resp=0x%h", address, data, mtestBresp);
   endtask :master_reg_write
 
-  // MODIFIED TASK: Replaced with the version from your working example.
   task master_reg_read;
     input   [design_1_axi_vip_0_1_VIP_ADDR_WIDTH - 1:0]  address;
     output  [design_1_axi_vip_0_1_VIP_DATA_WIDTH - 1:0]  data;
@@ -224,8 +204,7 @@ endtask :backdoor_mem_write_from_file
     wready_gen.set_ready_policy(XIL_AXI_READY_GEN_NO_BACKPRESSURE);
     slv_agent.wr_driver.send_wready(wready_gen);
   endtask :gen_wready
-  
-  // MODIFICATION: Removed the slv0_gen_tready task as it's not needed.
+
 
 
 // Add this task after your other task definitions
