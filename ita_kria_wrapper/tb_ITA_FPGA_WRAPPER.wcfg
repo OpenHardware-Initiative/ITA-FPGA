@@ -3,7 +3,7 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="tb_ITA_FPGA_WRAPPER/i_dut_behav.wdb" id="1">
+      <db_ref path="tb_ITA_FPGA_WRAPPER_behav.wdb" id="1">
          <top_modules>
             <top_module name="cf_math_pkg" />
             <top_module name="glbl" />
@@ -11,608 +11,1159 @@
             <top_module name="hwpe_ctrl_package" />
             <top_module name="hwpe_stream_package" />
             <top_module name="ita_hwpe_package" />
-            <top_module name="tb_ITA_FPGA_WRAPPER/i_dut" />
             <top_module name="ita_package" />
+            <top_module name="tb_ITA_FPGA_WRAPPER" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="13,967 ps"></ZoomStartTime>
-      <ZoomEndTime time="14,049 ps"></ZoomEndTime>
-      <Cursor1Time time="14,018 ps"></Cursor1Time>
+      <ZoomStartTime time="3,598,884,882 ps"></ZoomStartTime>
+      <ZoomEndTime time="3,598,885,024 ps"></ZoomEndTime>
+      <Cursor1Time time="3,598,885,000 ps"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="168"></NameColumnWidth>
-      <ValueColumnWidth column_width="85"></ValueColumnWidth>
+      <ValueColumnWidth column_width="81"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="68" />
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_SEQUENCE_DIM">
+   <WVObjectSize size="53" />
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_SEQUENCE_DIM" type="array">
       <obj_property name="ElementShortName">N_TILES_SEQUENCE_DIM[31:0]</obj_property>
       <obj_property name="ObjectShortName">N_TILES_SEQUENCE_DIM[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_EMBEDDING_DIM">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_EMBEDDING_DIM" type="array">
       <obj_property name="ElementShortName">N_TILES_EMBEDDING_DIM[31:0]</obj_property>
       <obj_property name="ObjectShortName">N_TILES_EMBEDDING_DIM[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_PROJECTION_DIM">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_PROJECTION_DIM" type="array">
       <obj_property name="ElementShortName">N_TILES_PROJECTION_DIM[31:0]</obj_property>
       <obj_property name="ObjectShortName">N_TILES_PROJECTION_DIM[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_FEEDFORWARD_DIM">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_FEEDFORWARD_DIM" type="array">
       <obj_property name="ElementShortName">N_TILES_FEEDFORWARD_DIM[31:0]</obj_property>
       <obj_property name="ObjectShortName">N_TILES_FEEDFORWARD_DIM[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_ELEMENTS_PER_TILE">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_ELEMENTS_PER_TILE" type="array">
       <obj_property name="ElementShortName">N_ELEMENTS_PER_TILE[31:0]</obj_property>
       <obj_property name="ObjectShortName">N_ELEMENTS_PER_TILE[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_OUTER_X">
-      <obj_property name="ElementShortName">N_TILES_OUTER_X[0:8][31:0]</obj_property>
-      <obj_property name="ObjectShortName">N_TILES_OUTER_X[0:8][31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_OUTER_Y">
-      <obj_property name="ElementShortName">N_TILES_OUTER_Y[0:8][31:0]</obj_property>
-      <obj_property name="ObjectShortName">N_TILES_OUTER_Y[0:8][31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_TILES_INNER_DIM">
-      <obj_property name="ElementShortName">N_TILES_INNER_DIM[0:8][31:0]</obj_property>
-      <obj_property name="ObjectShortName">N_TILES_INNER_DIM[0:8][31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR" type="array">
       <obj_property name="ElementShortName">BASE_PTR[0:22][31:0]</obj_property>
       <obj_property name="ObjectShortName">BASE_PTR[0:22][31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_INPUT">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_INPUT" type="array">
       <obj_property name="ElementShortName">BASE_PTR_INPUT[8:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">BASE_PTR_INPUT[8:0][31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_WEIGHT0">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_WEIGHT0" type="array">
       <obj_property name="ElementShortName">BASE_PTR_WEIGHT0[8:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">BASE_PTR_WEIGHT0[8:0][31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_WEIGHT1">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_WEIGHT1" type="array">
       <obj_property name="ElementShortName">BASE_PTR_WEIGHT1[8:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">BASE_PTR_WEIGHT1[8:0][31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_BIAS">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_BIAS" type="array">
       <obj_property name="ElementShortName">BASE_PTR_BIAS[8:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">BASE_PTR_BIAS[8:0][31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_OUTPUT">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/BASE_PTR_OUTPUT" type="array">
       <obj_property name="ElementShortName">BASE_PTR_OUTPUT[8:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">BASE_PTR_OUTPUT[8:0][31:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/clk">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/rst_n">
-      <obj_property name="ElementShortName">rst_n</obj_property>
-      <obj_property name="ObjectShortName">rst_n</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/evt">
-      <obj_property name="ElementShortName">evt[8:0][1:0]</obj_property>
-      <obj_property name="ObjectShortName">evt[8:0][1:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/busy">
-      <obj_property name="ElementShortName">busy</obj_property>
-      <obj_property name="ObjectShortName">busy</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_req">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_req" type="array">
       <obj_property name="ElementShortName">tcdm_req[31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_req[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_gnt">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_gnt" type="array">
       <obj_property name="ElementShortName">tcdm_gnt[31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_gnt[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add" type="array">
       <obj_property name="ElementShortName">tcdm_add[31:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_add[31:0][31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       <obj_property name="CustomSignalColor">#FF00FF</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[31]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[31]" type="array">
          <obj_property name="ElementShortName">[31][31:0]</obj_property>
          <obj_property name="ObjectShortName">[31][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[30]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[30]" type="array">
          <obj_property name="ElementShortName">[30][31:0]</obj_property>
          <obj_property name="ObjectShortName">[30][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[29]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[29]" type="array">
          <obj_property name="ElementShortName">[29][31:0]</obj_property>
          <obj_property name="ObjectShortName">[29][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[28]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[28]" type="array">
          <obj_property name="ElementShortName">[28][31:0]</obj_property>
          <obj_property name="ObjectShortName">[28][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[27]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[27]" type="array">
          <obj_property name="ElementShortName">[27][31:0]</obj_property>
          <obj_property name="ObjectShortName">[27][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[26]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[26]" type="array">
          <obj_property name="ElementShortName">[26][31:0]</obj_property>
          <obj_property name="ObjectShortName">[26][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[25]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[25]" type="array">
          <obj_property name="ElementShortName">[25][31:0]</obj_property>
          <obj_property name="ObjectShortName">[25][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[24]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[24]" type="array">
          <obj_property name="ElementShortName">[24][31:0]</obj_property>
          <obj_property name="ObjectShortName">[24][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[23]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[23]" type="array">
          <obj_property name="ElementShortName">[23][31:0]</obj_property>
          <obj_property name="ObjectShortName">[23][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[22]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[22]" type="array">
          <obj_property name="ElementShortName">[22][31:0]</obj_property>
          <obj_property name="ObjectShortName">[22][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[21]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[21]" type="array">
          <obj_property name="ElementShortName">[21][31:0]</obj_property>
          <obj_property name="ObjectShortName">[21][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[20]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[20]" type="array">
          <obj_property name="ElementShortName">[20][31:0]</obj_property>
          <obj_property name="ObjectShortName">[20][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[19]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[19]" type="array">
          <obj_property name="ElementShortName">[19][31:0]</obj_property>
          <obj_property name="ObjectShortName">[19][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[18]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[18]" type="array">
          <obj_property name="ElementShortName">[18][31:0]</obj_property>
          <obj_property name="ObjectShortName">[18][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[17]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[17]" type="array">
          <obj_property name="ElementShortName">[17][31:0]</obj_property>
          <obj_property name="ObjectShortName">[17][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[16]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[16]" type="array">
          <obj_property name="ElementShortName">[16][31:0]</obj_property>
          <obj_property name="ObjectShortName">[16][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[15]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[15]" type="array">
          <obj_property name="ElementShortName">[15][31:0]</obj_property>
          <obj_property name="ObjectShortName">[15][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[14]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[14]" type="array">
          <obj_property name="ElementShortName">[14][31:0]</obj_property>
          <obj_property name="ObjectShortName">[14][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[13]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[13]" type="array">
          <obj_property name="ElementShortName">[13][31:0]</obj_property>
          <obj_property name="ObjectShortName">[13][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[12]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[12]" type="array">
          <obj_property name="ElementShortName">[12][31:0]</obj_property>
          <obj_property name="ObjectShortName">[12][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[11]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[11]" type="array">
          <obj_property name="ElementShortName">[11][31:0]</obj_property>
          <obj_property name="ObjectShortName">[11][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[10]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[10]" type="array">
          <obj_property name="ElementShortName">[10][31:0]</obj_property>
          <obj_property name="ObjectShortName">[10][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[9]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[9]" type="array">
          <obj_property name="ElementShortName">[9][31:0]</obj_property>
          <obj_property name="ObjectShortName">[9][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[8]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[8]" type="array">
          <obj_property name="ElementShortName">[8][31:0]</obj_property>
          <obj_property name="ObjectShortName">[8][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[7]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[7]" type="array">
          <obj_property name="ElementShortName">[7][31:0]</obj_property>
          <obj_property name="ObjectShortName">[7][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[6]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[6]" type="array">
          <obj_property name="ElementShortName">[6][31:0]</obj_property>
          <obj_property name="ObjectShortName">[6][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[5]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[5]" type="array">
          <obj_property name="ElementShortName">[5][31:0]</obj_property>
          <obj_property name="ObjectShortName">[5][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[4]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[4]" type="array">
          <obj_property name="ElementShortName">[4][31:0]</obj_property>
          <obj_property name="ObjectShortName">[4][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[3]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[3]" type="array">
          <obj_property name="ElementShortName">[3][31:0]</obj_property>
          <obj_property name="ObjectShortName">[3][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[2]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[2]" type="array">
          <obj_property name="ElementShortName">[2][31:0]</obj_property>
          <obj_property name="ObjectShortName">[2][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[1]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[1]" type="array">
          <obj_property name="ElementShortName">[1][31:0]</obj_property>
          <obj_property name="ObjectShortName">[1][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[0]">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[0]" type="array">
          <obj_property name="ElementShortName">[0][31:0]</obj_property>
          <obj_property name="ObjectShortName">[0][31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[31]" type="array">
+         <obj_property name="ElementShortName">[31][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[31][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[30]" type="array">
+         <obj_property name="ElementShortName">[30][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[30][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[29]" type="array">
+         <obj_property name="ElementShortName">[29][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[29][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[28]" type="array">
+         <obj_property name="ElementShortName">[28][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[28][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[27]" type="array">
+         <obj_property name="ElementShortName">[27][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[27][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[26]" type="array">
+         <obj_property name="ElementShortName">[26][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[26][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[25]" type="array">
+         <obj_property name="ElementShortName">[25][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[25][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[24]" type="array">
+         <obj_property name="ElementShortName">[24][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[24][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[23]" type="array">
+         <obj_property name="ElementShortName">[23][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[23][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[22]" type="array">
+         <obj_property name="ElementShortName">[22][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[22][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[21]" type="array">
+         <obj_property name="ElementShortName">[21][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[21][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[20]" type="array">
+         <obj_property name="ElementShortName">[20][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[20][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[19]" type="array">
+         <obj_property name="ElementShortName">[19][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[19][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[18]" type="array">
+         <obj_property name="ElementShortName">[18][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[18][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[17]" type="array">
+         <obj_property name="ElementShortName">[17][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[17][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[16]" type="array">
+         <obj_property name="ElementShortName">[16][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[16][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[15]" type="array">
+         <obj_property name="ElementShortName">[15][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[15][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[14]" type="array">
+         <obj_property name="ElementShortName">[14][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[14][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[13]" type="array">
+         <obj_property name="ElementShortName">[13][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[13][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[12]" type="array">
+         <obj_property name="ElementShortName">[12][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[12][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[11]" type="array">
+         <obj_property name="ElementShortName">[11][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[11][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[10]" type="array">
+         <obj_property name="ElementShortName">[10][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[10][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[9]" type="array">
+         <obj_property name="ElementShortName">[9][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[8]" type="array">
+         <obj_property name="ElementShortName">[8][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[7]" type="array">
+         <obj_property name="ElementShortName">[7][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[6]" type="array">
+         <obj_property name="ElementShortName">[6][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[5]" type="array">
+         <obj_property name="ElementShortName">[5][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[4]" type="array">
+         <obj_property name="ElementShortName">[4][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[3]" type="array">
+         <obj_property name="ElementShortName">[3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[2]" type="array">
+         <obj_property name="ElementShortName">[2][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[1]" type="array">
+         <obj_property name="ElementShortName">[1][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_add[0]" type="array">
+         <obj_property name="ElementShortName">[0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_wen">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_wen" type="array">
       <obj_property name="ElementShortName">tcdm_wen[31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_wen[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_be">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_be" type="array">
       <obj_property name="ElementShortName">tcdm_be[31:0][3:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_be[31:0][3:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_data">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_data" type="array">
       <obj_property name="ElementShortName">tcdm_data[31:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_data[31:0][31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/m_data">
-      <obj_property name="ElementShortName">m_data[31:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">m_data[31:0][31:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/sel_init">
-      <obj_property name="ElementShortName">sel_init</obj_property>
-      <obj_property name="ObjectShortName">sel_init</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_r_data">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_r_data" type="array">
       <obj_property name="ElementShortName">tcdm_r_data[31:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_r_data[31:0][31:0]</obj_property>
       <obj_property name="CustomSignalColor">#FFFF00</obj_property>
       <obj_property name="UseCustomSignalColor">true</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_r_valid">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/tcdm_r_valid" type="array">
       <obj_property name="ElementShortName">tcdm_r_valid[31:0]</obj_property>
       <obj_property name="ObjectShortName">tcdm_r_valid[31:0]</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/clk_i">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/clk_i" type="logic">
       <obj_property name="ElementShortName">clk_i</obj_property>
       <obj_property name="ObjectShortName">clk_i</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/CLK_PERIOD">
-      <obj_property name="ElementShortName">CLK_PERIOD[63:0]</obj_property>
-      <obj_property name="ObjectShortName">CLK_PERIOD[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/APPL_DELAY">
-      <obj_property name="ElementShortName">APPL_DELAY[63:0]</obj_property>
-      <obj_property name="ObjectShortName">APPL_DELAY[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/ACQ_DELAY">
-      <obj_property name="ElementShortName">ACQ_DELAY[63:0]</obj_property>
-      <obj_property name="ObjectShortName">ACQ_DELAY[63:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/RST_CLK_CYCLES">
-      <obj_property name="ElementShortName">RST_CLK_CYCLES[31:0]</obj_property>
-      <obj_property name="ObjectShortName">RST_CLK_CYCLES[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/N_PE">
-      <obj_property name="ElementShortName">N_PE[31:0]</obj_property>
-      <obj_property name="ObjectShortName">N_PE[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/step">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/step" type="array">
       <obj_property name="ElementShortName">step[31:0]</obj_property>
       <obj_property name="ObjectShortName">step[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/M_TILE_LEN">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/M_TILE_LEN" type="array">
       <obj_property name="ElementShortName">M_TILE_LEN[31:0]</obj_property>
       <obj_property name="ObjectShortName">M_TILE_LEN[31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/SEQUENCE_LEN">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/SEQUENCE_LEN" type="array">
       <obj_property name="ElementShortName">SEQUENCE_LEN[31:0]</obj_property>
       <obj_property name="ObjectShortName">SEQUENCE_LEN[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/PROJECTION_SPACE">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/PROJECTION_SPACE" type="array">
       <obj_property name="ElementShortName">PROJECTION_SPACE[31:0]</obj_property>
       <obj_property name="ObjectShortName">PROJECTION_SPACE[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/EMBEDDING_SIZE">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/EMBEDDING_SIZE" type="array">
       <obj_property name="ElementShortName">EMBEDDING_SIZE[31:0]</obj_property>
       <obj_property name="ObjectShortName">EMBEDDING_SIZE[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/FEEDFORWARD_SIZE">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/FEEDFORWARD_SIZE" type="array">
       <obj_property name="ElementShortName">FEEDFORWARD_SIZE[31:0]</obj_property>
       <obj_property name="ObjectShortName">FEEDFORWARD_SIZE[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/ACTIVATION">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/ACTIVATION" type="array">
       <obj_property name="ElementShortName">ACTIVATION[1:0]</obj_property>
       <obj_property name="ObjectShortName">ACTIVATION[1:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/SINGLE_ATTENTION">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/SINGLE_ATTENTION" type="array">
       <obj_property name="ElementShortName">SINGLE_ATTENTION[31:0]</obj_property>
       <obj_property name="ObjectShortName">SINGLE_ATTENTION[31:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/ITA_REG_OFFSET">
-      <obj_property name="ElementShortName">ITA_REG_OFFSET[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ITA_REG_OFFSET[31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/MEMORY_SIZE">
-      <obj_property name="ElementShortName">MEMORY_SIZE[31:0]</obj_property>
-      <obj_property name="ObjectShortName">MEMORY_SIZE[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/AccDataWidth">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/AccDataWidth" type="array">
       <obj_property name="ElementShortName">AccDataWidth[31:0]</obj_property>
       <obj_property name="ObjectShortName">AccDataWidth[31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/IdWidth">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/IdWidth" type="array">
       <obj_property name="ElementShortName">IdWidth[31:0]</obj_property>
       <obj_property name="ObjectShortName">IdWidth[31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/MemDataWidth">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/MemDataWidth" type="array">
       <obj_property name="ElementShortName">MemDataWidth[31:0]</obj_property>
       <obj_property name="ObjectShortName">MemDataWidth[31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/MP">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/MP" type="array">
       <obj_property name="ElementShortName">MP[31:0]</obj_property>
       <obj_property name="ObjectShortName">MP[31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/HCI_SIZE_tcdm_mem">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/HCI_SIZE_tcdm_mem" type="array">
       <obj_property name="ElementShortName">HCI_SIZE_tcdm_mem</obj_property>
       <obj_property name="ObjectShortName">HCI_SIZE_tcdm_mem</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/oup_o">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/oup_o" type="array">
       <obj_property name="ElementShortName">oup_o[7:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">oup_o[7:0][7:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/inp_weight_i">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/inp_weight_i" type="array">
       <obj_property name="ElementShortName">inp_weight_i[127:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">inp_weight_i[127:0][7:0]</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_inp1_mux/inp_i">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_inp1_mux/inp_i" type="array">
       <obj_property name="ElementShortName">inp_i[63:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">inp_i[63:0][7:0]</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group52">
+   <wvobject fp_name="group52" type="group">
       <obj_property name="label">uram_mem</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_memory_model/bank_addra">
-      <obj_property name="ElementShortName">bank_addra[31:0][11:0]</obj_property>
-      <obj_property name="ObjectShortName">bank_addra[31:0][11:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_memory_model/bank_addrb">
-      <obj_property name="ElementShortName">bank_addrb[31:0][11:0]</obj_property>
-      <obj_property name="ObjectShortName">bank_addrb[31:0][11:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_memory_model/bank_dinb">
-      <obj_property name="ElementShortName">bank_dinb[31:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">bank_dinb[31:0][31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_memory_model/bank_douta">
-      <obj_property name="ElementShortName">bank_douta[31:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">bank_douta[31:0][31:0]</obj_property>
-   </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_memory_model/bank_web">
-      <obj_property name="ElementShortName">bank_web[31:0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">bank_web[31:0][3:0]</obj_property>
-   </wvobject>
-   <wvobject type="group" fp_name="group231">
+   <wvobject fp_name="group231" type="group">
       <obj_property name="label">ita_tcdm_interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/clk">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/clk" type="logic">
          <obj_property name="ElementShortName">clk</obj_property>
          <obj_property name="ObjectShortName">clk</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/req">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/req" type="logic">
          <obj_property name="ElementShortName">req</obj_property>
          <obj_property name="ObjectShortName">req</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/gnt">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/gnt" type="logic">
          <obj_property name="ElementShortName">gnt</obj_property>
          <obj_property name="ObjectShortName">gnt</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_valid">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_valid" type="logic">
          <obj_property name="ElementShortName">r_valid</obj_property>
          <obj_property name="ObjectShortName">r_valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_ready">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_ready" type="logic">
          <obj_property name="ElementShortName">r_ready</obj_property>
          <obj_property name="ObjectShortName">r_ready</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/add">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/add" type="array">
          <obj_property name="ElementShortName">add[31:0]</obj_property>
          <obj_property name="ObjectShortName">add[31:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/wen">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/wen" type="logic">
          <obj_property name="ElementShortName">wen</obj_property>
          <obj_property name="ObjectShortName">wen</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/data">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/data" type="array">
          <obj_property name="ElementShortName">data[1023:0]</obj_property>
          <obj_property name="ObjectShortName">data[1023:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/be">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/be" type="array">
          <obj_property name="ElementShortName">be[127:0]</obj_property>
          <obj_property name="ObjectShortName">be[127:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/user">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/user" type="array">
          <obj_property name="ElementShortName">user[0:0]</obj_property>
          <obj_property name="ObjectShortName">user[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/id">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/id" type="array">
          <obj_property name="ElementShortName">id[1:0]</obj_property>
          <obj_property name="ObjectShortName">id[1:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_data">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_data" type="array">
          <obj_property name="ElementShortName">r_data[1023:0]</obj_property>
          <obj_property name="ObjectShortName">r_data[1023:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_user">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_user" type="array">
          <obj_property name="ElementShortName">r_user[0:0]</obj_property>
          <obj_property name="ObjectShortName">r_user[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_id">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_id" type="array">
          <obj_property name="ElementShortName">r_id[1:0]</obj_property>
          <obj_property name="ObjectShortName">r_id[1:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_opc">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_opc" type="logic">
          <obj_property name="ElementShortName">r_opc</obj_property>
          <obj_property name="ObjectShortName">r_opc</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/ecc">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/ecc" type="array">
          <obj_property name="ElementShortName">ecc[0:0]</obj_property>
          <obj_property name="ObjectShortName">ecc[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_ecc">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_ecc" type="array">
          <obj_property name="ElementShortName">r_ecc[0:0]</obj_property>
          <obj_property name="ObjectShortName">r_ecc[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/ereq">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/ereq" type="array">
          <obj_property name="ElementShortName">ereq[0:0]</obj_property>
          <obj_property name="ObjectShortName">ereq[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/egnt">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/egnt" type="array">
          <obj_property name="ElementShortName">egnt[0:0]</obj_property>
          <obj_property name="ObjectShortName">egnt[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_evalid">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_evalid" type="array">
          <obj_property name="ElementShortName">r_evalid[0:0]</obj_property>
          <obj_property name="ObjectShortName">r_evalid[0:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_eready">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/r_eready" type="array">
          <obj_property name="ElementShortName">r_eready[0:0]</obj_property>
          <obj_property name="ObjectShortName">r_eready[0:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/clk_assert">
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/tcdm/clk_assert" type="logic">
          <obj_property name="ElementShortName">clk_assert</obj_property>
          <obj_property name="ObjectShortName">clk_assert</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/count_d">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/count_d" type="array">
       <obj_property name="ElementShortName">count_d[11:0]</obj_property>
       <obj_property name="ObjectShortName">count_d[11:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/count_q">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/count_q" type="array">
       <obj_property name="ElementShortName">count_q[11:0]</obj_property>
       <obj_property name="ObjectShortName">count_q[11:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/tile_d">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/tile_d" type="array">
       <obj_property name="ElementShortName">tile_d[11:0]</obj_property>
       <obj_property name="ObjectShortName">tile_d[11:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/tile_q">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/tile_q" type="array">
       <obj_property name="ElementShortName">tile_q[11:0]</obj_property>
       <obj_property name="ObjectShortName">tile_q[11:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/inner_tile_d">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/inner_tile_d" type="array">
       <obj_property name="ElementShortName">inner_tile_d[11:0]</obj_property>
       <obj_property name="ObjectShortName">inner_tile_d[11:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/inner_tile_q">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_engine/i_ita/i_controller/inner_tile_q" type="array">
       <obj_property name="ElementShortName">inner_tile_q[11:0]</obj_property>
       <obj_property name="ObjectShortName">inner_tile_q[11:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_ctrl/ctrl_stream_o">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_ctrl/ctrl_stream_o" type="array">
       <obj_property name="ElementShortName">ctrl_stream_o</obj_property>
       <obj_property name="ObjectShortName">ctrl_stream_o</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_ctrl/ctrl_engine_o">
+   <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_hwpe_wrap/i_ita/i_ctrl/ctrl_engine_o" type="array">
       <obj_property name="ElementShortName">ctrl_engine_o</obj_property>
       <obj_property name="ObjectShortName">ctrl_engine_o</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group132">
+   <wvobject fp_name="group132" type="group">
       <obj_property name="label">periph</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/clk">
-         <obj_property name="ElementShortName">clk</obj_property>
-         <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="group245" type="group">
+      <obj_property name="label">seq_q</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/clk_i" type="logic">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/req">
-         <obj_property name="ElementShortName">req</obj_property>
-         <obj_property name="ObjectShortName">req</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/rst_ni" type="logic">
+         <obj_property name="ElementShortName">rst_ni</obj_property>
+         <obj_property name="ObjectShortName">rst_ni</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/gnt">
-         <obj_property name="ElementShortName">gnt</obj_property>
-         <obj_property name="ObjectShortName">gnt</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/start_i" type="logic">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/add">
-         <obj_property name="ElementShortName">add[31:0]</obj_property>
-         <obj_property name="ObjectShortName">add[31:0]</obj_property>
-         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/step_i" type="array">
+         <obj_property name="ElementShortName">step_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">step_i[31:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/wen">
-         <obj_property name="ElementShortName">wen</obj_property>
-         <obj_property name="ObjectShortName">wen</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/done_o" type="logic">
+         <obj_property name="ElementShortName">done_o</obj_property>
+         <obj_property name="ObjectShortName">done_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/be">
-         <obj_property name="ElementShortName">be[3:0]</obj_property>
-         <obj_property name="ObjectShortName">be[3:0]</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/hwpe_busy_i" type="logic">
+         <obj_property name="ElementShortName">hwpe_busy_i</obj_property>
+         <obj_property name="ObjectShortName">hwpe_busy_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/data">
-         <obj_property name="ElementShortName">data[31:0]</obj_property>
-         <obj_property name="ObjectShortName">data[31:0]</obj_property>
-         <obj_property name="Radix">HEXRADIX</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/periph_req_o" type="logic">
+         <obj_property name="ElementShortName">periph_req_o</obj_property>
+         <obj_property name="ObjectShortName">periph_req_o</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/id">
-         <obj_property name="ElementShortName">id[7:0]</obj_property>
-         <obj_property name="ObjectShortName">id[7:0]</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/periph_gnt_i" type="logic">
+         <obj_property name="ElementShortName">periph_gnt_i</obj_property>
+         <obj_property name="ObjectShortName">periph_gnt_i</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/r_data">
-         <obj_property name="ElementShortName">r_data[31:0]</obj_property>
-         <obj_property name="ObjectShortName">r_data[31:0]</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/periph_add_o" type="array">
+         <obj_property name="ElementShortName">periph_add_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_add_o[31:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/periph/r_valid">
-         <obj_property name="ElementShortName">r_valid</obj_property>
-         <obj_property name="ObjectShortName">r_valid</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/periph_wen_o" type="logic">
+         <obj_property name="ElementShortName">periph_wen_o</obj_property>
+         <obj_property name="ObjectShortName">periph_wen_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/periph_be_o" type="array">
+         <obj_property name="ElementShortName">periph_be_o[3:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_be_o[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/periph_data_o" type="array">
+         <obj_property name="ElementShortName">periph_data_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_data_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/current_state" type="array">
+         <obj_property name="ElementShortName">current_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/write_step_cnt" type="array">
+         <obj_property name="ElementShortName">write_step_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/write_step_cnt_next" type="array">
+         <obj_property name="ElementShortName">write_step_cnt_next[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt_next[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/tile_cnt" type="array">
+         <obj_property name="ElementShortName">tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/next_tile_cnt" type="array">
+         <obj_property name="ElementShortName">next_tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">next_tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/delay_cnt" type="array">
+         <obj_property name="ElementShortName">delay_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/delay_cnt_next" type="array">
+         <obj_property name="ElementShortName">delay_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_q/prev_data" type="array">
+         <obj_property name="ElementShortName">prev_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_data[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group246" type="group">
+      <obj_property name="label">seq_k</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/clk_i" type="logic">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/rst_ni" type="logic">
+         <obj_property name="ElementShortName">rst_ni</obj_property>
+         <obj_property name="ObjectShortName">rst_ni</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/start_i" type="logic">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/step_i" type="array">
+         <obj_property name="ElementShortName">step_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">step_i[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/done_o" type="logic">
+         <obj_property name="ElementShortName">done_o</obj_property>
+         <obj_property name="ObjectShortName">done_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/hwpe_busy_i" type="logic">
+         <obj_property name="ElementShortName">hwpe_busy_i</obj_property>
+         <obj_property name="ObjectShortName">hwpe_busy_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/periph_req_o" type="logic">
+         <obj_property name="ElementShortName">periph_req_o</obj_property>
+         <obj_property name="ObjectShortName">periph_req_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/periph_gnt_i" type="logic">
+         <obj_property name="ElementShortName">periph_gnt_i</obj_property>
+         <obj_property name="ObjectShortName">periph_gnt_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/periph_add_o" type="array">
+         <obj_property name="ElementShortName">periph_add_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_add_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/periph_wen_o" type="logic">
+         <obj_property name="ElementShortName">periph_wen_o</obj_property>
+         <obj_property name="ObjectShortName">periph_wen_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/periph_be_o" type="array">
+         <obj_property name="ElementShortName">periph_be_o[3:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_be_o[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/periph_data_o" type="array">
+         <obj_property name="ElementShortName">periph_data_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_data_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/current_state" type="array">
+         <obj_property name="ElementShortName">current_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/write_step_cnt" type="array">
+         <obj_property name="ElementShortName">write_step_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/write_step_cnt_next" type="array">
+         <obj_property name="ElementShortName">write_step_cnt_next[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt_next[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/tile_cnt" type="array">
+         <obj_property name="ElementShortName">tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/next_tile_cnt" type="array">
+         <obj_property name="ElementShortName">next_tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">next_tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/delay_cnt" type="array">
+         <obj_property name="ElementShortName">delay_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/delay_cnt_next" type="array">
+         <obj_property name="ElementShortName">delay_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/prev_data" type="array">
+         <obj_property name="ElementShortName">prev_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/wait5_cnt" type="array">
+         <obj_property name="ElementShortName">wait5_cnt[8:0]</obj_property>
+         <obj_property name="ObjectShortName">wait5_cnt[8:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_k/wait5_cnt_n" type="array">
+         <obj_property name="ElementShortName">wait5_cnt_n[8:0]</obj_property>
+         <obj_property name="ObjectShortName">wait5_cnt_n[8:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group247" type="group">
+      <obj_property name="label">seq_v</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/clk_i" type="logic">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/rst_ni" type="logic">
+         <obj_property name="ElementShortName">rst_ni</obj_property>
+         <obj_property name="ObjectShortName">rst_ni</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/start_i" type="logic">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/step_i" type="array">
+         <obj_property name="ElementShortName">step_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">step_i[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/done_o" type="logic">
+         <obj_property name="ElementShortName">done_o</obj_property>
+         <obj_property name="ObjectShortName">done_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/hwpe_busy_i" type="logic">
+         <obj_property name="ElementShortName">hwpe_busy_i</obj_property>
+         <obj_property name="ObjectShortName">hwpe_busy_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/periph_req_o" type="logic">
+         <obj_property name="ElementShortName">periph_req_o</obj_property>
+         <obj_property name="ObjectShortName">periph_req_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/periph_gnt_i" type="logic">
+         <obj_property name="ElementShortName">periph_gnt_i</obj_property>
+         <obj_property name="ObjectShortName">periph_gnt_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/periph_add_o" type="array">
+         <obj_property name="ElementShortName">periph_add_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_add_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/periph_wen_o" type="logic">
+         <obj_property name="ElementShortName">periph_wen_o</obj_property>
+         <obj_property name="ObjectShortName">periph_wen_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/periph_be_o" type="array">
+         <obj_property name="ElementShortName">periph_be_o[3:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_be_o[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/periph_data_o" type="array">
+         <obj_property name="ElementShortName">periph_data_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_data_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/current_state" type="array">
+         <obj_property name="ElementShortName">current_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/write_step_cnt" type="array">
+         <obj_property name="ElementShortName">write_step_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/write_step_cnt_next" type="array">
+         <obj_property name="ElementShortName">write_step_cnt_next[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt_next[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/tile_cnt" type="array">
+         <obj_property name="ElementShortName">tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/next_tile_cnt" type="array">
+         <obj_property name="ElementShortName">next_tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">next_tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/delay_cnt" type="array">
+         <obj_property name="ElementShortName">delay_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/delay_cnt_next" type="array">
+         <obj_property name="ElementShortName">delay_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/prev_data" type="array">
+         <obj_property name="ElementShortName">prev_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_v/wait5_cnt" type="array">
+         <obj_property name="ElementShortName">wait5_cnt[8:0]</obj_property>
+         <obj_property name="ObjectShortName">wait5_cnt[8:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group248" type="group">
+      <obj_property name="label">seq_qk</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/clk_i" type="logic">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/rst_ni" type="logic">
+         <obj_property name="ElementShortName">rst_ni</obj_property>
+         <obj_property name="ObjectShortName">rst_ni</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/start_i" type="logic">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/step_i" type="array">
+         <obj_property name="ElementShortName">step_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">step_i[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/done_o" type="logic">
+         <obj_property name="ElementShortName">done_o</obj_property>
+         <obj_property name="ObjectShortName">done_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/hwpe_busy_i" type="logic">
+         <obj_property name="ElementShortName">hwpe_busy_i</obj_property>
+         <obj_property name="ObjectShortName">hwpe_busy_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/periph_req_o" type="logic">
+         <obj_property name="ElementShortName">periph_req_o</obj_property>
+         <obj_property name="ObjectShortName">periph_req_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/periph_gnt_i" type="logic">
+         <obj_property name="ElementShortName">periph_gnt_i</obj_property>
+         <obj_property name="ObjectShortName">periph_gnt_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/periph_add_o" type="array">
+         <obj_property name="ElementShortName">periph_add_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_add_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/periph_wen_o" type="logic">
+         <obj_property name="ElementShortName">periph_wen_o</obj_property>
+         <obj_property name="ObjectShortName">periph_wen_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/periph_be_o" type="array">
+         <obj_property name="ElementShortName">periph_be_o[3:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_be_o[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/periph_data_o" type="array">
+         <obj_property name="ElementShortName">periph_data_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_data_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/current_state" type="array">
+         <obj_property name="ElementShortName">current_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/write_step_cnt" type="array">
+         <obj_property name="ElementShortName">write_step_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/write_step_cnt_next" type="array">
+         <obj_property name="ElementShortName">write_step_cnt_next[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt_next[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/tile_cnt" type="array">
+         <obj_property name="ElementShortName">tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/next_tile_cnt" type="array">
+         <obj_property name="ElementShortName">next_tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">next_tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/delay_cnt" type="array">
+         <obj_property name="ElementShortName">delay_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/delay_cnt_next" type="array">
+         <obj_property name="ElementShortName">delay_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/prev_data" type="array">
+         <obj_property name="ElementShortName">prev_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_qk/wait5_cnt" type="array">
+         <obj_property name="ElementShortName">wait5_cnt[8:0]</obj_property>
+         <obj_property name="ObjectShortName">wait5_cnt[8:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group249" type="group">
+      <obj_property name="label">seq_av</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/clk_i" type="logic">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/rst_ni" type="logic">
+         <obj_property name="ElementShortName">rst_ni</obj_property>
+         <obj_property name="ObjectShortName">rst_ni</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/start_i" type="logic">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/step_i" type="array">
+         <obj_property name="ElementShortName">step_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">step_i[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/done_o" type="logic">
+         <obj_property name="ElementShortName">done_o</obj_property>
+         <obj_property name="ObjectShortName">done_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/hwpe_busy_i" type="logic">
+         <obj_property name="ElementShortName">hwpe_busy_i</obj_property>
+         <obj_property name="ObjectShortName">hwpe_busy_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/periph_req_o" type="logic">
+         <obj_property name="ElementShortName">periph_req_o</obj_property>
+         <obj_property name="ObjectShortName">periph_req_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/periph_gnt_i" type="logic">
+         <obj_property name="ElementShortName">periph_gnt_i</obj_property>
+         <obj_property name="ObjectShortName">periph_gnt_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/periph_add_o" type="array">
+         <obj_property name="ElementShortName">periph_add_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_add_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/periph_wen_o" type="logic">
+         <obj_property name="ElementShortName">periph_wen_o</obj_property>
+         <obj_property name="ObjectShortName">periph_wen_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/periph_be_o" type="array">
+         <obj_property name="ElementShortName">periph_be_o[3:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_be_o[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/periph_data_o" type="array">
+         <obj_property name="ElementShortName">periph_data_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_data_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/current_state" type="array">
+         <obj_property name="ElementShortName">current_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/write_step_cnt" type="array">
+         <obj_property name="ElementShortName">write_step_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/write_step_cnt_next" type="array">
+         <obj_property name="ElementShortName">write_step_cnt_next[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt_next[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/tile_cnt" type="array">
+         <obj_property name="ElementShortName">tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/next_tile_cnt" type="array">
+         <obj_property name="ElementShortName">next_tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">next_tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/delay_cnt" type="array">
+         <obj_property name="ElementShortName">delay_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/delay_cnt_next" type="array">
+         <obj_property name="ElementShortName">delay_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/prev_data" type="array">
+         <obj_property name="ElementShortName">prev_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_av/wait5_cnt" type="array">
+         <obj_property name="ElementShortName">wait5_cnt[8:0]</obj_property>
+         <obj_property name="ObjectShortName">wait5_cnt[8:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group360" type="group">
+      <obj_property name="label">seq_ow</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/clk_i" type="logic">
+         <obj_property name="ElementShortName">clk_i</obj_property>
+         <obj_property name="ObjectShortName">clk_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/rst_ni" type="logic">
+         <obj_property name="ElementShortName">rst_ni</obj_property>
+         <obj_property name="ObjectShortName">rst_ni</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/start_i" type="logic">
+         <obj_property name="ElementShortName">start_i</obj_property>
+         <obj_property name="ObjectShortName">start_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/step_i" type="array">
+         <obj_property name="ElementShortName">step_i[31:0]</obj_property>
+         <obj_property name="ObjectShortName">step_i[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/done_o" type="logic">
+         <obj_property name="ElementShortName">done_o</obj_property>
+         <obj_property name="ObjectShortName">done_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/hwpe_busy_i" type="logic">
+         <obj_property name="ElementShortName">hwpe_busy_i</obj_property>
+         <obj_property name="ObjectShortName">hwpe_busy_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/periph_req_o" type="logic">
+         <obj_property name="ElementShortName">periph_req_o</obj_property>
+         <obj_property name="ObjectShortName">periph_req_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/periph_gnt_i" type="logic">
+         <obj_property name="ElementShortName">periph_gnt_i</obj_property>
+         <obj_property name="ObjectShortName">periph_gnt_i</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/periph_add_o" type="array">
+         <obj_property name="ElementShortName">periph_add_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_add_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/periph_wen_o" type="logic">
+         <obj_property name="ElementShortName">periph_wen_o</obj_property>
+         <obj_property name="ObjectShortName">periph_wen_o</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/periph_be_o" type="array">
+         <obj_property name="ElementShortName">periph_be_o[3:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_be_o[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/periph_data_o" type="array">
+         <obj_property name="ElementShortName">periph_data_o[31:0]</obj_property>
+         <obj_property name="ObjectShortName">periph_data_o[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/current_state" type="array">
+         <obj_property name="ElementShortName">current_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">current_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[4:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/write_step_cnt" type="array">
+         <obj_property name="ElementShortName">write_step_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/write_step_cnt_next" type="array">
+         <obj_property name="ElementShortName">write_step_cnt_next[7:0]</obj_property>
+         <obj_property name="ObjectShortName">write_step_cnt_next[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/tile_cnt" type="array">
+         <obj_property name="ElementShortName">tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/next_tile_cnt" type="array">
+         <obj_property name="ElementShortName">next_tile_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">next_tile_cnt[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/delay_cnt" type="array">
+         <obj_property name="ElementShortName">delay_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/delay_cnt_next" type="array">
+         <obj_property name="ElementShortName">delay_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">delay_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/prev_data" type="array">
+         <obj_property name="ElementShortName">prev_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">prev_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_ITA_FPGA_WRAPPER/i_dut/i_ita_sequencer_ow/wait5_cnt" type="array">
+         <obj_property name="ElementShortName">wait5_cnt[8:0]</obj_property>
+         <obj_property name="ObjectShortName">wait5_cnt[8:0]</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

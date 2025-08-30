@@ -56,8 +56,16 @@ module ita_sequencer_hardcoded_qk_step #(
     logic [7:0]  write_step_cnt, write_step_cnt_next, tile_cnt, next_tile_cnt;
     logic [$clog2(INTER_TILE_DELAY_CYCLES):0] delay_cnt, delay_cnt_next;
     logic [31:0] prev_data;
-    localparam int unsigned WAIT5_CYCLES = 500; // 5us wait / 1ns period
+    localparam int unsigned WAIT5_CYCLES = 250; // 5us wait / 1ns period
     logic [$clog2(WAIT5_CYCLES)-1:0] wait5_cnt, wait5_cnt_n;
+    
+    // Intermediate signals for registered outputs
+    logic        done_next;
+    logic        periph_req_next;
+    logic [31:0] periph_add_next;
+    logic        periph_wen_next;
+    logic [3:0]  periph_be_next;
+    logic [31:0] periph_data_next;
 
     // FSM state registers
     always_ff @(posedge clk_i or negedge rst_ni) begin
@@ -83,43 +91,39 @@ module ita_sequencer_hardcoded_qk_step #(
         delay_cnt_next      = delay_cnt;
         wait5_cnt_n         = wait5_cnt; //counter
         next_tile_cnt       = tile_cnt;
-        done_o              = 1'b0;
-        periph_req_o        = 1'b0;
-        periph_add_o        = '0;
-        periph_wen_o        = 1'b1; // Default to read
-        periph_be_o         = 4'hf;
-        periph_data_o       = '0;
+        
+        done_next              = 1'b0;
+        periph_req_next        = 1'b0;
+        periph_add_next        = '0;
+        periph_wen_next        = 1'b1; // Default to read
+        periph_be_next         = 4'hf;
+        periph_data_next       = '0;
 
         case (current_state)
             S_IDLE: begin
                 if (start_i) begin
                     next_state = S_WRITE_REQ_0;
-                    periph_req_o = 1'b1;
-                    periph_wen_o = 1'b0;
-                    periph_add_o = 32'd20; 
-                    periph_data_o = 32'h0;
-                    periph_be_o  = 4'hF;
                 end
             end
 
             S_CHECK_BUSY: begin
                 write_step_cnt_next = 0;
                 if (!hwpe_busy_i) begin
-                    periph_req_o = 1'b1;
-                    periph_wen_o = 1'b0;
-                    periph_add_o = 32'd00; 
-                    periph_data_o = 32'h0;
-                    periph_be_o  = 4'hF;
+                    periph_req_next = 1'b1;
+                    periph_wen_next = 1'b0;
+                    periph_add_next = 32'd00; 
+                    periph_data_next = 32'h0;
+                    periph_be_next  = 4'hF;
                     next_state = S_CHOOSE_STATE;
                 end
             end
             
             S_CHOOSE_STATE: begin
-                    periph_req_o = 1'b0;
-                    periph_wen_o = 1'b1;
-                    periph_add_o = 32'd00; 
-                    periph_data_o = 32'h0;
-                    periph_be_o  = 4'hF;
+                    periph_req_next = 1'b0;
+                    periph_wen_next = 1'b1;
+                    periph_add_next = 32'd00; 
+                    periph_data_next = 32'h0;
+                    periph_be_next  = 4'hF;
                     next_state = S_WAIT_5;
             end  
 
@@ -150,20 +154,20 @@ module ita_sequencer_hardcoded_qk_step #(
                     default: next_state = S_FINISH_STEP; // All tiles done
                 endcase
 
-                periph_req_o = 1'b0;
-                periph_wen_o = 1'b1;
-                periph_data_o = prev_data; 
-                periph_data_o = 32'h0;
-                periph_be_o  = 4'hF;
+                periph_req_next = 1'b0;
+                periph_wen_next = 1'b1;
+                periph_data_next = prev_data; 
+                periph_data_next = 32'h0;
+                periph_be_next  = 4'hF;
                 @(posedge clk_i);
                 
             end
             S_SEND_TRIGGER: begin
-                periph_req_o = 1'b1;
-                periph_wen_o = 1'b0;
-                periph_add_o = 32'h00; 
-                periph_data_o = 32'h0;
-                periph_be_o  = 4'hF;
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0;
+                periph_add_next = 32'h00; 
+                periph_data_next = 32'h0;
+                periph_be_next  = 4'hF;
                 case (tile_cnt)
                     0: next_state = S_WRITE_REQ_0;
                     1: next_state = S_WRITE_REQ_1;
@@ -173,18 +177,18 @@ module ita_sequencer_hardcoded_qk_step #(
             end
 
             S_WRITE_REQ_0: begin
-                periph_req_o = 1'b1;
-                periph_wen_o = 1'b0; 
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
                 case (write_step_cnt)
-                    0:   begin periph_add_o = 32'd32; periph_data_o = 32'h2ecc0; end // INPUT_PTR
-                    1:   begin periph_add_o = 32'd36; periph_data_o = 32'h31cc0; end // WEIGHT_PTR0
-                    2:   begin periph_add_o = 32'd40; periph_data_o = 32'h32cc0; end // WEIGHT_PTR1
-                    3:   begin periph_add_o = 32'd48; periph_data_o = 32'h37cc0; end // OUTPUT_PTR
-                    4:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
-                    5:   begin periph_add_o = 32'd88; periph_data_o = 32'h00016; end // EPS_MULT0
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h2ecc0; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h31cc0; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h32cc0; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd48; periph_data_next = 32'h37cc0; end // OUTPUT_PTR
+                    4:   begin periph_add_next = 32'd84; periph_data_next = 32'h00000; end // TILES
+                    5:   begin periph_add_next = 32'd88; periph_data_next = 32'h00016; end // EPS_MULT0
                 endcase
 
-                prev_data = periph_data_o;
+                //prev_data = periph_data_o;
                 
                 if (write_step_cnt == 5) begin
                    
@@ -198,18 +202,18 @@ module ita_sequencer_hardcoded_qk_step #(
 
             
             S_WRITE_REQ_1: begin
-                periph_req_o = 1'b1;
-                periph_wen_o = 1'b0; 
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
                 case (write_step_cnt)
-                    0:   begin periph_add_o = 32'd32; periph_data_o = 32'h2fcc0; end // INPUT_PTR
-                    1:   begin periph_add_o = 32'd36; periph_data_o = 32'h32cc0; end // WEIGHT_PTR0
-                    2:   begin periph_add_o = 32'd40; periph_data_o = 32'h33cc0; end // WEIGHT_PTR1
-                    3:   begin periph_add_o = 32'd48; periph_data_o = 32'h37cc0; end // OUTPUT_PTR
-                    4:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
-                    5:   begin periph_add_o = 32'd88; periph_data_o = 32'h00016; end // EPS_MULT0
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h2fcc0; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h32cc0; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h33cc0; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd48; periph_data_next = 32'h37cc0; end // OUTPUT_PTR
+                    4:   begin periph_add_next = 32'd84; periph_data_next = 32'h00000; end // TILES
+                    5:   begin periph_add_next = 32'd88; periph_data_next = 32'h00016; end // EPS_MULT0
                 endcase
 
-                prev_data = periph_data_o;
+               // prev_data = periph_data_o;
 
                 if (write_step_cnt == 5) begin
                     next_state = S_CHECK_BUSY;
@@ -221,18 +225,18 @@ module ita_sequencer_hardcoded_qk_step #(
             end
 
             S_WRITE_REQ_2: begin
-                periph_req_o = 1'b1;
-                periph_wen_o = 1'b0; 
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
                 case (write_step_cnt)
-                    0:   begin periph_add_o = 32'd32; periph_data_o = 32'h30cc0; end // INPUT_PTR
-                    1:   begin periph_add_o = 32'd36; periph_data_o = 32'h33cc0; end // WEIGHT_PTR0
-                    2:   begin periph_add_o = 32'd40; periph_data_o = 32'h34cc0; end // WEIGHT_PTR1
-                    3:   begin periph_add_o = 32'd48; periph_data_o = 32'h37cc0; end // OUTPUT_PTR
-                    4:   begin periph_add_o = 32'd84; periph_data_o = 32'h00000; end // TILES
-                    5:   begin periph_add_o = 32'd88; periph_data_o = 32'h00006; end // EPS_MULT0
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h30cc0; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h33cc0; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h34cc0; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd48; periph_data_next = 32'h37cc0; end // OUTPUT_PTR
+                    4:   begin periph_add_next = 32'd84; periph_data_next = 32'h00000; end // TILES
+                    5:   begin periph_add_next = 32'd88; periph_data_next = 32'h00006; end // EPS_MULT0
                 endcase
 
-                prev_data = periph_data_o;
+               // prev_data = periph_data_o;
 
                 if (write_step_cnt == 5) begin
                     next_state = S_CHECK_BUSY;
@@ -244,7 +248,7 @@ module ita_sequencer_hardcoded_qk_step #(
             end
 
             S_FINISH_STEP: begin
-                done_o = 1'b1;
+                done_next = 1'b1;
                 next_state = S_IDLE;
             end
         endcase
