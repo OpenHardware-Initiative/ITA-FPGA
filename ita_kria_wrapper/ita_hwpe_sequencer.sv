@@ -269,6 +269,7 @@ module ita_sequencer #(
                     step_r_next               = step_i;
                     outer_tile_cnt_next       = '0;
                     tile_inner_cnt_next       = '0;
+                    reg_prog_cnt_next         = '0;
                     is_first_tile_ever_r_next = 1'b1;
                     if (step_i == F1) ita_reg_cnt_next = '0;
                     next_state = S_LATCH_AND_PROG;
@@ -344,28 +345,32 @@ module ita_sequencer #(
 
             S_PROG_ACK: begin
                 if (reg_prog_cnt == PROGRAM_STEPS - 1) begin
+                    // Always go to wait/delay path, but handle first tile specially in S_WAIT_BUSY
                     next_state = is_first_tile_ever_r ? S_TRIGGER_REQ : S_WAIT_BUSY;
                 end else begin
                     reg_prog_cnt_next = reg_prog_cnt + 1;
                     next_state = S_PROG_REQ;
                 end
             end
-
+            
             S_WAIT_BUSY: begin
-                if (!hwpe_busy_i) begin
+                // For first tile, hwpe_busy_i will be 0, so skip immediately to delay
+                // For subsequent tiles, wait for previous tile to complete
+                if (!hwpe_busy_i || is_first_tile_ever_r) begin
                     delay_cnt_next = '0;
                     next_state = S_DELAY;
                 end
             end
-
+            
             S_DELAY: begin
+                // Always wait 5 cycles before triggering
                 if (delay_cnt == INTER_TILE_DELAY_CYCLES - 1) begin
                     next_state = S_TRIGGER_REQ;
                 end else begin
                     delay_cnt_next = delay_cnt + 1;
                 end
             end
-
+    
             S_TRIGGER_REQ: begin
                 periph_req_o  = 1'b1;
                 periph_wen_o  = 1'b0;
