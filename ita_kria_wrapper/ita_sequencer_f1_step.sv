@@ -422,7 +422,7 @@ module ita_sequencer_f1_step #(
             end
         endcase
     end
-     // New registered block for all module outputs
+
     always_ff @(posedge clk_i or negedge rst_ni) begin
         if (!rst_ni) begin
             done_o        <= 1'b0;

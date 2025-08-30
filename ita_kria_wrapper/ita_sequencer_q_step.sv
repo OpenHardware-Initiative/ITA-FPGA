@@ -1,19 +1,3 @@
-// Copyright 2023 ETH Zurich and University of Bologna.
-// Solderpad Hardware License, Version 0.51, see LICENSE for details.
-// SPDX-License-Identifier: SHL-0.51
-
-// Author: Gemini AI, based on user-provided testbench
-// Version: 8.1 (Fully Expanded Hardcoded Sequencer for Debugging Step Q)
-//
-// PURPOSE:
-// This is a special-purpose, temporary module for debugging Step Q ONLY.
-// It replaces all dynamic pointer and control calculations with a pre-computed,
-// hardcoded sequence of peripheral writes. This is used to verify that the FSM's
-// timing and the HWPE core's response are correct, by eliminating the
-// dynamic calculations as a potential source of error.
-//
-// THIS MODULE IS NOT SCALABLE, PARAMETRIC, OR SUITABLE FOR SYNTHESIS IN A FINAL DESIGN.
-
 `include "hci_helpers.svh"
 
 import ita_package::*;
@@ -384,7 +368,7 @@ module ita_sequencer_q_step #(
             done_o        <= 1'b0;
             periph_req_o  <= 1'b0;
             periph_add_o  <= '0;
-            periph_wen_o  <= 1'b1; // Default to read, inactive state
+            periph_wen_o  <= 1'b1; 
             periph_be_o   <= '0;
             periph_data_o <= '0;
             prev_data     <= '0;
