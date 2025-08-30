@@ -12,7 +12,6 @@ import ita_package::*;
  * connection between them, exposing a clean interface that matches
  * the peripheral and control signals used in the provided testbench.
  */
-
 module ITA_FPGA_WRAPPER #(
     // Parameters for ita_hwpe_wrap
     parameter int unsigned AccDataWidth = 1024,
@@ -139,9 +138,9 @@ module ITA_FPGA_WRAPPER #(
     logic [IdWidth-1:0] periph_r_id_seq;
     
     // ===================================================================
-    // Per-Sequencer Peripheral Bus Wires
+    // NEW: Per-Sequencer Peripheral Bus Wires
     // ===================================================================
-    // We created a separate bus for each sequencer module.
+    // We create a separate bus for each sequencer module.
     // The arbiter below will select which one is active.
 
     // --- From Sequencers to Mux ---
@@ -320,7 +319,7 @@ module ITA_FPGA_WRAPPER #(
     localparam int ATTN_W_LOAD_WORDS  = (H * 4 * EMBEDDING_SIZE * PROJECTION_SPACE) / (C_S_AXIS_TDATA_WIDTH / 8);
     localparam int ATTN_B_LOAD_WORDS  = (H * (9 * PROJECTION_SPACE + 3 * EMBEDDING_SIZE)) / (C_S_AXIS_TDATA_WIDTH / 8);
     localparam int ATTN_WB_LOAD_WORDS = ATTN_W_LOAD_WORDS + ATTN_B_LOAD_WORDS;
-    localparam int ATTN_LOAD_WORDS    = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 4);
+    localparam int ATTN_LOAD_WORDS    = 2 * (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_S_AXIS_TDATA_WIDTH / 8);
     localparam int ATTN_OUTPUT_WORDS  = (SEQUENCE_LEN * EMBEDDING_SIZE) / (C_M_AXIS_TDATA_WIDTH / 8);
 
     // FFN Layer
@@ -492,7 +491,7 @@ module ITA_FPGA_WRAPPER #(
     assign ffn_done_o         = (current_state == S_DONE_FFN && dma_ag_done);
     
      // ===================================================================
-    // Peripheral Bus Arbiter/Multiplexer
+    // NEW: Peripheral Bus Arbiter/Multiplexer
     // ===================================================================
     // This logic selects which sequencer gets to drive the peripheral bus
     // based on the main FSM's current state.
