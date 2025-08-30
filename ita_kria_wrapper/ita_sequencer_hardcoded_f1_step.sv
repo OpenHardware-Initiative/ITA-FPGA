@@ -1,0 +1,467 @@
+// Copyright 2023 ETH Zurich and University of Bologna.
+// Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
+
+// Author: Gemini AI, based on user-provided testbench
+// Version: 8.1 (Fully Expanded Hardcoded Sequencer for Debugging Step Q)
+//
+// PURPOSE:
+// This is a special-purpose, temporary module for debugging Step Q ONLY.
+// It replaces all dynamic pointer and control calculations with a pre-computed,
+// hardcoded sequence of peripheral writes. This is used to verify that the FSM's
+// timing and the HWPE core's response are correct, by eliminating the
+// dynamic calculations as a potential source of error.
+//
+// THIS MODULE IS NOT SCALABLE, PARAMETRIC, OR SUITABLE FOR SYNTHESIS IN A FINAL DESIGN.
+
+`include "hci_helpers.svh"
+
+import ita_package::*;
+import ita_hwpe_package::*;
+
+module ita_sequencer_hardcoded_f1_step #(
+    parameter int INTER_TILE_DELAY_CYCLES = 5
+) (
+    input  logic clk_i,
+    input  logic rst_ni,
+    input  logic start_i,
+    // step_i is ignored, this module only does Step Q
+    input  step_e     step_i,
+    output logic      done_o,
+    input  logic      hwpe_busy_i,
+    output logic                   periph_req_o,
+    input  logic                   periph_gnt_i,
+    output logic [31:0]            periph_add_o,
+    output logic                   periph_wen_o,
+    output logic [3:0]             periph_be_o,
+    output logic [31:0]            periph_data_o
+);
+    typedef enum logic [4:0] {
+        S_IDLE,
+        S_CHECK_BUSY,
+        S_WAIT_CYCLE,
+        S_WRITE_REQ_0,
+        S_WRITE_REQ_1,
+        S_WRITE_REQ_2,
+        S_WRITE_REQ_3,
+        S_WRITE_REQ_4,
+        S_WRITE_REQ_5,
+        S_WRITE_REQ_6,
+        S_WRITE_REQ_7,
+        S_WRITE_WAIT_GNT,
+        S_WRITE_ACK,
+        S_SEND_TRIGGER,
+        S_FINISH_STEP,
+        S_CHOOSE_STATE,
+        S_WAIT_5,
+        S_WAIT_5_2,
+        S_WRITE_REQS
+    } seq_state_t;
+
+    seq_state_t  current_state, next_state;
+    logic [7:0]  write_step_cnt, write_step_cnt_next, tile_cnt, next_tile_cnt;
+    logic [$clog2(INTER_TILE_DELAY_CYCLES):0] delay_cnt, delay_cnt_next;
+    logic [31:0] prev_data;
+    localparam int unsigned WAIT5_CYCLES = 250; // 5us wait / 1ns period
+    logic [$clog2(WAIT5_CYCLES)-1:0] wait5_cnt, wait5_cnt_n;
+    
+    // Intermediate signals for registered outputs
+    logic        done_next;
+    logic        periph_req_next;
+    logic [31:0] periph_add_next;
+    logic        periph_wen_next;
+    logic [3:0]  periph_be_next;
+    logic [31:0] periph_data_next;
+
+    // FSM state registers
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            current_state  <= S_IDLE;
+            write_step_cnt <= '0;
+            delay_cnt      <= '0;
+            tile_cnt       <= '0;
+            wait5_cnt      <= '0; //counter
+        end else begin
+            current_state  <= next_state;
+            write_step_cnt <= write_step_cnt_next;
+            delay_cnt      <= delay_cnt_next;
+            tile_cnt       <= next_tile_cnt;
+            wait5_cnt      <= wait5_cnt_n; //counter
+        end
+    end
+
+    // Combinational logic for FSM and outputs
+    always_comb begin
+        next_state          = current_state;
+        write_step_cnt_next = write_step_cnt;
+        delay_cnt_next      = delay_cnt;
+        wait5_cnt_n         = wait5_cnt; //counter
+        next_tile_cnt       = tile_cnt;
+        
+        done_next              = 1'b0;
+        periph_req_next        = 1'b0;
+        periph_add_next        = '0;
+        periph_wen_next        = 1'b1; // Default to read
+        periph_be_next         = 4'hf;
+        periph_data_next       = '0;
+
+        case (current_state)
+            S_IDLE: begin
+                if (start_i) begin
+                    next_state = S_WRITE_REQ_0;
+                end
+            end
+
+            S_CHECK_BUSY: begin
+                write_step_cnt_next = 0;
+                if (!hwpe_busy_i) begin
+                    periph_req_next = 1'b1;
+                    periph_wen_next = 1'b0;
+                    periph_add_next = 32'd00; 
+                    periph_data_next = 32'h0;
+                    periph_be_next  = 4'hF;
+                    next_state = S_CHOOSE_STATE;
+                end
+            end
+            
+            S_CHOOSE_STATE: begin
+                    periph_req_next = 1'b0;
+                    periph_wen_next = 1'b1;
+                    periph_add_next = 32'd00; 
+                    periph_data_next = 32'h0;
+                    periph_be_next  = 4'hF;
+                    next_state = S_WAIT_5;
+            end  
+
+            S_WAIT_5: begin
+                if (wait5_cnt == WAIT5_CYCLES-1) begin
+                wait5_cnt_n = '0;            // clear for next time
+                next_state  = S_WRITE_REQS;  // proceed after full 5us
+                end else begin
+                    wait5_cnt_n = wait5_cnt + 1'b1;
+                    next_state  = S_WAIT_5;      // keep waiting
+                end
+            end
+
+            S_WRITE_REQS: begin
+                case (tile_cnt)
+                    0: next_state = S_WRITE_REQ_0;
+                    1: next_state = S_WRITE_REQ_1;
+                    2: next_state = S_WRITE_REQ_2;
+                    3: next_state = S_WRITE_REQ_3;
+                    4: next_state = S_WRITE_REQ_4;
+                    5: next_state = S_WRITE_REQ_5;
+                    6: next_state = S_WRITE_REQ_6;
+                    7: next_state = S_WRITE_REQ_7;
+                    default: next_state = S_FINISH_STEP; // All tiles done
+                endcase
+            end          
+
+            S_WAIT_CYCLE: begin
+                case (tile_cnt)
+                    0: next_state = S_WRITE_REQ_0;
+                    1: next_state = S_WRITE_REQ_1;
+                    2: next_state = S_WRITE_REQ_2;
+                    3: next_state = S_WRITE_REQ_3;
+                    4: next_state = S_WRITE_REQ_4;
+                    5: next_state = S_WRITE_REQ_5;
+                    6: next_state = S_WRITE_REQ_6;
+                    7: next_state = S_WRITE_REQ_7;
+                    default: next_state = S_FINISH_STEP; // All tiles done
+                endcase
+
+                periph_req_next = 1'b0;
+                periph_wen_next = 1'b1;
+                periph_data_next = prev_data; 
+                periph_data_next = 32'h0;
+                periph_be_next  = 4'hF;
+                @(posedge clk_i);
+                
+            end
+            S_SEND_TRIGGER: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0;
+                periph_add_next = 32'h00; 
+                periph_data_next = 32'h0;
+                periph_be_next  = 4'hF;
+                case (tile_cnt)
+                    0: next_state = S_WRITE_REQ_0;
+                    1: next_state = S_WRITE_REQ_1;
+                    2: next_state = S_WRITE_REQ_2;
+                    3: next_state = S_WRITE_REQ_3;
+                    4: next_state = S_WRITE_REQ_4;
+                    5: next_state = S_WRITE_REQ_5;
+                    6: next_state = S_WRITE_REQ_6;
+                    7: next_state = S_WRITE_REQ_7;                   
+                    default: next_state = S_FINISH_STEP; // All tiles done
+                endcase
+            end
+
+            S_WRITE_REQ_0: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1c840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h1e840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h1f840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e840; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3dcc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd56; periph_data_next = 32'h04321; end
+                    6:   begin periph_add_next = 32'd60; periph_data_next = 32'h40756f6c; end
+                    7:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
+                    8:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
+                    9:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
+                    10:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
+                    11:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
+                    12:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
+                    13:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
+                    14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
+                    15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00013; end // EPS_MULT0
+                endcase
+
+                //prev_data = periph_data_o;
+                
+                if (write_step_cnt == 15) begin
+                   
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+
+            
+            S_WRITE_REQ_1: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1d840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h1f840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h1f840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e840; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3dcc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd56; periph_data_next = 32'h04321; end
+                    6:   begin periph_add_next = 32'd60; periph_data_next = 32'h40756f6c; end
+                    7:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
+                    8:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
+                    9:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
+                    10:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
+                    11:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
+                    12:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
+                    13:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
+                    14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
+                    15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0  
+                endcase
+
+               // prev_data = periph_data_o;
+
+                if (write_step_cnt == 15) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+
+            S_WRITE_REQ_2: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1c840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h20840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h21840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e900; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3ecc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd56; periph_data_next = 32'h04321; end
+                    6:   begin periph_add_next = 32'd60; periph_data_next = 32'h40756f6c; end
+                    7:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
+                    8:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
+                    9:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
+                    10:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
+                    11:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
+                    12:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
+                    13:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
+                    14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
+                    15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00012; end // EPS_MULT0
+                endcase
+
+               // prev_data = periph_data_o;
+
+                if (write_step_cnt == 15) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+            
+            S_WRITE_REQ_3: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1d840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h21840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h22840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e900; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3ecc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd56; periph_data_next = 32'h04321; end
+                    6:   begin periph_add_next = 32'd60; periph_data_next = 32'h40756f6c; end
+                    7:   begin periph_add_next = 32'd64; periph_data_next = 32'h49677b43; end
+                    8:   begin periph_add_next = 32'd68; periph_data_next = 32'hf101010; end
+                    9:   begin periph_add_next = 32'd72; periph_data_next = 32'h1110100b; end
+                    10:   begin periph_add_next = 32'd76; periph_data_next = 32'h00000; end
+                    11:   begin periph_add_next = 32'd80; periph_data_next = 32'h00000; end
+                    12:   begin periph_add_next = 32'd92; periph_data_next = 32'he44dffb0; end
+                    13:   begin periph_add_next = 32'd96; periph_data_next = 32'h144a; end
+                    14:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end // TILES
+                    15:   begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0
+                endcase
+
+               // prev_data = periph_data_o;
+
+                if (write_step_cnt == 15) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+            
+            S_WRITE_REQ_4: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1c840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h22840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h23840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e9c0; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3fcc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end 
+                    6:   begin periph_add_next = 32'd88; periph_data_next = 32'h00012; end // EPS_MULT0
+                endcase
+
+               // prev_data = periph_data_o;
+
+                if (write_step_cnt == 6) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+            
+            S_WRITE_REQ_5: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1d840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h23840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h24840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2e9c0; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h3fcc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end 
+                    6:   begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0
+                endcase
+
+               // prev_data = periph_data_o;
+
+                if (write_step_cnt == 6) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+            
+            S_WRITE_REQ_6: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1c840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h24840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h25840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2ea80; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h40cc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end 
+                    6:   begin periph_add_next = 32'd88; periph_data_next = 32'h00012; end // EPS_MULT0
+                endcase
+
+               // prev_data = periph_data_next;
+
+                if (write_step_cnt == 6) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+            
+            S_WRITE_REQ_7: begin
+                periph_req_next = 1'b1;
+                periph_wen_next = 1'b0; 
+                case (write_step_cnt)
+                    0:   begin periph_add_next = 32'd32; periph_data_next = 32'h1d840; end // INPUT_PTR
+                    1:   begin periph_add_next = 32'd36; periph_data_next = 32'h25840; end // WEIGHT_PTR0
+                    2:   begin periph_add_next = 32'd40; periph_data_next = 32'h26840; end // WEIGHT_PTR1
+                    3:   begin periph_add_next = 32'd44; periph_data_next = 32'h2ea80; end // BIAS_PTR
+                    4:   begin periph_add_next = 32'd48; periph_data_next = 32'h40cc0; end // OUTPUT_PTR
+                    5:   begin periph_add_next = 32'd84; periph_data_next = 32'h00001; end 
+                    6:   begin periph_add_next = 32'd88; periph_data_next = 32'h00002; end // EPS_MULT0
+                endcase
+
+               // prev_data = periph_data_o;
+
+                if (write_step_cnt == 6) begin
+                    next_state = S_CHECK_BUSY;
+                    next_tile_cnt = tile_cnt + 1;
+                end else begin
+                    next_state = S_WAIT_CYCLE;
+                    write_step_cnt_next = write_step_cnt + 1;
+                end
+            end
+                                 
+            S_FINISH_STEP: begin
+                done_next = 1'b1;
+                next_state = S_WAIT_5;
+            end
+            
+            S_WAIT_5_2: begin
+                if (wait5_cnt == WAIT5_CYCLES-1) begin
+                wait5_cnt_n = '0;            // clear for next time
+                next_state  = S_IDLE;  // proceed after full 5us
+                end else begin
+                    wait5_cnt_n = wait5_cnt + 1'b1;
+                    next_state  = S_WAIT_5_2;      // keep waiting
+                end
+            end
+        endcase
+    end
+     // New registered block for all module outputs
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni) begin
+            done_o        <= 1'b0;
+            periph_req_o  <= 1'b0;
+            periph_add_o  <= '0;
+            periph_wen_o  <= 1'b1; // Default to read, inactive state
+            periph_be_o   <= '0;
+            periph_data_o <= '0;
+            prev_data     <= '0;
+        end else begin
+            done_o        <= done_next;
+            periph_req_o  <= periph_req_next;
+            periph_add_o  <= periph_add_next;
+            periph_wen_o  <= periph_wen_next;
+            periph_be_o   <= periph_be_next;
+            periph_data_o <= periph_data_next;
+            // CORRECTED: Safely register prev_data to avoid combinational loop
+            prev_data     <= periph_data_next;
+        end
+    end
+endmodule
