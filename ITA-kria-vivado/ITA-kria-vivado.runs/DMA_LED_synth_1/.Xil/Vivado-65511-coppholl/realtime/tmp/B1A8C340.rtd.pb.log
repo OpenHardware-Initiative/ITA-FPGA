@@ -1,0 +1,109 @@
+xilinx rtfpga
+rt::do_reinfer_area_combined 1
+INFO: [Synth 8-5845] Not enough pipeline registers after wide multiplier. Recommended levels of pipeline registers is 4 [/home/coppholl/Projects/ITA-FPGA/src/ita_controller.sv:224]
+INFO: [Synth 8-5845] Not enough pipeline registers after wide multiplier. Recommended levels of pipeline registers is 4 [/home/coppholl/Projects/ITA-FPGA/src/ita_controller.sv:135]
+INFO: [Synth 8-5845] Not enough pipeline registers after wide multiplier. Recommended levels of pipeline registers is 4 [/home/coppholl/Projects/ITA-FPGA/src/ita_controller.sv:210]
+INFO: [Synth 8-5544] ROM "step_d0" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
+DSP Report: Generating DSP step_d1, operation Mode is: A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: Generating DSP step_d1, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+DSP Report: operator step_d1 is absorbed into DSP step_d1.
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: setting the param 'removeWireWithInitVal' to 1005562240 for N_9A4799E0((null))
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: setting the param 'removeWireWithInitVal' to 1005562240 for N_82B79AA0((null))
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: setting the param 'removeWireWithInitVal' to 1005562240 for N_A47E50E0((null))
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+RedundantWireRemoval: 
+RemoveRedundantWireWithInitVal: -----proceeding forward.. did not stuck in conditions check-----
+HARTDFVerify: start recording ...
+HARTDFVerify: done recording ...
+HARTDFVerify: verify changes ...
+createChangeGraphs ...
+HARTDFVerify: 0 change(s) need to be verified ...
+HARTDFVerify: finished verification.

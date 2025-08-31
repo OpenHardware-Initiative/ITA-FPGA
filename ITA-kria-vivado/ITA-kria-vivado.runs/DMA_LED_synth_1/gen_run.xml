@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="DMA_LED_synth_1" LaunchPart="xck26-sfvc784-2LV-c" LaunchTime="1756596363">
+  <File Type="VDS-TIMING-PB" Name="DMA_LED_timing_summary_synth.pb"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="DMA_LED_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="DMA_LED.dcp"/>
+  <File Type="RDS-UTIL-PB" Name="DMA_LED_utilization_synth.pb"/>
+  <File Type="RDS-UTIL" Name="DMA_LED_utilization_synth.rpt"/>
+  <File Type="RDS-PROPCONSTRS" Name="DMA_LED_drc_synth.rpt"/>
+  <File Type="RDS-RDS" Name="DMA_LED.vds"/>
+  <File Type="REPORTS-TCL" Name="DMA_LED_reports.tcl"/>
+  <File Type="PA-TCL" Name="DMA_LED.tcl"/>
+  <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/DMA_LED" RelGenDir="$PGENDIR/DMA_LED">
+    <File Path="$PSRCDIR/sources_1/bd/DMA_LED/DMA_LED.bd">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="DMA_LED"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="BlockSrcs" RelSrcDir="$PSRCDIR/DMA_LED" RelGenDir="$PGENDIR/DMA_LED">
+    <File Path="$PSRCDIR/sources_1/bd/DMA_LED/DMA_LED.bd">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="DMA_LED"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1" RelGenDir="$PGENDIR/utils_1">
+    <Filter Type="Utils"/>
+    <Config>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2024"/>
+    <Step Id="synth_design"/>
+  </Strategy>
+</GenRun>

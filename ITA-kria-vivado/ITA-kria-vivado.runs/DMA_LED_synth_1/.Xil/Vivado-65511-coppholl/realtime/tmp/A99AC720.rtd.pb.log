@@ -1,0 +1,12 @@
+xilinx rtfpga
+rt::do_reinfer_area_combined 1
+Command "rt::cleanup_dangling_modules " finished in 0 second(s)
+Command "rt::get_parameter nlOptUseSmartML" finished in 0 second(s)
+ML NlOpt Prediction Report:-  Module: uram_memory_controller_ita_dma__GB0
+Predicted : 0, Not Predicted : 0, Used NlOpt Local Cache : 0, Used NlOpt Global Cache : 0, ML Invalid features : 0
+Command "rt::ml_nlOptPrediction_report " finished in 0 second(s)
+Command "rt::get_parameter printParallelStat" finished in 0 second(s)
+Parallel Stat: Finished rt::do_reinfer_area_combined 1 for uram_memory_controller_ita_dma__GB0 : elapsed :    116.119 second(s)
+Command "rt::get_parameter printParallelStat" finished in 0 second(s)
+Parallel Stat: Start Writing rtd for uram_memory_controller_ita_dma__GB0 : elapsed :    116.120 second(s)
+regenerateCell mod name=uram_memory_controller_ita_dma__GB0

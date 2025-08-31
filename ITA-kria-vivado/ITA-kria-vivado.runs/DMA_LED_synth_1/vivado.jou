@@ -1,0 +1,24 @@
+#-----------------------------------------------------------
+# Vivado v2024.1 (64-bit)
+# SW Build 5076996 on Wed May 22 18:36:09 MDT 2024
+# IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
+# SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
+# Start of session at: Sat Aug 30 16:26:06 2025
+# Process ID: 65511
+# Current directory: /home/coppholl/Projects/ITA-FPGA/ITA-kria-vivado/ITA-kria-vivado.runs/DMA_LED_synth_1
+# Command line: vivado -log DMA_LED.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source DMA_LED.tcl
+# Log file: /home/coppholl/Projects/ITA-FPGA/ITA-kria-vivado/ITA-kria-vivado.runs/DMA_LED_synth_1/DMA_LED.vds
+# Journal file: /home/coppholl/Projects/ITA-FPGA/ITA-kria-vivado/ITA-kria-vivado.runs/DMA_LED_synth_1/vivado.jou
+# Running On        :coppholl
+# Platform          :Ubuntu
+# Operating System  :Ubuntu 20.04.6 LTS
+# Processor Detail  :AMD Ryzen 7 4700U with Radeon Graphics
+# CPU Frequency     :1400.000 MHz
+# CPU Physical cores:8
+# CPU Logical cores :8
+# Host memory       :15942 MB
+# Swap memory       :2147 MB
+# Total Virtual     :18089 MB
+# Available Virtual :12001 MB
+#-----------------------------------------------------------
+source DMA_LED.tcl -notrace

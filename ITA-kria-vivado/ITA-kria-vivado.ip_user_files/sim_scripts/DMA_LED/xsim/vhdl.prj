@@ -1,0 +1,7 @@
+vhdl xil_defaultlib  \
+"../../../bd/DMA_LED/ip/DMA_LED_axi_dma_0_0/sim/DMA_LED_axi_dma_0_0.vhd" \
+"../../../bd/DMA_LED/ip/DMA_LED_proc_sys_reset_0_0/sim/DMA_LED_proc_sys_reset_0_0.vhd" \
+"../../../bd/DMA_LED/ip/DMA_LED_smartconnect_0_0/bd_0/ip/ip_1/sim/bd_9be7_psr_aclk_0.vhd" \
+
+# Do not sort compile order
+nosort
