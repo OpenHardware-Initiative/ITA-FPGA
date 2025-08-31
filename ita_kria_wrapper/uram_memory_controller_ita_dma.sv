@@ -350,7 +350,7 @@ end endgenerate
   generate
     for (genvar i = 0; i < MP; i++) begin : g_uram_instance
       xpm_memory_tdpram #(
-        .MEMORY_SIZE        (BANK_DEPTH_WORDS * 32),
+        .MEMORY_SIZE        (3200),
         .MEMORY_PRIMITIVE   ("ultra"),
         .ADDR_WIDTH_A       (BANK_ADDR_W),
         .ADDR_WIDTH_B       (BANK_ADDR_W),
