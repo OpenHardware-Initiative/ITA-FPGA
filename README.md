@@ -1,3 +1,10 @@
+# AMD Open Hardware Competition Team AOHW25_216
+AI Compilers Meet FPGAs: A HW/SW Codesign Approach for Vision Transformers
+
+# Link to our 2 minute video: 
+https://www.youtube.com/watch?v=RXjw670piBA
+
+
 # Integer Transformer Accelerator
 The Integer Transformer Accelerator is a hardware accelerator for the Multi-Head Attention (MHA) operation in the Transformer model.
 It targets  efficient inference on embedded systems by exploiting 8-bit quantization and an innovative softmax implementation that operates exclusively on integer values.
