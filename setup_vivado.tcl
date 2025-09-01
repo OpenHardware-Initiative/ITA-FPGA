@@ -1,5 +1,5 @@
 # ========================================================================
-#             New Vivado Project Creation Script
+#             Vivado Project Creation Script
 #
 # This script is designed to replicate the successful manual project
 # creation workflow, ensuring all properties and file dependencies

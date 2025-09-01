@@ -69,22 +69,7 @@ module ITA_FPGA_WRAPPER #(
     output logic m_axis_tvalid,
     input  logic m_axis_tready
 
-    // RQS and activation constants (PROGRAMMING THE ACCELERATOR)
 
-    /*input  logic [31:0] activation_gelu_const_i,
-    input  logic [31:0] activation_rqs_const_i,
-
-    input  logic [31:0] rqs_eps_mult0_i,
-    input  logic [31:0] rqs_eps_mult1_i,
-    input  logic [31:0] rqs_eps_mult2_i,
-    input  logic [31:0] rqs_rshift0_i,
-    input  logic [31:0] rqs_rshift1_i,
-    input  logic [31:0] rqs_rshift2_i,
-    input  logic [31:0] rqs_add0_i,
-    input  logic [31:0] rqs_add1_i,
-    input  logic [31:0] rqs_add2_i,
-    input  logic [31:0] rqs_add3_i,
-    input  logic [31:0] rqs_add4_i*/
 );
     
     // --- FSM State Definition  ---
@@ -215,16 +200,7 @@ module ITA_FPGA_WRAPPER #(
         N_TILES_EMBEDDING_DIM,      // [7] F1
         N_TILES_FEEDFORWARD_DIM     // [8] F2
     };
-    
-    // Use a generate block to perform a direct, 1-to-1 mapping to the output signals.
-    generate
-        genvar i;
-        for (i = 0; i < N_STATES; i=i+1) begin : map_tile_dims
-            assign N_TILES_OUTER_X[i]   = OUTER_X_VALUES[i];
-            assign N_TILES_OUTER_Y[i]   = OUTER_Y_VALUES[i];
-            assign N_TILES_INNER_DIM[i] = INNER_DIM_VALUES[i];
-        end
-    endgenerate*/
+    */
     
     // 1. Declare the golden arrays as 'logic' (unpacked array of nets)
     logic [31:0] GOLDEN_OUTER_X     [0:N_STATES-1];
@@ -491,7 +467,7 @@ module ITA_FPGA_WRAPPER #(
     assign ffn_done_o         = (current_state == S_DONE_FFN && dma_ag_done);
     
      // ===================================================================
-    // NEW: Peripheral Bus Arbiter/Multiplexer
+    // Peripheral Bus Arbiter/Multiplexer
     // ===================================================================
     // This logic selects which sequencer gets to drive the peripheral bus
     // based on the main FSM's current state.

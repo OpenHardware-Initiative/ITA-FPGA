@@ -1,12 +1,3 @@
-
-################################################################
-# This is a generated script based on design: DMA_LED
-#
-# Though there are limitations about the generated script,
-# the main purpose of this utility is to make learning
-# IP Integrator Tcl commands easier.
-################################################################
-
 namespace eval _tcl {
 proc get_script_folder {} {
    set script_path [file normalize [info script]]

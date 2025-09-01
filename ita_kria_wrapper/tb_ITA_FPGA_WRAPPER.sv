@@ -57,7 +57,7 @@ module tb_ITA_FPGA_WRAPPER;
 
 
     // ==============================================================================
-    // MODIFICATION START: Corrected Word Count Calculations
+    // Corrected Word Count Calculations
     // The parameter 'H' was undefined. Assuming H=1 as implied by the non-parameterized
     // design of the accelerator. The formulas now directly calculate the number of
     // 32-bit words based on the byte sizes of the data structures.
@@ -89,10 +89,6 @@ module tb_ITA_FPGA_WRAPPER;
     // Final FFN output (F2) is 8-bit.
     localparam int FFN_OUTPUT_BYTES = SEQUENCE_LEN * EMBEDDING_SIZE;
     localparam int FFN_OUTPUT_WORDS = (FFN_OUTPUT_BYTES + 3) / 4;
-    // ==============================================================================
-    // MODIFICATION END
-    // ==============================================================================
-
 
     // =================================================================
     // Testbench Signals
@@ -193,20 +189,6 @@ module tb_ITA_FPGA_WRAPPER;
             $fscanf(file, "%h", dummy_word);
         end
 
-//        for (int i = 0; i < num_words; i++) begin
-//            if ($feof(file)) begin $error("[%0t] FATAL: Reached EOF prematurely while reading from %s", $time, filename); $finish; end
-//            $fscanf(file, "%h", data_word);
-//            s_axis_tvalid <= 1'b1;
-//            s_axis_tdata <= data_word;
-//            @(posedge clk_i);
-//             while (s_axis_tready !== 1'b1) begin
-//              if (dut_state == S_WAIT_QK_DONE) begin
-//                  $display("[%0t] DEBUG: DUT state is S_WAIT_QK_DONE, forcing handshake complete.", $time);
-//                  break;
-//               end
-//              @(posedge clk_i);
-//            end
-//        end
 
         for (int i = 0; i < num_words; i++) begin
             if ($feof(file)) begin $error("[%0t] FATAL: Reached EOF prematurely while reading from %s", $time, filename); $finish; end
@@ -224,7 +206,7 @@ module tb_ITA_FPGA_WRAPPER;
         $display("[%0t] INFO: Finished driving %0d words from '%s'.", $time, num_words, filename);
     endtask
 
-    // MODIFICATION: New verification task to compare output against a golden file.
+    //  New verification task to compare output against a golden file.
     task automatic verify_m_axis_output(input string golden_filename, input int num_words);
         integer golden_file, mismatch_count;
         logic [C_M_AXIS_TDATA_WIDTH-1:0] golden_data, actual_data;
@@ -331,7 +313,7 @@ module tb_ITA_FPGA_WRAPPER;
     initial begin
     
 
-        simdir = {"C:/Users/micha/Documents/GitHub/ITA-FPGA/ita_kria_wrapper/data_S64_E128_P192_F256_H1_B1_Relu"};
+        simdir = {".../ITA-FPGA/ita_kria_wrapper/data_S64_E128_P192_F256_H1_B1_Relu"};
         // Base pointer calculations for the logical memory map
         BASE_PTR[0 ] = 0; //input q
         BASE_PTR[1 ] = BASE_PTR[0 ] + SEQUENCE_LEN * EMBEDDING_SIZE;
