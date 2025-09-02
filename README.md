@@ -54,11 +54,15 @@ The key architectural changes are:
 
 Below are diagrams of the top-level system and the memory controller we designed.
 
-**Overall System Architecture**
-![Overall System Architecture Diagram](path/to/your/wrapper_figure.png)
+### Overall System Architecture
+*This diagram shows the ITA core integrated with our custom control FSM, sequencer, DMA address generator, and the ITA-URAM-DMA Adapter, forming a complete inference pipeline.*
 
-**ITA-URAM-DMA Adapter**
-![ITA-URAM-DMA Adapter Diagram](path/to/your/adapter_figure.png)
+![Overall System Architecture Diagram](docs/img/Overall-System-Architecture-Diagram.png)
+
+### ITA-URAM-DMA Adapter
+*This diagram illustrates the internal logic of our memory controller, including the 32 URAM banks, the arbitration MUX, and the crossbar for routing memory requests.*
+
+![ITA-URAM-DMA Adapter Diagram](docs/img/ITA-URAM-DMA-Adapter-Diagram.png)
 
 ---
 
