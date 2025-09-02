@@ -4,6 +4,68 @@ AI Compilers Meet FPGAs: A HW/SW Codesign Approach for Vision Transformers
 # Link to our 2 minute video: 
 https://www.youtube.com/watch?v=RXjw670piBA
 
+---
+
+### Table of Contents
+- [Fork Notice](#note)
+- [Summary of Changes](#summary-of-changes)
+- [FPGA System Architecture](#fpga-system-architecture)
+- [Getting Started: Running the Full FPGA System](#getting-started-running-the-full-fpga-system)
+  - [Requirements](#requirements)
+  - [Vivado Project Setup](#vivado-project-setup)
+  - [New Testbenches](#new-testbenches)
+- [Original README Content](#original-readme-content)
+  - [Simulating the Standalone ITA Core](#simulating-the-standalone-ita-core)
+  - [Test Vector Generation](#test-vector-generation)
+- [Contributors](#contributors)
+- [License](#license)
+- [References](#references)
+
+---
+
+# Note
+This project is a fork of the excellent [ITA](https://github.com/pulp-platform/ita) by Gamze İslamoğlu (gislamoglu@iis.ee.ethz.ch) and Philip Wiese (wiesep@iis.ee.ethz.ch). We have ported the original ASIC-targeted accelerator core to an FPGA platform, building a custom memory subsystem and the necessary control logic to manage the full inference dataflow. Our sincere thanks go to the original creators for their foundational work.
+
+### Summary of Changes
+
+This fork adapts the original accelerator, which was designed for an ASIC, to a fully functional FPGA implementation. Our primary contributions were to refactor the core for FPGA synthesis and build the entire surrounding memory and control infrastructure required to run a complete inference pipeline.
+
+The key architectural changes are:
+
+*   **Core Refactoring for FPGA Synthesis**
+    *   The original ASIC-optimized ITA core was modified to be FPGA-friendly. This involved replacing all latch-based memory elements with synthesizable flip-flops and removing the non-synthesizable clock-gating infrastructure. The core computational logic remains the same.
+
+*   **New Memory Subsystem (ITA-URAM-DMA Adapter)**
+    *   We replaced the original design's dependency on a 32-port Tightly-Coupled Data Memory (TCDM) with a custom memory controller built for FPGAs. This new adapter is the central hub of the memory system and is responsible for:
+        *   **Emulating the TCDM:** It uses 32 parallel on-chip URAM banks to provide the high-bandwidth memory access required by the ITA core.
+        *   **Memory Interleaving:** It maps sequential addresses across the URAM banks, allowing a single wide request from the ITA to be serviced in parallel.
+        *   **Adding a DMA Interface:** It introduces a streaming interface for efficient, bulk data transfers to and from external memory (e.g., DDR), which is essential for loading model weights and input data.
+        *   **Arbitration:** It manages access to the URAMs, granting control to either the ITA core during computation or the DMA during data transfers.
+
+*   **Holistic Control and Dataflow Logic**
+    *   A multi-level control system was created from scratch to manage the entire end-to-end inference process.
+        *   **Top-Level FSM:** Orchestrates the high-level sequence: initiating DMA transfers to load data, triggering the ITA core for computation, and initiating DMA transfers to write back results.
+        *   **Sequencer Module:** Acts as a low-level driver for the ITA core. It translates high-level commands (e.g., "compute Q matrix") into the series of precise register writes needed to process each data tile.
+        *   **DMA Address Generator:** A dedicated helper module that generates the correct address streams for the memory controller during bulk DMA transfers.
+
+---
+
+## FPGA System Architecture
+
+Below are diagrams of the top-level system and the memory controller we designed.
+
+**Overall System Architecture**
+![Overall System Architecture Diagram](path/to/your/wrapper_figure.png)
+
+**ITA-URAM-DMA Adapter**
+![ITA-URAM-DMA Adapter Diagram](path/to/your/adapter_figure.png)
+
+---
+
+## Original README Content
+
+<details>
+<summary><b>Click to expand the original documentation for the standalone ITA core</b></summary>
 
 # Integer Transformer Accelerator
 The Integer Transformer Accelerator is a hardware accelerator for the Multi-Head Attention (MHA) operation in the Transformer model.
