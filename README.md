@@ -7,16 +7,15 @@ https://www.youtube.com/watch?v=RXjw670piBA
 ---
 
 ### Table of Contents
-- [Fork Notice](#note)
+- [Note](#note)
 - [Summary of Changes](#summary-of-changes)
 - [FPGA System Architecture](#fpga-system-architecture)
 - [Getting Started: Running the Full FPGA System](#getting-started-running-the-full-fpga-system)
   - [Requirements](#requirements)
-  - [Vivado Project Setup](#vivado-project-setup)
-  - [New Testbenches](#new-testbenches)
+  - [Setup and Simulation Flow](#setup-and-simulation-flow)
+  - [Verifying the Results](#verifying-the-results)
+- [Contributors](#contributors) 
 - [Original README Content](#original-readme-content)
-  - [Simulating the Standalone ITA Core](#simulating-the-standalone-ita-core)
-  - [Test Vector Generation](#test-vector-generation)
 - [Contributors](#contributors)
 - [License](#license)
 - [References](#references)
@@ -65,7 +64,72 @@ Below are diagrams of the top-level system and the memory controller we designed
 ![ITA-URAM-DMA Adapter Diagram](docs/img/ITA-URAM-DMA-Adapter-Diagram.png)
 
 ---
+## Getting Started: Running the Full FPGA System
 
+This guide will walk you through setting up the Vivado project and running a simulation of our complete FPGA system. The goal is to verify the end-to-end functionality, from loading data via a streaming interface to computing with the ITA core and streaming the results back out.
+
+### Requirements
+- Vivado 2023.1 or a compatible version.
+- A Python environment with the packages from `requirements.txt` installed. You can set this up by following the instructions in the original documentation under the "Test Vector Generation" section.
+
+### Setup and Simulation Flow
+
+The process involves three main stages: generating test data, parameterizing the hardware, and running the simulation.
+
+#### Step 1: Generate Test Vectors
+Our testbench reads input data (weights, queries, keys, etc.) and golden results from files. You must first generate these files using the original authors' `PyITA` scripts.
+
+1.  Navigate to the `PyITA` directory.
+2.  Run the test generator script. The parameters you choose (e.g., `-S` for sequence length) define the dimensions of the Transformer attention layer being tested.
+    ```bash
+    # Example for generating test vectors for a sequence length of 64:
+    python testGenerator.py -H 1 -S 64 -E 128 -P 192 -F 256 --no-bias --activation=identity
+    ```
+    *   This command will create the necessary stimuli and golden reference files in the `simvectors` directory. The hardware you configure in the next step must be able to support the dimensions you select here.
+
+#### Step 2: Create the Vivado Project
+We provide a Tcl script that automates the creation of the Vivado project, setting up all the necessary files and IP.
+
+1.  From the root directory of the repository, run the following command in your terminal:
+    ```bash
+    # This will create a 'vivado_prj' directory containing the project
+    vivado -mode batch -source setup_vivado.tcl
+    ```
+2.  **Optional - Hardware Parameterization:**
+    *   If you wish to change the level of parallelism in the hardware, you can edit the `setup_vivado.tcl` file before running the command.
+    *   Locate the `ITA_N` parameter. This value defines **the number of parallel processing engines** in the accelerator.
+    *   The script uses a default value 8, but you can change it to explore different hardware configurations (e.g., setting it to `16`).
+
+#### Step 3: Run the System Simulation
+1.  Open Vivado and use "Open Project" to open the project located in the newly created `vivado_prj` directory.
+2.  In the "Sources" panel on the left, expand the "Simulation Sources" hierarchy.
+3.  To run the primary system simulation, right-click on **`tb_ITA_FPGA_WRAPPER.sv`** and select **"Set as Top"**.
+4.  Click the **"Run Simulation"** button in the Flow Navigator pane.
+
+This testbench instantiates our complete FPGA wrapper. In the simulation, you can observe the entire inference process: input data is streamed into the on-chip memories, the main controller triggers the ITA core for computation, and the final results are streamed back out. This is the recommended testbench for verifying end-to-end functionality.
+
+### Verifying the Results
+
+The primary goal of the simulation is to confirm that our hardware produces bit-accurate results.
+
+The `tb_ITA_FPGA_WRAPPER.sv` testbench is designed to write the final output matrix from the hardware into a file within the simulation directory. You can then compare this output file against the "golden" reference files that were created by the Python `testGenerator.py` script in Step 1.
+
+A successful run is one where the hardware's output perfectly matches the golden reference file, confirming the correctness of our design.
+
+---
+## Contributors
+
+#### Original Authors (ITA Core)
+- **Gamze İslamoğlu** ([gislamoglu@iis.ee.ethz.ch](mailto:gislamoglu@iis.ee.ethz.ch))
+- **Philip Wiese** ([wiesep@iis.ee.ethz.ch](mailto:wiesep@iis.ee.ethz.ch))
+
+#### FPGA Adaptation and System Integration (Team AOHW25_216)
+- **Ipek Akdeniz** (Technical University of Munich) - [ipek.akdeniz@tum.de](mailto:ipek.akdeniz@tum.de)
+- **Osman Yaşar** (Technical University of Munich) - [osman.yasar@tum.de](mailto:osman.yasar@tum.de)
+- **Agustin Coppari Hollmann** (Technical University of Munich) - [agustin.coppari-hollmann@tum.de](mailto:agustin.coppari-hollmann@tum.de)
+- **Michael Lobis** (Technical University of Munich) - [michael.lobis@tum.de](mailto:michael.lobis@tum.de)
+
+---
 ## Original README Content
 
 <details>
