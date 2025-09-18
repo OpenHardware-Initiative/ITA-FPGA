@@ -66,6 +66,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/ita_kria_wrapper/ita_sequencer_k_step.sv" \
     "$ROOT/ita_kria_wrapper/ita_sequencer_v_step.sv" \
     "$ROOT/ita_kria_wrapper/ita_sequencer_qk_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_ow_step.sv" \
     "$ROOT/ita_kria_wrapper/ita_sequencer_av_step.sv" \
     "$ROOT/ita_kria_wrapper/ita_sequencer_f1_step.sv" \
     "$ROOT/ita_kria_wrapper/ita_sequencer_f2_step.sv" \
