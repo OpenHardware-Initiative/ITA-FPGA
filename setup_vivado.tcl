@@ -62,13 +62,13 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/ita_kria_wrapper/uram_memory_controller_ita_dma.sv" \
     "$ROOT/ita_kria_wrapper/ITA_FPGA_WRAPPER.sv" \
     "$ROOT/ita_kria_wrapper/ITA_AXI_WRAPPER.v" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_q_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_k_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_v_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_qk_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_av_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_f1_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_f2_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_q_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_k_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_v_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_qk_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_av_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_f1_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_f2_step.sv" \
 ]
 update_compile_order -fileset sources_1
 
