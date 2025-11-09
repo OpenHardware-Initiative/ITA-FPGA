@@ -62,13 +62,13 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/ita_kria_wrapper/uram_memory_controller_ita_dma.sv" \
     "$ROOT/ita_kria_wrapper/ITA_FPGA_WRAPPER.sv" \
     "$ROOT/ita_kria_wrapper/ITA_AXI_WRAPPER.v" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_q_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_k_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_v_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_qk_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_av_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_f1_step.sv" \
-    "$ROOT/ita_kria_wrapper/ita_sequencer_hardcoded_f2_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_q_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_k_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_v_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_qk_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_av_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_f1_step.sv" \
+    "$ROOT/ita_kria_wrapper/ita_sequencer_f2_step.sv" \
 ]
 update_compile_order -fileset sources_1
 
@@ -124,9 +124,9 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_demux_static.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/tcdm/hwpe_stream_tcdm_reorder_static.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_buffer.sv" \
-    "$ROOT/no_latches/hwpe_stream_fifo_scm.sv" \
+    "$ROOT/latch_free_files_ita/hwpe_stream_fifo_scm.sv" \
     "$ROOT/.bender/git/checkouts/hci-5c5dd55394261a4b/rtl/core/hci_core_mux_ooo.sv" \
-    "$ROOT/no_latches/hwpe_stream_fifo.sv" \
+    "$ROOT/latch_free_files_ita/hwpe_stream_fifo.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_assign.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/basic/hwpe_stream_fence.sv" \
     "$ROOT/.bender/git/checkouts/hwpe-stream-5514f8f76c0edc16/rtl/fifo/hwpe_stream_fifo_ctrl.sv" \
@@ -193,7 +193,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/addr_decode_dync.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/passthrough_stream_fifo.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_filter.sv" \
-    "$ROOT/no_latches/hwpe_ctrl_regfile_latch_test_wrap.sv" \
+    "$ROOT/latch_free_files_ita/hwpe_ctrl_regfile_latch_test_wrap.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/cdc_2phase_clearable.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_mux.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/deprecated/pulp_buffer.sv" \
@@ -201,7 +201,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/rstgen_bypass.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/edge_propagator_tx.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/rr_arb_tree.sv" \
-    "$ROOT/no_latches/hwpe_ctrl_regfile_ff.sv" \
+    "$ROOT/latch_free_files_ita/hwpe_ctrl_regfile_ff.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/ecc_encode.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/fall_through_register.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/popcount.sv" \
@@ -212,7 +212,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_throttle.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/binary_to_gray.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/isochronous_4phase_handshake.sv" \
-    "$ROOT/no_latches/hwpe_ctrl_slave.sv" \
+    "$ROOT/latch_free_files_ita/hwpe_ctrl_slave.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_delay.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/mem_to_banks.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_fifo.sv" \
@@ -248,7 +248,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_join.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/stream_arbiter.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/sub_per_hash.sv" \
-    "$ROOT/no_latches/hwpe_ctrl_regfile.sv" \
+    "$ROOT/latch_free_files_ita/hwpe_ctrl_regfile.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/fpga/tc_clk_xilinx.sv" \
     "$ROOT/.bender/git/checkouts/common_cells-a9dda427ecf0aef2/src/multiaddr_decode.sv" \
     "$ROOT/.bender/git/checkouts/tech_cells_generic-55fa3871c0dd2458/src/deprecated/pulp_clock_gating_async.sv" \
@@ -278,7 +278,7 @@ add_files -norecurse -scan_for_includes [list \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_all.sv" \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1w_64b_1r_32b.sv" \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/latch_scm/register_file_multi_way_1w_multi_port_read.sv" \
-    "$ROOT/no_latches/register_file_1r_1w.sv" \
+    "$ROOT/latch_free_files_ita/register_file_1r_1w.sv" \
     "$ROOT/.bender/git/checkouts/scm-a479c2e455a7e638/fpga_scm/register_file_1r_1w_1row.sv" \
 ]
 update_compile_order -fileset sources_1
